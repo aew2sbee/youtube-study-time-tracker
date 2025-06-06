@@ -16,10 +16,7 @@ export default function Page() {
       try {
         const res = await fetch('/api/youtube');
         if (!res.ok) throw new Error(`Error: ${res.status}`);
-        // 取得データが items 配列として来ている想定なら、
-        // 必要なフィールドだけ抽出
         if (res) {
-          // setMessages(calculateStudyTime(utcDate, res));
           const data = await res.json();
           const startOnlyMsg = fillterChatMessages(data);
           console.log('Fetched messages:', startOnlyMsg);
@@ -38,19 +35,26 @@ export default function Page() {
     fetchLiveChat();
   }, []);
 
-  if (loading) return <p>Loading chat messages...</p>;
-  if (error) return <p>Error: {error}</p>;
+  if (loading) return <p className="text-center text-gray-500">Loading chat messages...</p>;
+  if (error) return <p className="text-center text-red-500">Error: {error}</p>;
 
   return (
-    <main>
-      <h1>This Week Study Time Ranking</h1>
-      <ul>
-        {messages.map((msg, idx) => (
-          <li key={idx}>
-            <strong>{msg.user}</strong><p>{msg.displayStudyTime}</p>
-          </li>
-        ))}
-      </ul>
+    <main className="min-h-screen bg-transparent p-6">
+      <div className="max-w-4xl mx-auto bg-transparent shadow-md rounded-lg p-6">
+        <h1 className="text-2xl font-bold text-white mb-4">Today's Study Time</h1>
+        <h2 className="text-l font-bold text-white mb-4">(Real-Time Updates Every 30 Minutes)</h2>
+        <ul className="space-y-4">
+          {messages.map((msg, idx) => (
+            <li
+              key={idx}
+              className="flex items-center gap-x-2 bg-transparent p-4 rounded-lg shadow-sm hover:bg-gray-100"
+            >
+              <div className="text-lg font-medium text-white">{msg.user}</div>
+              <div className="text-sm text-white">{msg.displayStudyTime}</div>
+            </li>
+          ))}
+        </ul>
+      </div>
     </main>
   );
 }
