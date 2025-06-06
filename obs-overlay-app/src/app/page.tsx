@@ -35,21 +35,21 @@ export default function Page() {
     // 30分ごとに実行
     const interval = setInterval(() => {
       fetchLiveChat();
-    }, 15 * 60 * 1000); // 30分 = 30 * 60 * 1000 ミリ秒
+    }, 1 * 60 * 1000); // 15分 = 15 * 60 * 1000 ミリ秒
 
     // クリーンアップ処理
     return () => clearInterval(interval);
   }, []);
 
-  useEffect(() => {
-    // 10秒ごとに次の3件を表示
-    const interval = setInterval(() => {
-      setCurrentIndex((prevIndex) => (prevIndex + 3) % messages.length);
-    }, 3 * 1000); // 3秒 = 3 * 1000 ミリ秒
+  // useEffect(() => {
+  //   // 10秒ごとに次の3件を表示
+  //   const interval = setInterval(() => {
+  //     setCurrentIndex((prevIndex) => (prevIndex + 3) % messages.length);
+  //   }, 3 * 1000); // 3秒 = 3 * 1000 ミリ秒
 
-    // クリーンアップ処理
-    return () => clearInterval(interval);
-  }, [messages]);
+  //   // クリーンアップ処理
+  //   return () => clearInterval(interval);
+  // }, [messages]);
 
   if (loading)
     return (
@@ -58,7 +58,7 @@ export default function Page() {
   if (error) return <p className="text-center text-red-500">Error: {error}</p>;
 
   return (
-    <main className="min-h-screen bg-transparent p-6">
+    <main className="min-h-screen bg-transparent p-12">
       <div className="mx-auto bg-transparent shadow-md rounded-lg p-6">
         <h1 className="font-bold text-white mb-4">
           Today's Study Time
