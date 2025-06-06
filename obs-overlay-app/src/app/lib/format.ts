@@ -6,11 +6,17 @@ const START_MESSAGE = 'study start';
 export const fillterChatMessages = (
   youTubeChat: YouTubeChat[]
 ): YouTubeChat[] => {
-  const studyRecordList = youTubeChat.filter((msg) => {
+  const uniqueMessages = new Map<string, YouTubeChat>();
+
+  youTubeChat.forEach((msg) => {
     const lowerMessage = msg.displayMessage.toLowerCase();
-    return lowerMessage.includes(START_MESSAGE);
+    if (lowerMessage.includes(START_MESSAGE)) {
+      // ユーザー名をキーとして後のデータで上書き
+      uniqueMessages.set(msg.displayName, msg);
+    }
   });
-  return studyRecordList;
+
+  return Array.from(uniqueMessages.values());
 };
 
 // export const formatChatMessages = (youTubeChat: YouTubeChat[]): StudyRecord => {
