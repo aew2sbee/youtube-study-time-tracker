@@ -1,20 +1,13 @@
 'use client'; // Reactのクライアントコンポーネントとして動かす場合
 
 import React, { useEffect, useState } from 'react';
-import { calculateStudyTime } from './lib/formatChat';
-import { saveJson } from './lib/saveChat';
-import { readJson } from './lib/json';
-import { fillterChatMessages, formatChatMessages } from './lib/format';
-
-type ChatMessage = {
-  displayName: string;
-  displayMessage: string;
-  publishedAt: string;
-};
+import { fillterChatMessages } from './lib/format';
+import { calculateStudyTime } from './lib/calculateTime';
+import { StudyRecord } from '@/types/chat';
 
 export default function Page() {
   const utcDate = new Date();
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [messages, setMessages] = useState<StudyRecord[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -27,18 +20,11 @@ export default function Page() {
         // 必要なフィールドだけ抽出
         if (res) {
           // setMessages(calculateStudyTime(utcDate, res));
-          fillterChatMessages(res);
-          formatChatMessages(res);
-          saveJson(utcDate, res);
-          readJson(utcDate).then((data) => {
-            setMessages(data);
-          });
-        } else if (Array.isArray(res)) {
-          setMessages(res.map((msg: any) => ({
-            displayName: msg.displayName,
-            displayMessage: msg.displayMessage,
-            publishedAt: new Date(msg.publishedAtJst).toISOString(),
-          })));
+          const data = await res.json();
+          const startOnlyMsg = fillterChatMessages(data);
+          console.log('Fetched messages:', startOnlyMsg);
+          const studyRecord = calculateStudyTime(utcDate, startOnlyMsg);
+          setMessages(studyRecord);
         } else {
           setError('Invalid data format');
         }
@@ -61,8 +47,7 @@ export default function Page() {
       <ul>
         {messages.map((msg, idx) => (
           <li key={idx}>
-            <strong>{msg.displayName}</strong> [{new Date(msg.publishedAt).toLocaleTimeString('ja-JP')}]:{' '}
-            {msg.displayMessage}
+            <strong>{msg.user}</strong><p>{msg.displayStudyTime}</p>
           </li>
         ))}
       </ul>

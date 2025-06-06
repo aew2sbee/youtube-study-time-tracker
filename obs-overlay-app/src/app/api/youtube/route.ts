@@ -26,7 +26,7 @@ export async function GET() {
     }
     const liveChatId =
       videoRes.data.items?.[0]?.liveStreamingDetails?.activeLiveChatId;
-    console.log('liveChatId:', liveChatId);
+    // console.log('liveChatId:', liveChatId);
 
     if (!liveChatId) {
       return NextResponse.json(
@@ -52,9 +52,9 @@ export async function GET() {
     const extracted: YouTubeChat[] = items.map((item) => ({
       displayName: item.authorDetails!.displayName,
       displayMessage: item.snippet!.displayMessage,
-      publishedAtJst: item.snippet!.publishedAt,
+      publishedAt: item.snippet!.publishedAt,
     }));
-    console.log('Chat response:', extracted);
+    // console.log('Chat response:', extracted);
     return NextResponse.json(extracted);
   } catch (error) {
     console.error('YouTube API error', error);

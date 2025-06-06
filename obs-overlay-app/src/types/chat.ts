@@ -5,8 +5,6 @@ export type YouTubeChat = {
 };
 
 export type StudyRecord = {
-  [userName: string]: {
-    start: Date | null; // ISO 8601形式のタイムスタンプ
-    end: Date | null;
-  };
+  user: string;
+  displayStudyTime: string;
 };
