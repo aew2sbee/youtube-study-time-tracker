@@ -1,3 +1,4 @@
+import { YouTubeChat } from '@/types/chat';
 import { google } from 'googleapis';
 import { NextResponse } from 'next/server';
 
@@ -17,6 +18,12 @@ export async function GET() {
       id: [VIDEO_ID],
     });
     // console.log('Video response:', videoRes);
+    if (!videoRes.data.items || videoRes.data.items.length === 0) {
+      return NextResponse.json(
+        { error: 'Video not found or not a live stream' },
+        { status: 404 }
+      );
+    }
     const liveChatId =
       videoRes.data.items?.[0]?.liveStreamingDetails?.activeLiveChatId;
     console.log('liveChatId:', liveChatId);
@@ -34,12 +41,18 @@ export async function GET() {
       liveChatId,
       maxResults: 200,
     });
+    if (!chatRes.data.items || chatRes.data.items.length === 0) {
+      return NextResponse.json(
+        { error: 'No chat messages found' },
+        { status: 404 }
+      );
+    }
     const items = chatRes.data.items;
 
-    const extracted = items.map((item) => ({
-      displayName: item.authorDetails.displayName,
-      displayMessage: item.snippet.displayMessage,
-      publishedAtJst: convertToJST(item.snippet.publishedAt),
+    const extracted: YouTubeChat[] = items.map((item) => ({
+      displayName: item.authorDetails!.displayName,
+      displayMessage: item.snippet!.displayMessage,
+      publishedAtJst: item.snippet!.publishedAt,
     }));
     console.log('Chat response:', extracted);
     return NextResponse.json(extracted);
@@ -51,14 +64,3 @@ export async function GET() {
     );
   }
 }
-
-/**
- * UTC日時文字列を日本標準時(JST)のDateオブジェクトに変換する
- * @param {string} utcString - UTC形式の日時文字列
- * @returns {Date} JSTの日時を表すDateオブジェクト
- */
-const convertToJST = (utcString: string): Date => {
-  const utcDate = new Date(utcString);
-  const jstTimestamp = utcDate.getTime() + 9 * 60 * 60 * 1000;
-  return new Date(jstTimestamp);
-};
