@@ -1,4 +1,4 @@
-import { StudyRecord, YouTubeChat } from '@/types/chat';
+import { YouTubeChat } from '@/types/chat';
 
 const START_MESSAGE = 'study start';
 // const END_MESSAGE = 'study end';

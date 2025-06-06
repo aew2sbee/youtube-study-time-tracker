@@ -35,7 +35,7 @@ export default function Page() {
     // 30分ごとに実行
     const interval = setInterval(() => {
       fetchLiveChat();
-    }, 30 * 60 * 1000); // 30分 = 30 * 60 * 1000 ミリ秒
+    }, 15 * 60 * 1000); // 30分 = 30 * 60 * 1000 ミリ秒
 
     // クリーンアップ処理
     return () => clearInterval(interval);
@@ -59,21 +59,21 @@ export default function Page() {
 
   return (
     <main className="min-h-screen bg-transparent p-6">
-      <div className="max-w-4xl mx-auto bg-transparent shadow-md rounded-lg p-6">
-        <h1 className="text-2xl font-bold text-white mb-4">
+      <div className="mx-auto bg-transparent shadow-md rounded-lg p-6">
+        <h1 className="font-bold text-white mb-4">
           Today's Study Time
         </h1>
-        <h2 className="text-l font-bold text-white mb-4">
-          (Real-Time Updates Every 30 Minutes)
-        </h2>
+        {/* <h2 className="font-bold text-white mb-4">
+          (Real-Time Updates Every 15 Minutes)
+        </h2> */}
         <ul className="space-y-1">
           {messages.slice(currentIndex, currentIndex + 3).map((msg, idx) => (
             <li
               key={idx}
-              className="flex items-center gap-x-2 bg-transparent p-2 rounded-lg shadow-sm"
+              className="flex items-center gap-x-2 bg-transparent p-16 rounded-lg shadow-sm"
             >
-              <div className="text-lg text-white">{msg.user}</div>
-              <div className="text-lg font-medium text-white">{msg.displayStudyTime}</div>
+              <div className="text-white pr-16">{msg.user}</div>
+              <div className="font-medium text-white">{msg.displayStudyTime}</div>
             </li>
           ))}
         </ul>

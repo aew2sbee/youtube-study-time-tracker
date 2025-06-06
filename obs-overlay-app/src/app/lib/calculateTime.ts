@@ -24,5 +24,5 @@ const calcTimeDiff = (utcDate: Date, publishedAt: Date): string => {
   const diffSec = Math.floor(diffMs / 1000);
   const hours = Math.floor(diffSec / 3600);
   const minutes = Math.floor((diffSec % 3600) / 60);
-  return `${hours}時間 ${minutes}分`;
+  return `${hours}h ${minutes}min`;
 };
