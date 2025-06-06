@@ -11,28 +11,33 @@ export default function Page() {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    async function fetchLiveChat() {
-      try {
-        const res = await fetch('/api/youtube');
-        if (!res.ok) throw new Error(`Error: ${res.status}`);
-        if (res) {
-          const data = await res.json();
-          const startOnlyMsg = fillterChatMessages(data);
-          console.log('Fetched messages:', startOnlyMsg);
-          const studyRecord = calculateStudyTime(utcDate, startOnlyMsg);
-          setMessages(studyRecord);
-        } else {
-          setError('Invalid data format');
-        }
-      } catch (err: any) {
-        setError(err.message || 'Fetch error');
-      } finally {
-        setLoading(false);
-      }
+  const fetchLiveChat = async () => {
+    try {
+      const res = await fetch('/api/youtube');
+      if (!res.ok) throw new Error(`Error: ${res.status}`);
+      const data = await res.json();
+      const startOnlyMsg = fillterChatMessages(data);
+      console.log('Fetched messages:', startOnlyMsg);
+      const studyRecord = calculateStudyTime(utcDate, startOnlyMsg);
+      setMessages(studyRecord);
+    } catch (err: any) {
+      setError(err.message || 'Fetch error');
+    } finally {
+      setLoading(false);
     }
+  };
 
+  useEffect(() => {
+    // 初回実行
     fetchLiveChat();
+
+    // 30分ごとに実行
+    const interval = setInterval(() => {
+      fetchLiveChat();
+    }, 30 * 60 * 1000); // 30分 = 30 * 60 * 1000 ミリ秒
+
+    // クリーンアップ処理
+    return () => clearInterval(interval);
   }, []);
 
   if (loading) return <p className="text-center text-gray-500">Loading chat messages...</p>;
