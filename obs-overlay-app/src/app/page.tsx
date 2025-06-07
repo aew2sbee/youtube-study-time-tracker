@@ -1,6 +1,6 @@
 'use client'; // Reactのクライアントコンポーネントとして動かす場合
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { fillterChatMessages } from './lib/format';
 import { calculateStudyTime } from './lib/calculateTime';
 import { StudyRecord } from '@/types/chat';
@@ -12,7 +12,7 @@ export default function Page() {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchLiveChat = async () => {
+  const fetchLiveChat = useCallback(async () => {
     try {
       const res = await fetch('/api/youtube');
       if (!res.ok) throw new Error(`Error: ${res.status}`);
@@ -29,7 +29,7 @@ export default function Page() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [utcDate]);
 
   useEffect(() => {
     // 初回実行
@@ -49,7 +49,7 @@ export default function Page() {
       clearInterval(fetchInterval);
       clearInterval(displayInterval);
     };
-  }, [record.length]); // record.length に変更
+  }, [fetchLiveChat, record.length]); // fetchLiveChat を依存関係に追加
 
   if (loading)
     return <p className="text-center text-white">Loading chat messages...</p>;
