@@ -20,8 +20,12 @@ export default function Page() {
       const fillteredMessages = fillterChatMessages(data);
       const studyRecord = calculateStudyTime(utcDate, fillteredMessages);
       setRecord(studyRecord);
-    } catch (err: any) {
-      setError(err.message || 'Fetch error');
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError('An unknown error occurred');
+      }
     } finally {
       setLoading(false);
     }
