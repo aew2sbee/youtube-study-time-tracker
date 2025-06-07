@@ -1,18 +1,18 @@
 'use client'; // Reactのクライアントコンポーネントとして動かす場合
 
-import React, { useEffect, useState, useCallback, useMemo } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { fillterChatMessages } from './lib/format';
 import { calculateStudyTime } from './lib/calculateTime';
 import { StudyRecord } from '@/types/chat';
 
 export default function Page() {
-  const utcDate = useMemo(() => new Date(), []); // utcDate をメモ化
   const [record, setRecord] = useState<StudyRecord[]>([]);
   const [currentIndex, setCurrentIndex] = useState<number>(0); // 現在の表示インデックス
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
   const fetchLiveChat = useCallback(async () => {
+    const utcDate = new Date(); // 実行時に現在時刻を取得
     try {
       const res = await fetch('/api/youtube');
       if (!res.ok) throw new Error(`Error: ${res.status}`);
@@ -28,8 +28,9 @@ export default function Page() {
       }
     } finally {
       setLoading(false);
+      console.log('utcDate', utcDate);
     }
-  }, [utcDate]); // utcDate はメモ化されているため依存関係が安定
+  }, []);
 
   useEffect(() => {
     // 初回実行
