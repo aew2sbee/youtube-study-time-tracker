@@ -1,6 +1,8 @@
 import { StudyRecord, YouTubeChat } from '@/types/chat';
 import { MESSAGE } from '../constant/chat';
 
+const NOT_FOUND = -1 as const;
+
 export const calculateStudyTime = (
   utcDate: Date,
   messages: YouTubeChat[]
@@ -20,10 +22,10 @@ export const calculateStudyTime = (
         msg.displayName === user &&
         msg.displayMessage.toLowerCase() === MESSAGE.END
     );
-    if (startIndex === -1 || endIndex === -1 || startIndex >= endIndex) {
+    if (startIndex === NOT_FOUND || endIndex === NOT_FOUND || startIndex >= endIndex) {
       continue; // 開始または終了メッセージが見つからない、または順序が正しくない場合はスキップ
     }
-    if (endIndex === -1 || startIndex >= endIndex) {
+    if (endIndex === NOT_FOUND || startIndex >= endIndex) {
       studyRecordList.push({
         user: user,
         displayStudyTime: calcTimeDiff(
