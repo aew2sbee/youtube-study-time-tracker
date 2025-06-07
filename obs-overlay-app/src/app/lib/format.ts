@@ -1,8 +1,6 @@
 import { YouTubeChat } from '@/types/chat';
 import { MESSAGE } from '../constant/chat';
 
-
-
 export const fillterChatMessages = (
   youTubeChat: YouTubeChat[]
 ): YouTubeChat[] => {
