@@ -38,7 +38,7 @@ export default function Page() {
     // タイマー設定
     const fetchInterval = setInterval(() => {
       fetchLiveChat();
-    }, 30 * 60 * 1000); // 30分 = 30 * 60 * 1000 ミリ秒
+    }, 15 * 60 * 1000); // 15分 = 15 * 60 * 1000 ミリ秒
 
     const displayInterval = setInterval(() => {
       setCurrentIndex((prevIndex) => (prevIndex + 3) % record.length);
@@ -49,7 +49,7 @@ export default function Page() {
       clearInterval(fetchInterval);
       clearInterval(displayInterval);
     };
-  }, [record]);
+  }, [record.length]); // record.length に変更
 
   if (loading)
     return <p className="text-center text-white">Loading chat messages...</p>;
