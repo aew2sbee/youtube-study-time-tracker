@@ -7,7 +7,7 @@ import { StudyRecord } from '@/types/chat';
 
 export default function Page() {
   const utcDate = new Date();
-  const [messages, setMessages] = useState<StudyRecord[]>([]);
+  const [record, setRecord] = useState<StudyRecord[]>([]);
   const [currentIndex, setCurrentIndex] = useState<number>(0); // 現在の表示インデックス
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -18,9 +18,8 @@ export default function Page() {
       if (!res.ok) throw new Error(`Error: ${res.status}`);
       const data = await res.json();
       const fillteredMessages = fillterChatMessages(data);
-      console.log('Fetched messages:', fillteredMessages);
       const studyRecord = calculateStudyTime(utcDate, fillteredMessages);
-      setMessages(studyRecord);
+      setRecord(studyRecord);
     } catch (err: any) {
       setError(err.message || 'Fetch error');
     } finally {
@@ -32,48 +31,40 @@ export default function Page() {
     // 初回実行
     fetchLiveChat();
 
-    // 30分ごとに実行
-    const interval = setInterval(() => {
+    // タイマー設定
+    const fetchInterval = setInterval(() => {
       fetchLiveChat();
-    }, 1 * 60 * 1000); // 15分 = 15 * 60 * 1000 ミリ秒
+    }, 30 * 60 * 1000); // 30分 = 30 * 60 * 1000 ミリ秒
+
+    const displayInterval = setInterval(() => {
+      setCurrentIndex((prevIndex) => (prevIndex + 3) % record.length);
+    }, 3 * 1000); // 3秒 = 3 * 1000 ミリ秒
 
     // クリーンアップ処理
-    return () => clearInterval(interval);
-  }, []);
-
-  // useEffect(() => {
-  //   // 10秒ごとに次の3件を表示
-  //   const interval = setInterval(() => {
-  //     setCurrentIndex((prevIndex) => (prevIndex + 3) % messages.length);
-  //   }, 3 * 1000); // 3秒 = 3 * 1000 ミリ秒
-
-  //   // クリーンアップ処理
-  //   return () => clearInterval(interval);
-  // }, [messages]);
+    return () => {
+      clearInterval(fetchInterval);
+      clearInterval(displayInterval);
+    };
+  }, [record]);
 
   if (loading)
-    return (
-      <p className="text-center text-gray-500">Loading chat messages...</p>
-    );
+    return <p className="text-center text-white">Loading chat messages...</p>;
   if (error) return <p className="text-center text-red-500">Error: {error}</p>;
 
   return (
     <main className="min-h-screen bg-transparent p-12">
-      <div className="mx-auto bg-transparent shadow-md rounded-lg p-6">
-        <h1 className="font-bold text-white mb-4">
-          Today's Study Time
-        </h1>
-        {/* <h2 className="font-bold text-white mb-4">
-          (Real-Time Updates Every 15 Minutes)
-        </h2> */}
+      <div className="mx-auto bg-transparent p-6">
+        <h1 className="font-bold text-white mb-4">Study Time for Today</h1>
         <ul className="space-y-1">
-          {messages.slice(currentIndex, currentIndex + 3).map((msg, idx) => (
+          {record.slice(currentIndex, currentIndex + 3).map((msg, idx) => (
             <li
               key={idx}
-              className="flex items-center gap-x-2 bg-transparent p-16 rounded-lg shadow-sm"
+              className="flex items-center gap-x-2 bg-transparent p-16"
             >
               <div className="text-white pr-16">{msg.user}</div>
-              <div className="font-medium text-white">{msg.displayStudyTime}</div>
+              <div className="font-medium text-white">
+                {msg.displayStudyTime}
+              </div>
             </li>
           ))}
         </ul>
