@@ -1,4 +1,4 @@
-'use client'; // Reactのクライアントコンポーネントとして動かす場合
+'use client';
 
 import { useEffect, useState, useCallback } from 'react';
 import { fillterChatMessages } from './lib/format';
@@ -7,12 +7,12 @@ import { StudyRecord } from '@/types/chat';
 
 export default function Page() {
   const [record, setRecord] = useState<StudyRecord[]>([]);
-  const [currentIndex, setCurrentIndex] = useState<number>(0); // 現在の表示インデックス
+  const [currentIndex, setCurrentIndex] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
   const fetchLiveChat = useCallback(async () => {
-    const utcDate = new Date(); // 実行時に現在時刻を取得
+    const utcDate = new Date();
     try {
       const res = await fetch('/api/youtube');
       if (!res.ok) throw new Error(`Error: ${res.status}`);
@@ -33,24 +33,21 @@ export default function Page() {
   }, []);
 
   useEffect(() => {
-    // 初回実行
     fetchLiveChat();
 
-    // タイマー設定
     const fetchInterval = setInterval(() => {
       fetchLiveChat();
-    }, 15 * 60 * 1000); // 15分 = 15 * 60 * 1000 ミリ秒
+    }, 15 * 60 * 1000);
 
     const displayInterval = setInterval(() => {
       setCurrentIndex((prevIndex) => (prevIndex + 3) % record.length);
-    }, 3 * 1000); // 3秒 = 3 * 1000 ミリ秒
+    }, 5 * 1000);
 
-    // クリーンアップ処理
     return () => {
       clearInterval(fetchInterval);
       clearInterval(displayInterval);
     };
-  }, [fetchLiveChat, record.length]); // fetchLiveChat を依存関係に追加
+  }, [fetchLiveChat, record.length]);
 
   if (loading)
     return <p className="text-center text-white">Loading chat messages...</p>;
@@ -64,7 +61,7 @@ export default function Page() {
           {record.slice(currentIndex, currentIndex + 3).map((msg, idx) => (
             <li
               key={idx}
-              className="flex items-center gap-x-2 bg-transparent p-16"
+              className="flex items-center gap-x-2 bg-transparent px-16"
             >
               <div className="text-white pr-16">{msg.user}</div>
               <div className="font-medium text-white">
