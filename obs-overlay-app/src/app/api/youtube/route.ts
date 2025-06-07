@@ -5,6 +5,13 @@ import { NextResponse } from 'next/server';
 const YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY;
 const VIDEO_ID = process.env.VIDEO_ID;
 
+if (!VIDEO_ID) {
+  return NextResponse.json(
+    { error: 'VIDEO_ID environment variable is not set' },
+    { status: 400 }
+  );
+}
+
 export async function GET() {
   try {
     const youtube = google.youtube({

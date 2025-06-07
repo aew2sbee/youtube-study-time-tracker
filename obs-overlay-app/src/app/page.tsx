@@ -17,9 +17,9 @@ export default function Page() {
       const res = await fetch('/api/youtube');
       if (!res.ok) throw new Error(`Error: ${res.status}`);
       const data = await res.json();
-      const startOnlyMsg = fillterChatMessages(data);
-      console.log('Fetched messages:', startOnlyMsg);
-      const studyRecord = calculateStudyTime(utcDate, startOnlyMsg);
+      const fillteredMessages = fillterChatMessages(data);
+      console.log('Fetched messages:', fillteredMessages);
+      const studyRecord = calculateStudyTime(utcDate, fillteredMessages);
       setMessages(studyRecord);
     } catch (err: any) {
       setError(err.message || 'Fetch error');
