@@ -1,12 +1,12 @@
 'use client'; // Reactのクライアントコンポーネントとして動かす場合
 
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { fillterChatMessages } from './lib/format';
 import { calculateStudyTime } from './lib/calculateTime';
 import { StudyRecord } from '@/types/chat';
 
 export default function Page() {
-  const utcDate = new Date();
+  const utcDate = useMemo(() => new Date(), []); // utcDate をメモ化
   const [record, setRecord] = useState<StudyRecord[]>([]);
   const [currentIndex, setCurrentIndex] = useState<number>(0); // 現在の表示インデックス
   const [loading, setLoading] = useState<boolean>(true);
@@ -29,7 +29,7 @@ export default function Page() {
     } finally {
       setLoading(false);
     }
-  }, [utcDate]);
+  }, [utcDate]); // utcDate はメモ化されているため依存関係が安定
 
   useEffect(() => {
     // 初回実行
