@@ -66,5 +66,5 @@ const calcTimeDiff = (startPublishedAt: Date, endPublishedAt: Date): string => {
   const diffSec = Math.floor(diffMs / 1000);
   const hours = Math.floor(diffSec / 3600);
   const minutes = Math.floor((diffSec % 3600) / 60);
-  return `${hours}h ${minutes}min`;
+  return `${hours}:${minutes}`;
 };
