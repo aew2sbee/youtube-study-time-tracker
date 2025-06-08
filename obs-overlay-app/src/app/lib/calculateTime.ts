@@ -9,6 +9,7 @@ export const calculateStudyTime = (
 ): StudyRecord[] => {
   const studyRecordList: StudyRecord[] = [];
 
+  if (messages.length === 0) return studyRecordList;
   // messagesからユニークなdisplayNameを抽出する
   const uniqueUserList = getUniqueDisplayNames(messages);
   for (const user of uniqueUserList) {
@@ -22,10 +23,10 @@ export const calculateStudyTime = (
         msg.displayName === user &&
         msg.displayMessage.toLowerCase() === MESSAGE.END
     );
-    if (startIndex === NOT_FOUND || endIndex === NOT_FOUND || startIndex >= endIndex) {
+    if (startIndex === NOT_FOUND || startIndex <= endIndex) {
       continue; // 開始または終了メッセージが見つからない、または順序が正しくない場合はスキップ
     }
-    if (endIndex === NOT_FOUND || startIndex >= endIndex) {
+    if (endIndex === NOT_FOUND) {
       studyRecordList.push({
         user: user,
         displayStudyTime: calcTimeDiff(
@@ -33,6 +34,7 @@ export const calculateStudyTime = (
           utcDate
         ),
       });
+      break;
     }
     if (startIndex >= endIndex) {
       studyRecordList.push({
@@ -42,9 +44,10 @@ export const calculateStudyTime = (
           new Date(messages[endIndex].publishedAt)
         ),
       });
+      break;
     }
   }
-  return studyRecordList
+  return studyRecordList;
 };
 
 const getUniqueDisplayNames = (messages: YouTubeChat[]): Set<string> => {
@@ -66,5 +69,5 @@ const calcTimeDiff = (startPublishedAt: Date, endPublishedAt: Date): string => {
   const diffSec = Math.floor(diffMs / 1000);
   const hours = Math.floor(diffSec / 3600);
   const minutes = Math.floor((diffSec % 3600) / 60);
-  return `${hours}:${minutes}`;
+  return hours === 0 ? `${minutes}min` : `${hours}h ${minutes}min`;
 };
