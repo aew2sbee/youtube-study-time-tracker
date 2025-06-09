@@ -3,64 +3,53 @@ import { google } from 'googleapis'
 import { NextResponse } from 'next/server'
 
 const YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY
-const VIDEO_ID = process.env.VIDEO_ID
+const YOUTUBE_CHANNEL_ID = process.env.YOUTUBE_CHANNEL_ID
 
 export async function GET() {
   try {
     logWithTimestamp('Starting YouTube API request...')
+
+    if (!YOUTUBE_API_KEY) {
+      logWithTimestamp('Environment variables of youtube api key is not defined')
+      return NextResponse.json({ error: 'Environment variables of youtube api key is not defined' }, { status: 400 })
+    }
+
+    if (!YOUTUBE_CHANNEL_ID) {
+      logWithTimestamp('Environment variables of youtube channel id is not defined')
+      return NextResponse.json({ error: 'Environment variables of youtube channel id is not defined' }, { status: 400 })
+    }
+
     const youtube = google.youtube({
       version: 'v3',
       auth: YOUTUBE_API_KEY
     })
 
+    logWithTimestamp('Fetching live broadcasts...')
+    const searchRes = await youtube.search.list({
+      part: 'id', // 修正: 配列ではなく文字列
+      channelId: YOUTUBE_CHANNEL_ID, // 修正: 配列ではなく文字列
+      eventType: 'live', // 修正: 配列ではなく文字列
+      type: 'video', // 修正: 配列ではなく文字列
+      maxResults: 1
+    })
+    logWithTimestamp(`Search response: ${JSON.stringify(searchRes.data)}`)
+
+    if (!searchRes.data.items || searchRes.data.items.length === 0) {
+      logWithTimestamp('No live broadcasts found')
+      return NextResponse.json({ error: 'No live broadcasts found' }, { status: 404 })
+    }
+
+    const VIDEO_ID = searchRes.data.items[0].id?.videoId
+    logWithTimestamp(`Found VIDEO_ID: ${VIDEO_ID}`)
+
     if (!VIDEO_ID) {
-      logWithTimestamp('VIDEO_ID is not defined in environment variables')
-      return NextResponse.json({ error: 'VIDEO_ID is not defined in environment variables' }, { status: 400 })
+      logWithTimestamp('VIDEO_ID not found')
+      return NextResponse.json({ error: 'VIDEO_ID not found' }, { status: 404 })
     }
 
-    logWithTimestamp('Fetching video details...')
-    const videoRes = await youtube.videos.list({
-      part: ['liveStreamingDetails'],
-      id: [VIDEO_ID!] // VIDEO_ID が undefined でないことを保証
-    })
-    logWithTimestamp(`Video response: ${JSON.stringify(videoRes.data)}`)
-
-    if (!videoRes.data.items || videoRes.data.items.length === 0) {
-      logWithTimestamp('Video not found or not a live stream')
-      return NextResponse.json({ error: 'Video not found or not a live stream' }, { status: 404 })
-    }
-    const liveChatId = videoRes.data.items?.[0]?.liveStreamingDetails?.activeLiveChatId
-    logWithTimestamp(`Live chat ID: ${liveChatId}`)
-
-    if (!liveChatId) {
-      logWithTimestamp('Live chat ID not found')
-      return NextResponse.json({ error: 'Live chat ID not found' }, { status: 404 })
-    }
-
-    logWithTimestamp('Fetching live chat messages...')
-    const chatRes = await youtube.liveChatMessages.list({
-      part: ['snippet', 'authorDetails'],
-      liveChatId,
-      maxResults: 200
-    })
-    logWithTimestamp(`Chat response: ${JSON.stringify(chatRes.data)}`)
-
-    if (!chatRes.data.items || chatRes.data.items.length === 0) {
-      logWithTimestamp('No chat messages found')
-      return NextResponse.json({ error: 'No chat messages found' }, { status: 404 })
-    }
-    const items = chatRes.data.items
-
-    const extracted = items.map((item) => ({
-      displayName: item.authorDetails!.displayName,
-      displayMessage: item.snippet!.displayMessage,
-      publishedAt: item.snippet!.publishedAt
-    }))
-    logWithTimestamp(`Extracted chat messages: ${JSON.stringify(extracted)}`)
-
-    return NextResponse.json(extracted)
+    return NextResponse.json({ videoId: VIDEO_ID })
   } catch (error) {
     logWithTimestamp(`YouTube API error: ${error}`)
-    return NextResponse.json({ error: 'Failed to fetch live chat' }, { status: 500 })
+    return NextResponse.json({ error: 'Failed to fetch VIDEO_ID' }, { status: 500 })
   }
 }
