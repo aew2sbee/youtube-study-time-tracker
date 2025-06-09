@@ -8,7 +8,7 @@ WORKDIR /app
 COPY ./package.json ./package-lock.json* ./
 
 # 依存関係をインストール
-RUN npm install --production
+RUN npm install
 
 # アプリケーションコードをコピー
 COPY . .
