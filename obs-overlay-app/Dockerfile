@@ -5,13 +5,13 @@ FROM node:18-alpine
 WORKDIR /app
 
 # package.jsonとpackage-lock.jsonをコピー
-COPY ./obs-overlay-app/package.json ./obs-overlay-app/package-lock.json* ./ 
+COPY ./package.json ./package-lock.json* ./
 
 # 依存関係をインストール
-RUN npm install
+RUN npm install --production
 
 # アプリケーションコードをコピー
-COPY ./obs-overlay-app .
+COPY . .
 
 # ビルドを実行
 RUN npm run build
