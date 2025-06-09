@@ -4,6 +4,9 @@ import { useEffect, useState, useCallback } from 'react'
 import { fillterChatMessages, calculateStudyTime } from './lib/youtube'
 import { StudyRecord } from 'types/youtube'
 
+const YOUTUBE_API_INTERVAL = 15 * 60 * 1000 // 15 minutes
+const DISPLAY_MESSAGES_INTERVAL = 5 * 1000 // 5 seconds
+
 export default function Page() {
   const [record, setRecord] = useState<StudyRecord[]>([])
   const [currentIndex, setCurrentIndex] = useState<number>(0)
@@ -27,23 +30,19 @@ export default function Page() {
       }
     } finally {
       setLoading(false)
-      console.log('utcDate', utcDate)
     }
   }, [])
 
   useEffect(() => {
     fetchLiveChat()
 
-    const fetchInterval = setInterval(
-      () => {
-        fetchLiveChat()
-      },
-      15 * 60 * 1000
-    )
+    const fetchInterval = setInterval(() => {
+      fetchLiveChat()
+    }, YOUTUBE_API_INTERVAL)
 
     const displayInterval = setInterval(() => {
       setCurrentIndex((prevIndex) => (prevIndex + 3) % record.length)
-    }, 5 * 1000)
+    }, DISPLAY_MESSAGES_INTERVAL)
 
     return () => {
       clearInterval(fetchInterval)
