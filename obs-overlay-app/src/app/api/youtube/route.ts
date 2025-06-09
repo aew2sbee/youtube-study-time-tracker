@@ -1,11 +1,9 @@
-import { YouTubeChat } from './types/youtube'
+import { logWithTimestamp } from 'app/lib/logger'
 import { google } from 'googleapis'
 import { NextResponse } from 'next/server'
 
 const YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY
 const VIDEO_ID = process.env.VIDEO_ID
-
-const logWithTimestamp = (message: string) => console.log(`[${new Date().toISOString()}] ${message}`)
 
 export async function GET() {
   try {
@@ -53,7 +51,7 @@ export async function GET() {
     }
     const items = chatRes.data.items
 
-    const extracted: YouTubeChat[] = items.map((item) => ({
+    const extracted = items.map((item) => ({
       displayName: item.authorDetails!.displayName,
       displayMessage: item.snippet!.displayMessage,
       publishedAt: item.snippet!.publishedAt
