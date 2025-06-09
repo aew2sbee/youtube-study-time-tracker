@@ -1,9 +1,8 @@
 'use client'
 
 import { useEffect, useState, useCallback } from 'react'
-import { fillterChatMessages } from './lib/youtube'
-import { calculateStudyTime } from './lib/youtube'
-import { StudyRecord } from './types/youtube'
+import { fillterChatMessages, calculateStudyTime } from './lib/youtube'
+import { StudyRecord } from 'types/youtube'
 
 export default function Page() {
   const [record, setRecord] = useState<StudyRecord[]>([])

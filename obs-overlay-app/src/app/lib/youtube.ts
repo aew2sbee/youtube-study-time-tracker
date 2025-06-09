@@ -61,9 +61,9 @@ export const calculateStudyTime = (utcDate: Date, messages: YouTubeChat[]): Stud
 /**
  * Extracts unique display names from an array of YouTube chat messages.
  * @param {YouTubeChat[]} messages - Array of YouTube chat messages.
- * @returns {Set<string>} Set of unique display names.
+ * @returns {string[]} Array of unique display names.
  */
-const getUniqueDisplayNames = (messages: YouTubeChat[]): Set<string> => {
+const getUniqueDisplayNames = (messages: YouTubeChat[]): string[] => {
   const uniqueUserList = new Set<string>()
 
   for (const message of messages) {
@@ -72,7 +72,7 @@ const getUniqueDisplayNames = (messages: YouTubeChat[]): Set<string> => {
     }
   }
 
-  return uniqueUserList
+  return Array.from(uniqueUserList) // Convert Set to Array to avoid iteration issues
 }
 
 /**
