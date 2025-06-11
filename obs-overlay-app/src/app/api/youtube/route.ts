@@ -22,9 +22,9 @@ export async function GET() {
     logWithTimestamp('Fetching live broadcasts...')
 
     const searchRes = await youtube.search.list({
-      channelId: [YOUTUBE_CHANNEL_ID],
       part: ['snippet'],
-      eventType: ['live'],
+      channelId: YOUTUBE_CHANNEL_ID,
+      eventType: 'live',
       type: ['video'],
       maxResults: 1
     })
