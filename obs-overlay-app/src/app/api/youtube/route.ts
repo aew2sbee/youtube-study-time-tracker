@@ -3,7 +3,7 @@ import { google } from 'googleapis'
 import { NextResponse } from 'next/server'
 
 const YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY
-const YOUTUBE_CHANNEL_ID = process.env.YOUTUBE_CHANNEL_ID
+const YOUTUBE_CHANNEL_ID = 'UCDV95uUZlqOmxJ0hONnoALw'
 
 export async function GET() {
   try {
@@ -12,11 +12,6 @@ export async function GET() {
     if (!YOUTUBE_API_KEY) {
       logWithTimestamp('Environment variables of youtube api key is not defined')
       return NextResponse.json({ error: 'Environment variables of youtube api key is not defined' }, { status: 400 })
-    }
-
-    if (!YOUTUBE_CHANNEL_ID) {
-      logWithTimestamp('Environment variables of youtube channel id is not defined')
-      return NextResponse.json({ error: 'Environment variables of youtube channel id is not defined' }, { status: 400 })
     }
 
     const youtube = google.youtube({
