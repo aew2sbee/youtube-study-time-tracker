@@ -1,4 +1,4 @@
-import { logWithTimestamp } from 'app/lib/logger'
+import { logWithTimestamp } from 'lib/logger'
 import { google } from 'googleapis'
 import { NextResponse } from 'next/server'
 
@@ -20,21 +20,23 @@ export async function GET() {
     })
 
     logWithTimestamp('Fetching live broadcasts...')
+
     const searchRes = await youtube.search.list({
-      part: 'id', // 修正: 配列ではなく文字列
-      channelId: YOUTUBE_CHANNEL_ID, // 修正: 配列ではなく文字列
-      eventType: 'live', // 修正: 配列ではなく文字列
-      type: 'video', // 修正: 配列ではなく文字列
+      channelId: [YOUTUBE_CHANNEL_ID],
+      part: ['snippet'],
+      eventType: ['live'],
+      type: ['video'],
       maxResults: 1
     })
-    logWithTimestamp(`Search response: ${JSON.stringify(searchRes.data)}`)
 
-    if (!searchRes.data.items || searchRes.data.items.length === 0) {
+    const items = searchRes.data?.items ?? []
+
+    if (items.length === 0) {
       logWithTimestamp('No live broadcasts found')
       return NextResponse.json({ error: 'No live broadcasts found' }, { status: 404 })
     }
 
-    const VIDEO_ID = searchRes.data.items[0].id?.videoId
+    const VIDEO_ID = items[0]?.id?.videoId
     logWithTimestamp(`Found VIDEO_ID: ${VIDEO_ID}`)
 
     if (!VIDEO_ID) {
@@ -44,7 +46,7 @@ export async function GET() {
 
     return NextResponse.json({ videoId: VIDEO_ID })
   } catch (error) {
-    logWithTimestamp(`YouTube API error: ${error}`)
+    logWithTimestamp(`YouTube API error: ${error.message || error}`)
     return NextResponse.json({ error: 'Failed to fetch VIDEO_ID' }, { status: 500 })
   }
 }

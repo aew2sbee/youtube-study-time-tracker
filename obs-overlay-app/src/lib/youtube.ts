@@ -1,5 +1,5 @@
 import { StudyRecord, YouTubeChat } from 'types/youtube'
-import { MESSAGE } from '../constant/youtube'
+import { MESSAGE } from '../app/constant/youtube'
 
 const NOT_FOUND = -1 as const
 

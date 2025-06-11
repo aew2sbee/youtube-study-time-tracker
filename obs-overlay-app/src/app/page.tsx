@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState, useCallback } from 'react'
-import { fillterChatMessages, calculateStudyTime } from './lib/youtube'
+import { fillterChatMessages, calculateStudyTime } from '../lib/youtube'
 import { StudyRecord } from 'types/youtube'
 
 const YOUTUBE_API_INTERVAL = 15 * 60 * 1000 // 15 minutes
