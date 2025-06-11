@@ -50,8 +50,20 @@ export default function Page() {
     }
   }, [fetchLiveChat, record.length])
 
-  if (loading) return <p className="text-center text-white">Loading chat messages...</p>
-  if (error) return <p className="text-center text-red-500">Error: {error}</p>
+  if (loading) return (
+    <main className="min-h-screen bg-transparent p-12">
+      <div className="mx-auto bg-transparent p-6">
+        <p className="text-center text-white">Loading chat messages...</p>
+      </div>
+    </main>
+  )
+  if (error) return (
+    <main className="min-h-screen bg-transparent p-12">
+      <div className="mx-auto bg-transparent p-6">
+    <p className="text-center text-red-500">{error}</p>
+      </div>
+    </main>
+  )
 
   return (
     <main className="min-h-screen bg-transparent p-12">
