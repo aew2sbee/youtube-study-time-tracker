@@ -1,17 +1,17 @@
 import { logWithTimestamp } from 'lib/logger'
-import { google } from 'googleapis'
 import { NextResponse } from 'next/server'
+import { google } from 'googleapis'
 
 const YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY
 const YOUTUBE_CHANNEL_ID = 'UCDV95uUZlqOmxJ0hONnoALw'
 
 export async function GET() {
   try {
-    logWithTimestamp('Starting YouTube API request...')
+    logWithTimestamp('START: YouTube API request...')
 
     if (!YOUTUBE_API_KEY) {
       logWithTimestamp('Environment variables of youtube api key is not defined')
-      return NextResponse.json({ error: 'Environment variables of youtube api key is not defined' }, { status: 400 })
+      return NextResponse.json({ error: 'Environment variables of youtube api key is not defined' }, { status: 401 })
     }
 
     const youtube = google.youtube({
@@ -29,14 +29,14 @@ export async function GET() {
       maxResults: 1
     })
 
-    const items = searchRes.data?.items ?? []
+    const searchList = searchRes.data?.items ?? []
 
-    if (!searchRes.data.items || searchRes.data.items.length === 0) {
+    if (searchList.length === 0) {
       logWithTimestamp('No live broadcasts found')
       return NextResponse.json({ error: 'No live broadcasts found' }, { status: 404 })
     }
 
-    const VIDEO_ID = items[0]?.id?.videoId
+    const VIDEO_ID = searchList[0]?.id?.videoId
     logWithTimestamp(`Found VIDEO_ID: ${VIDEO_ID}`)
 
     if (!VIDEO_ID) {
@@ -48,7 +48,6 @@ export async function GET() {
       part: ['liveStreamingDetails'],
       id: [VIDEO_ID]
     })
-    logWithTimestamp(`Video response: ${JSON.stringify(videoRes.data)}`)
 
     if (!videoRes.data.items || videoRes.data.items.length === 0) {
       logWithTimestamp('Video not found or not a live stream')
@@ -59,7 +58,7 @@ export async function GET() {
 
     if (!liveChatId) {
       logWithTimestamp('Live chat ID not found')
-      return NextResponse.json({ error: 'Live chat ID not found' }, { status: 404 })
+      return NextResponse.json({}, { status: 204 })
     }
 
     logWithTimestamp('Fetching live chat messages...')
@@ -68,22 +67,22 @@ export async function GET() {
       liveChatId,
       maxResults: 200
     })
-    logWithTimestamp(`Chat response: ${JSON.stringify(chatRes.data)}`)
 
     if (!chatRes.data.items || chatRes.data.items.length === 0) {
       logWithTimestamp('No chat messages found')
       return NextResponse.json({ error: 'No chat messages found' }, { status: 404 })
     }
 
-    const extracted = items.map((item) => ({
+    const chatList = chatRes.data?.items ?? []
+
+    const res = chatList.map((item) => ({
       displayName: item.authorDetails!.displayName,
       displayMessage: item.snippet!.displayMessage,
       publishedAt: item.snippet!.publishedAt
     }))
-    logWithTimestamp(`Extracted chat messages: ${JSON.stringify(extracted)}`)
+    logWithTimestamp(`Extracted ${res.length} chat messages`)
 
-    return NextResponse.json(extracted)
-    return NextResponse.json({ videoId: VIDEO_ID })
+    return NextResponse.json(res)
   } catch (error: unknown) {
     if (error instanceof Error) {
       logWithTimestamp(`YouTube API error: ${error.message}`)
@@ -92,5 +91,7 @@ export async function GET() {
       logWithTimestamp('YouTube API error: Unknown error')
       return NextResponse.json({ error: 'Unknown error occurred' }, { status: 500 })
     }
+  } finally {
+    logWithTimestamp('END: YouTube API request completed')
   }
 }
