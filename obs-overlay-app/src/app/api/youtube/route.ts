@@ -31,7 +31,7 @@ export async function GET() {
 
     const items = searchRes.data?.items ?? []
 
-    if (items.length === 0) {
+    if (!searchRes.data.items || searchRes.data.items.length === 0) {
       logWithTimestamp('No live broadcasts found')
       return NextResponse.json({ error: 'No live broadcasts found' }, { status: 404 })
     }
@@ -44,6 +44,45 @@ export async function GET() {
       return NextResponse.json({ error: 'VIDEO_ID not found' }, { status: 404 })
     }
 
+    const videoRes = await youtube.videos.list({
+      part: ['liveStreamingDetails'],
+      id: [VIDEO_ID]
+    })
+    logWithTimestamp(`Video response: ${JSON.stringify(videoRes.data)}`)
+
+    if (!videoRes.data.items || videoRes.data.items.length === 0) {
+      logWithTimestamp('Video not found or not a live stream')
+      return NextResponse.json({ error: 'Video not found or not a live stream' }, { status: 404 })
+    }
+    const liveChatId = videoRes.data.items?.[0]?.liveStreamingDetails?.activeLiveChatId
+    logWithTimestamp(`Live chat ID: ${liveChatId}`)
+
+    if (!liveChatId) {
+      logWithTimestamp('Live chat ID not found')
+      return NextResponse.json({ error: 'Live chat ID not found' }, { status: 404 })
+    }
+
+    logWithTimestamp('Fetching live chat messages...')
+    const chatRes = await youtube.liveChatMessages.list({
+      part: ['snippet', 'authorDetails'],
+      liveChatId,
+      maxResults: 200
+    })
+    logWithTimestamp(`Chat response: ${JSON.stringify(chatRes.data)}`)
+
+    if (!chatRes.data.items || chatRes.data.items.length === 0) {
+      logWithTimestamp('No chat messages found')
+      return NextResponse.json({ error: 'No chat messages found' }, { status: 404 })
+    }
+
+    const extracted = items.map((item) => ({
+      displayName: item.authorDetails!.displayName,
+      displayMessage: item.snippet!.displayMessage,
+      publishedAt: item.snippet!.publishedAt
+    }))
+    logWithTimestamp(`Extracted chat messages: ${JSON.stringify(extracted)}`)
+
+    return NextResponse.json(extracted)
     return NextResponse.json({ videoId: VIDEO_ID })
   } catch (error: unknown) {
     if (error instanceof Error) {
