@@ -45,8 +45,13 @@ export async function GET() {
     }
 
     return NextResponse.json({ videoId: VIDEO_ID })
-  } catch (error) {
-    logWithTimestamp(`YouTube API error: ${error.message || error}`)
-    return NextResponse.json({ error: 'Failed to fetch VIDEO_ID' }, { status: 500 })
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      logWithTimestamp(`YouTube API error: ${error.message}`)
+      return NextResponse.json({ error: error.message }, { status: 500 })
+    } else {
+      logWithTimestamp('YouTube API error: Unknown error')
+      return NextResponse.json({ error: 'Unknown error occurred' }, { status: 500 })
+    }
   }
 }
