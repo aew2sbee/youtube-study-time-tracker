@@ -1,5 +1,6 @@
 import { StudyRecord, YouTubeChat } from 'types/youtube'
 import { MESSAGE } from '../constant/youtube'
+import { logWithTimestamp } from './logger'
 
 const NOT_FOUND = -1 as const
 
@@ -24,9 +25,13 @@ export const fillterChatMessages = (youTubeChat: YouTubeChat[]): YouTubeChat[] =
 export const calculateStudyTime = (utcDate: Date, messages: YouTubeChat[]): StudyRecord[] => {
   const studyRecordList: StudyRecord[] = []
 
-  if (messages.length === 0) return studyRecordList
+  if (messages.length === 0) {
+    logWithTimestamp('No messages found in the YouTube chat.')
+    return studyRecordList
+  }
   // messagesからユニークなdisplayNameを抽出する
   const uniqueUserList = getUniqueDisplayNames(messages)
+  logWithTimestamp(`Unique users found: ${uniqueUserList.length}`)
   for (const user of uniqueUserList) {
     const startIndex = messages.findLastIndex(
       (msg) => msg.displayName === user && msg.displayMessage.toLowerCase() === MESSAGE.START
@@ -55,6 +60,7 @@ export const calculateStudyTime = (utcDate: Date, messages: YouTubeChat[]): Stud
       break
     }
   }
+  logWithTimestamp(`Calculated study records: ${studyRecordList.length}`)
   return studyRecordList
 }
 
@@ -72,6 +78,7 @@ const getUniqueDisplayNames = (messages: YouTubeChat[]): string[] => {
     }
   }
 
+  logWithTimestamp(`Unique display names extracted: ${uniqueUserList.size}`)
   return Array.from(uniqueUserList) // Convert Set to Array to avoid iteration issues
 }
 
