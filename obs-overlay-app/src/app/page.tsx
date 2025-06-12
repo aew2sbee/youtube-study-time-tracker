@@ -56,16 +56,16 @@ export default function Page() {
   return (
     <main className="min-h-screen bg-transparent px-18">
       <div className="mx-auto bg-transparent">
-        <h1 className="font-bold text-white mb-4">Study Time for Today</h1>
-        <p className="font-bold"></p>
-        <ul className="space-y-1">
+        <h1 className="font-bold">Study Time for Today</h1>
+        <p className="font-bold mb-4">NOTE: The display is updated every 15 mins.</p>
+        <ul className="space-y-1 bg-gray-400/50 rounded-lg p-6">
           {record.length === 0 ? (
-            <li className="text-white">There are currently no participants</li>
+            <li className="px-16">There are currently no participants</li>
           ) : (
             record.slice(currentIndex, currentIndex + 3).map((msg, idx) => (
               <li key={idx} className="flex items-center gap-x-2 bg-transparent px-16">
-                <div className="text-white pr-16">{msg.user}</div>
-                <div className="font-medium text-white">{msg.displayStudyTime}</div>
+                <div className="px-16">{msg.user}</div>
+                <div className="font-medium">{msg.displayStudyTime}</div>
               </li>
             ))
           )}

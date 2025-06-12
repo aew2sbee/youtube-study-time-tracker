@@ -32,3 +32,9 @@ h1 {
   font-weight: 600;
   font-size: 160px;
 }
+
+p {
+  font-family: var(--font-mono);
+  font-weight: 400;
+  font-size: 70px;
+}
