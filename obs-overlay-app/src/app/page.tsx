@@ -54,17 +54,17 @@ export default function Page() {
   if (error) return <p className="text-center text-red-500">{error}</p>
 
   return (
-    <main className="min-h-screen bg-transparent px-18">
-      <div className="mx-auto bg-transparent">
+    <main className="min-h-screen px-18">
+      <div className="mx-auto">
         <h1 className="font-bold">Study Time for Today</h1>
-        <p className="font-bold mb-4">NOTE: The display is updated every 15 mins.</p>
-        <ul className="space-y-1 bg-gray-400/50 rounded-lg p-6">
+        <p className="font-bold">[ NOTE ]: The display is updated every 15 mins.</p>
+        <ul className="space-y-1 bg-gray-400/30 rounded-lg mt-12 px-16">
           {record.length === 0 ? (
-            <li className="px-16">There are currently no participants</li>
+            <li>No participants.</li>
           ) : (
             record.slice(currentIndex, currentIndex + 3).map((msg, idx) => (
-              <li key={idx} className="flex items-center gap-x-2 bg-transparent px-16">
-                <div className="px-16">{msg.user}</div>
+              <li key={idx} className="flex gap-x-2">
+                <div>{msg.user}: </div>
                 <div className="font-medium">{msg.displayStudyTime}</div>
               </li>
             ))
