@@ -10,6 +10,7 @@
     "prettier": "prettier --config .prettierrc --write ."
   },
   "dependencies": {
+    "@tailwindcss/postcss": "^4.1.10",
     "googleapis": "^150.0.1",
     "next": "15.3.3",
     "react": "^19.0.0",
@@ -23,9 +24,9 @@
     "autoprefixer": "^10.4.21",
     "eslint": "^9",
     "eslint-config-next": "15.3.3",
-    "postcss": "^8.5.4",
+    "postcss": "^8.5.5",
     "prettier": "^3.5.3",
-    "tailwindcss": "^4.1.8",
+    "tailwindcss": "^4.1.10",
     "typescript": "^5"
   }
 }

@@ -54,15 +54,16 @@ export default function Page() {
   if (error) return <p className="text-center text-red-500">{error}</p>
 
   return (
-    <main className="min-h-screen p-12">
-      <div className="mx-auto p-6">
+    <main className="min-h-screen bg-transparent px-18">
+      <div className="mx-auto bg-transparent">
         <h1 className="font-bold text-white mb-4">Study Time for Today</h1>
+        <p className="font-bold"></p>
         <ul className="space-y-1">
           {record.length === 0 ? (
             <li className="text-white">There are currently no participants</li>
           ) : (
             record.slice(currentIndex, currentIndex + 3).map((msg, idx) => (
-              <li key={idx} className="flex items-center gap-x-2 px-16">
+              <li key={idx} className="flex items-center gap-x-2 bg-transparent px-16">
                 <div className="text-white pr-16">{msg.user}</div>
                 <div className="font-medium text-white">{msg.displayStudyTime}</div>
               </li>

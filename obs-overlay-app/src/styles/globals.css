@@ -1,6 +1,4 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
 :root {
   --background: #ffffff;
@@ -14,10 +12,23 @@
   --font-mono: var(--font-geist-mono);
 }
 
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
 body {
-  background: transparent;
+  background: #0a0a0a;
   color: #ffffff;
   font-family: Arial, Helvetica, sans-serif;
   line-height: 1.5;
   font-size: 120px;
+}
+
+h1 {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 160px;
 }
