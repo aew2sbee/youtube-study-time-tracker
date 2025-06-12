@@ -12,9 +12,17 @@ export default function Page() {
   const [currentIndex, setCurrentIndex] = useState<number>(0)
   const [loading, setLoading] = useState<boolean>(true)
   const [error, setError] = useState<string | null>(null)
+  const [nextUpdateTime, setnextUpdateTime] = useState<string>('hh:mm')
 
   const fetchLiveChat = useCallback(async () => {
     const utcDate = new Date()
+    setnextUpdateTime(
+      new Date(utcDate.getTime() + YOUTUBE_API_INTERVAL).toLocaleTimeString('ja-JP', {
+        timeZone: 'Asia/Tokyo',
+        hour: '2-digit',
+        minute: '2-digit'
+      })
+    )
     try {
       const res = await fetch('/api/youtube')
       if (!res.ok) throw new Error(`Error: ${res.status}`)
@@ -57,15 +65,18 @@ export default function Page() {
     <main className="min-h-screen px-18">
       <div className="mx-auto">
         <h1 className="font-bold">Study Time for Today</h1>
-        <p className="font-bold">[ NOTE ]: The display is updated every 15 mins.</p>
+        <div className="flex">
+          <p className="font-bold">▶ Next upate time at </p>
+          <p className="font-bold pl-6">{nextUpdateTime}</p>
+        </div>
         <ul className="space-y-1 bg-gray-400/30 rounded-lg mt-12 px-16">
           {record.length === 0 ? (
             <li>No participants.</li>
           ) : (
             record.slice(currentIndex, currentIndex + 3).map((msg, idx) => (
               <li key={idx} className="flex gap-x-2">
-                <div>{msg.user}: </div>
-                <div className="font-medium">{msg.displayStudyTime}</div>
+                <div className="line-clamp-1">{msg.user}:</div>
+                <div className="font-medium pl-8">{msg.displayStudyTime}</div>
               </li>
             ))
           )}
