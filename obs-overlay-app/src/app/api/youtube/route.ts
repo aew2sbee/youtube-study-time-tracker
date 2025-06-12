@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server'
 import { google } from 'googleapis'
 
 const YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY
-const YOUTUBE_CHANNEL_ID = 'UCDV95uUZlqOmxJ0hONnoALw'
+const VIDEO_ID = process.env.VIDEO_ID
 
 export async function GET() {
   try {
@@ -20,24 +20,6 @@ export async function GET() {
     })
 
     logWithTimestamp('Fetching live broadcasts...')
-
-    const searchRes = await youtube.search.list({
-      part: ['snippet'],
-      channelId: YOUTUBE_CHANNEL_ID,
-      eventType: 'live',
-      type: ['video'],
-      maxResults: 1
-    })
-
-    const searchList = searchRes.data?.items ?? []
-
-    if (searchList.length === 0) {
-      logWithTimestamp('No live broadcasts found')
-      return NextResponse.json({ error: 'No live broadcasts found' }, { status: 404 })
-    }
-
-    const VIDEO_ID = searchList[0]?.id?.videoId
-    logWithTimestamp(`Found VIDEO_ID: ${VIDEO_ID}`)
 
     if (!VIDEO_ID) {
       logWithTimestamp('VIDEO_ID not found')
