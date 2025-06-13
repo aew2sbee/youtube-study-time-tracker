@@ -5,7 +5,7 @@ import { fillterChatMessages, calculateStudyTime } from '../lib/youtube'
 import { StudyRecord } from 'types/youtube'
 
 const YOUTUBE_API_INTERVAL = 15 * 60 * 1000 // 15 minutes
-const DISPLAY_MESSAGES_INTERVAL = 5 * 1000 // 5 seconds
+const DISPLAY_MESSAGES_INTERVAL = 30 * 1000 // 30 seconds
 
 export default function Page() {
   const [record, setRecord] = useState<StudyRecord[]>([])
@@ -27,6 +27,7 @@ export default function Page() {
       const res = await fetch('/api/youtube')
       if (!res.ok) throw new Error(`Error: ${res.status}`)
       const data = await res.json()
+      console.log('Fetched data:', data)
       const fillteredMessages = fillterChatMessages(data)
       const studyRecord = calculateStudyTime(utcDate, fillteredMessages)
       setRecord(studyRecord)

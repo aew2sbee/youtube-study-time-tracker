@@ -47,7 +47,7 @@ export async function GET() {
     const chatRes = await youtube.liveChatMessages.list({
       part: ['snippet', 'authorDetails'],
       liveChatId,
-      maxResults: 200
+      maxResults: 500
     })
 
     if (!chatRes.data.items || chatRes.data.items.length === 0) {

@@ -13,6 +13,7 @@ export const fillterChatMessages = (youTubeChat: YouTubeChat[]): YouTubeChat[] =
   const fillteredMessages = youTubeChat.filter(
     (item) => item.displayMessage.toLowerCase() === MESSAGE.START || item.displayMessage.toLowerCase() === MESSAGE.END
   )
+  logWithTimestamp(`Filtered messages count: ${fillteredMessages.length}`)
   return fillteredMessages
 }
 
@@ -31,15 +32,18 @@ export const calculateStudyTime = (utcDate: Date, messages: YouTubeChat[]): Stud
   }
   // messagesからユニークなdisplayNameを抽出する
   const uniqueUserList = getUniqueDisplayNames(messages)
+  console.log(messages)
   logWithTimestamp(`Unique users found: ${uniqueUserList.length}`)
   for (const user of uniqueUserList) {
+    logWithTimestamp(`Calculating study time for user: ${user}`)
     const startIndex = messages.findLastIndex(
       (msg) => msg.displayName === user && msg.displayMessage.toLowerCase() === MESSAGE.START
     )
     const endIndex = messages.findLastIndex(
       (msg) => msg.displayName === user && msg.displayMessage.toLowerCase() === MESSAGE.END
     )
-    if (startIndex === NOT_FOUND || startIndex <= endIndex) {
+    console.log(user, startIndex, endIndex)
+    if (startIndex === NOT_FOUND) {
       continue // 開始または終了メッセージが見つからない、または順序が正しくない場合はスキップ
     }
     if (endIndex === NOT_FOUND) {
@@ -47,18 +51,15 @@ export const calculateStudyTime = (utcDate: Date, messages: YouTubeChat[]): Stud
         user: user,
         displayStudyTime: calcTimeDiff(new Date(messages[startIndex].publishedAt), utcDate)
       })
-      break
+      continue
     }
-    if (startIndex >= endIndex) {
-      studyRecordList.push({
-        user: user,
-        displayStudyTime: calcTimeDiff(
-          new Date(messages[startIndex].publishedAt),
-          new Date(messages[endIndex].publishedAt)
-        )
-      })
-      break
-    }
+    studyRecordList.push({
+      user: user,
+      displayStudyTime: calcTimeDiff(
+        new Date(messages[startIndex].publishedAt),
+        new Date(messages[endIndex].publishedAt)
+      )
+    })
   }
   logWithTimestamp(`Calculated study records: ${studyRecordList.length}`)
   return studyRecordList
