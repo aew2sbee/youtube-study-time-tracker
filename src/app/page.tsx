@@ -1,0 +1,17 @@
+'use client';
+
+import { StudyTimeDisplay } from '@/components/StudyTimeDisplay';
+import { useStudyTime } from '@/hooks/useStudyTime';
+
+export default function Home() {
+  const { users, lastUpdateTime, formatTime, formatUpdateTime } = useStudyTime();
+
+  return (
+    <StudyTimeDisplay
+      users={users}
+      formatTime={formatTime}
+      lastUpdateTime={lastUpdateTime}
+      formatUpdateTime={formatUpdateTime}
+    />
+  );
+}
