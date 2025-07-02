@@ -49,17 +49,17 @@ export const StudyTimeDisplay = ({
       <div className="w-full max-w-2xl flex flex-col justify-start h-full">
         <div className="p-4 mb-2 min-h-fit mt-[50vh] transform translate-y-6">
           <h1 className="text-4xl font-bold text-white text-center mb-4">
-            勉強時間トラッカー
+            Study Time Tracker
           </h1>
           
           <div className="text-white text-center text-xl mb-4">
-            更新: {mounted ? formatUpdateTime(lastUpdateTime) : '--:--'}
+            Updated: {mounted ? formatUpdateTime(lastUpdateTime) : '--:--'}
           </div>
           
           <div className="flex flex-col">
             {displayedUsers.length === 0 ? (
               <div className="text-white text-center text-2xl flex-1 flex items-center justify-center">
-                コメント待機中...
+                Waiting for comments...
               </div>
             ) : (
               <div className={`space-y-3 flex-1 transition-opacity duration-1000 ${isTransitioning ? 'opacity-0' : 'opacity-100'}`}>
@@ -83,9 +83,9 @@ export const StudyTimeDisplay = ({
                     
                     <div className="text-white font-bold flex items-center space-x-3" style={{fontSize: '40px'}}>
                       {user.isStudying ? (
-                        <span className="text-green-400 animate-pulse w-24 text-center" style={{fontSize: '24px'}}>勉強中</span>
+                        <span className="text-green-400 animate-pulse w-24 text-center" style={{fontSize: '24px'}}>Studying</span>
                       ) : user.studyTime > 0 ? (
-                        <span className="text-blue-400 w-24 text-center" style={{fontSize: '24px'}}>勉強終了</span>
+                        <span className="text-blue-400 w-24 text-center" style={{fontSize: '24px'}}>Finished</span>
                       ) : null}
                       <span>{formatTime(user.studyTime)}</span>
                     </div>
