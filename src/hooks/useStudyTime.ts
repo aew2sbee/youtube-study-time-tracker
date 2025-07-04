@@ -133,7 +133,7 @@ export const useStudyTime = () => {
         setNextPageToken(data.nextPageToken);
       }
       
-      return data.pollingIntervalMillis || 5000;
+      return 600000; // 10分間隔 (10 * 60 * 1000 ms)
     } catch (error) {
       console.error('Error fetching live chat messages:', error);
       return 10000; // Retry in 10 seconds on error
@@ -158,6 +158,9 @@ export const useStudyTime = () => {
   }, [fetchLiveChatMessages]);
 
   const formatTime = (seconds: number): string => {
+    if (seconds === 0) {
+      return '--:--';
+    }
     const hours = Math.floor(seconds / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
     return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
@@ -169,6 +172,9 @@ export const useStudyTime = () => {
 
   const getSortedUsers = (): StudyTimeUser[] => {
     return Array.from(users.values()).sort((a, b) => b.studyTime - a.studyTime);
+    // return Array.from(users.values())
+    //   .filter(user => user.studyTime > 0 || user.isStudying)
+    //   .sort((a, b) => b.studyTime - a.studyTime);
   };
 
   return {
