@@ -60,7 +60,11 @@ export const StudyTimeDisplay = ({
           <div className="flex flex-col h-80">
             {displayedUsers.length === 0 ? (
               <div className="text-white text-center text-2xl flex-1 flex items-center justify-center">
-                Waiting for comments...
+                <div className="space-y-2">
+                  <div>勉強時間の計測に参加するには</div>
+                  <div>コメントで「start」で開始、「end」で終了してください</div>
+                  <div>複数回の「start」/「end」で時間が累積されます</div>
+                </div>
               </div>
             ) : (
               <div className={`space-y-1 flex-1 transition-opacity duration-1000 ${isTransitioning ? 'opacity-0' : 'opacity-100'} overflow-hidden`}>

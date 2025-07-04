@@ -1,6 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { StudyTimeUser, YouTubeLiveChatMessage } from '@/types/youtube';
 
+const API_POLLING_INTERVAL = 600000; // 10分間隔 (10 * 60 * 1000 ms)
+
 // Mock data for testing
 const createMockUsers = (): Map<string, StudyTimeUser> => {
   const mockUsers = new Map<string, StudyTimeUser>();
@@ -122,7 +124,7 @@ export const useStudyTime = () => {
       
       if (data.error) {
         console.error('API error:', data.error);
-        return 600000; // 10分後にリトライ
+        return API_POLLING_INTERVAL;
       }
       
       if (data.messages && data.messages.length > 0) {
@@ -133,10 +135,10 @@ export const useStudyTime = () => {
         setNextPageToken(data.nextPageToken);
       }
       
-      return 600000; // 10分間隔 (10 * 60 * 1000 ms)
+      return API_POLLING_INTERVAL;
     } catch (error) {
       console.error('Error fetching live chat messages:', error);
-      return 600000; // エラー時も10分後にリトライ
+      return API_POLLING_INTERVAL;
     }
   }, [updateStudyTime]);
 
@@ -171,10 +173,10 @@ export const useStudyTime = () => {
   };
 
   const getSortedUsers = (): StudyTimeUser[] => {
-    return Array.from(users.values()).sort((a, b) => b.studyTime - a.studyTime);
-    // return Array.from(users.values())
-    //   .filter(user => user.studyTime > 0 || user.isStudying)
-    //   .sort((a, b) => b.studyTime - a.studyTime);
+    // return Array.from(users.values()).sort((a, b) => b.studyTime - a.studyTime);
+    return Array.from(users.values())
+      .filter(user => user.studyTime > 0 || user.isStudying)
+      .sort((a, b) => b.studyTime - a.studyTime);
   };
 
   return {
