@@ -189,7 +189,7 @@ export const StudyTimeDisplay = ({
                 <div className="text-white text-center text-lg">
                   Target: {formatTime(targetStudyTime)} (
                   {Math.floor((getTotalStudyTime() / targetStudyTime) * 100)}%
-                  achieved)
+                  Achieved)
                 </div>
               </div>
             ) : (
