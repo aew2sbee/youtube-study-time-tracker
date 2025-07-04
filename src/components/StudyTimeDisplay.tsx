@@ -47,23 +47,23 @@ export const StudyTimeDisplay = ({
   return (
     <div className="w-screen h-screen p-2 flex justify-start items-end">
       <div className="w-full max-w-2xl flex flex-col justify-end h-full">
-        <div className="p-4 mb-2 min-h-fit">
+        <div className="p-4 mb-2 h-96">
           <div className="flex justify-between items-center mb-4">
             <h1 className="text-4xl font-bold text-white">
               Study Time Tracker
             </h1>
             <div className="text-white text-2xl">
-              Updated: {mounted ? formatUpdateTime(lastUpdateTime) : '--:--'}
+              Updated Time: {mounted ? formatUpdateTime(lastUpdateTime) : '--:--'}
             </div>
           </div>
           
-          <div className="flex flex-col">
+          <div className="flex flex-col h-80">
             {displayedUsers.length === 0 ? (
               <div className="text-white text-center text-2xl flex-1 flex items-center justify-center">
                 Waiting for comments...
               </div>
             ) : (
-              <div className={`space-y-3 flex-1 transition-opacity duration-1000 ${isTransitioning ? 'opacity-0' : 'opacity-100'}`}>
+              <div className={`space-y-1 flex-1 transition-opacity duration-1000 ${isTransitioning ? 'opacity-0' : 'opacity-100'} overflow-hidden`}>
                 {displayedUsers.map((user) => (
                   <div
                     key={user.name}
