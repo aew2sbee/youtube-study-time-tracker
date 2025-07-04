@@ -4,9 +4,9 @@ import { StudyTimeUser, YouTubeLiveChatMessage } from '@/types/youtube';
 const START_STUDY_KEYWORDS = 'start';
 const END_STUDY_KEYWORDS = 'end';
 
-const API_POLLING_INTERVAL = 600000; // 10分間隔 (10 * 60 * 1000 ms)
-const ADDITIONAL_STUDY_TIME = 3600; // 追加の勉強時間（秒）- 1時間
-const TARGET_STUDY_TIME = 7200; // 目標勉強時間（秒）- 2時間
+const API_POLLING_INTERVAL = 10 * 60 * 1000; // 10分間隔 (10 * 60 * 1000 ms)
+const ADDITIONAL_STUDY_TIME = 1 * 60 * 60; // 追加の勉強時間（秒: h * m + sec）- 1時間
+const TARGET_STUDY_TIME = 2 * 60 * 60; // 目標勉強時間（秒:h * m + sec ）- 2時間
 const SHOW_PROGRESS_BAR = true; // みんなの勉強時間表示の表示/非表示
 
 // 個人の勉強進捗データ
