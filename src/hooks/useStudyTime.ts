@@ -3,61 +3,6 @@ import { StudyTimeUser, YouTubeLiveChatMessage } from '@/types/youtube';
 
 const API_POLLING_INTERVAL = 600000; // 10分間隔 (10 * 60 * 1000 ms)
 
-// Mock data for testing
-const createMockUsers = (): Map<string, StudyTimeUser> => {
-  const mockUsers = new Map<string, StudyTimeUser>();
-  
-  mockUsers.set('田中太郎', {
-    name: '田中太郎',
-    studyTime: 7200, // 2 hours
-    profileImageUrl: 'https://yt3.ggpht.com/ToBVHdJPmTSckqWsesfbs8OxH6kBd-V-81pP8BLysaXnLwVfOjFF9pA05HGdiuTRJjYwuVZ_yA=s88-c-k-c0x00ffffff-no-rj',
-    startTime: undefined,
-    isStudying: false,
-  });
-  
-  mockUsers.set('佐藤花子', {
-    name: '佐藤花子',
-    studyTime: 5400, // 1.5 hours
-    profileImageUrl: 'https://yt3.ggpht.com/ToBVHdJPmTSckqWsesfbs8OxH6kBd-V-81pP8BLysaXnLwVfOjFF9pA05HGdiuTRJjYwuVZ_yA=s88-c-k-c0x00ffffff-no-rj',
-    startTime: new Date(Date.now() - 1800000), // started 30 minutes ago
-    isStudying: true,
-  });
-  
-  mockUsers.set('山田次郎', {
-    name: '山田次郎',
-    studyTime: 3600, // 1 hour
-    profileImageUrl: 'https://yt3.ggpht.com/ToBVHdJPmTSckqWsesfbs8OxH6kBd-V-81pP8BLysaXnLwVfOjFF9pA05HGdiuTRJjYwuVZ_yA=s88-c-k-c0x00ffffff-no-rj',
-    startTime: undefined,
-    isStudying: false,
-  });
-  
-  mockUsers.set('鈴木一郎', {
-    name: '鈴木一郎',
-    studyTime: 1800, // 30 minutes
-    profileImageUrl: 'https://yt3.ggpht.com/ToBVHdJPmTSckqWsesfbs8OxH6kBd-V-81pP8BLysaXnLwVfOjFF9pA05HGdiuTRJjYwuVZ_yA=s88-c-k-c0x00ffffff-no-rj',
-    startTime: new Date(Date.now() - 600000), // started 10 minutes ago
-    isStudying: true,
-  });
-  
-  mockUsers.set('高橋美咲', {
-    name: '高橋美咲',
-    studyTime: 2700, // 45 minutes
-    profileImageUrl: 'https://yt3.ggpht.com/ToBVHdJPmTSckqWsesfbs8OxH6kBd-V-81pP8BLysaXnLwVfOjFF9pA05HGdiuTRJjYwuVZ_yA=s88-c-k-c0x00ffffff-no-rj',
-    startTime: undefined,
-    isStudying: false,
-  });
-  
-  mockUsers.set('伊藤健太', {
-    name: '伊藤健太',
-    studyTime: 900, // 15 minutes
-    profileImageUrl: 'https://yt3.ggpht.com/ToBVHdJPmTSckqWsesfbs8OxH6kBd-V-81pP8BLysaXnLwVfOjFF9pA05HGdiuTRJjYwuVZ_yA=s88-c-k-c0x00ffffff-no-rj',
-    startTime: new Date(Date.now() - 300000), // started 5 minutes ago
-    isStudying: true,
-  });
-  
-  return mockUsers;
-};
-
 export const useStudyTime = () => {
   const [users, setUsers] = useState<Map<string, StudyTimeUser>>(new Map());
   const [lastUpdateTime, setLastUpdateTime] = useState<Date>(new Date());
