@@ -122,7 +122,7 @@ export const useStudyTime = () => {
       
       if (data.error) {
         console.error('API error:', data.error);
-        return 10000; // Retry in 10 seconds on API error
+        return 600000; // 10分後にリトライ
       }
       
       if (data.messages && data.messages.length > 0) {
@@ -136,9 +136,9 @@ export const useStudyTime = () => {
       return 600000; // 10分間隔 (10 * 60 * 1000 ms)
     } catch (error) {
       console.error('Error fetching live chat messages:', error);
-      return 10000; // Retry in 10 seconds on error
+      return 600000; // エラー時も10分後にリトライ
     }
-  }, [nextPageToken, updateStudyTime]);
+  }, [updateStudyTime]);
 
   useEffect(() => {
     let timeoutId: NodeJS.Timeout;
@@ -155,7 +155,7 @@ export const useStudyTime = () => {
         clearTimeout(timeoutId);
       }
     };
-  }, [fetchLiveChatMessages]);
+  }, []);
 
   const formatTime = (seconds: number): string => {
     if (seconds === 0) {
