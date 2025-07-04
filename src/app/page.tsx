@@ -4,7 +4,7 @@ import { StudyTimeDisplay } from '@/components/StudyTimeDisplay';
 import { useStudyTime } from '@/hooks/useStudyTime';
 
 export default function Home() {
-  const { users, lastUpdateTime, formatTime, formatUpdateTime } = useStudyTime();
+  const { users, lastUpdateTime, formatTime, formatUpdateTime, getTotalStudyTime, targetStudyTime, showProgressBar, personalProgress } = useStudyTime();
 
   return (
     <StudyTimeDisplay
@@ -12,6 +12,10 @@ export default function Home() {
       formatTime={formatTime}
       lastUpdateTime={lastUpdateTime}
       formatUpdateTime={formatUpdateTime}
+      getTotalStudyTime={getTotalStudyTime}
+      targetStudyTime={targetStudyTime}
+      showProgressBar={showProgressBar}
+      personalProgress={personalProgress}
     />
   );
 }
