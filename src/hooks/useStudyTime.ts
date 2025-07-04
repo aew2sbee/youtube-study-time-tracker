@@ -1,6 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
 import { StudyTimeUser, YouTubeLiveChatMessage } from '@/types/youtube';
 
+const START_STUDY_KEYWORDS = 'start';
+const END_STUDY_KEYWORDS = 'end';
+
 const API_POLLING_INTERVAL = 600000; // 10分間隔 (10 * 60 * 1000 ms)
 const ADDITIONAL_STUDY_TIME = 3600; // 追加の勉強時間（秒）- 1時間
 const TARGET_STUDY_TIME = 7200; // 目標勉強時間（秒）- 2時間
@@ -11,65 +14,12 @@ const PERSONAL_STUDY_PROGRESS = {
   totalTime: 21 * 60 * 60, // 個人の累積勉強時間（秒）- 4時間
   examDate: 'Not scheduled yet', // 受験日
   testScore: '科目A: 47%, 科目B: 95%', // テスト結果
-  updateDate: '07/03', // 更新日
+  updateDate: '2025/07/03', // 更新日
 } as const;
 
-// Temporary mock data for testing progress bar
-const createTestMockUsers = (): Map<string, StudyTimeUser> => {
-  const mockUsers = new Map<string, StudyTimeUser>();
-
-  mockUsers.set('田中太郎', {
-    name: '田中太郎',
-    studyTime: 2400, // 40分
-    profileImageUrl:
-      'https://yt3.ggpht.com/ToBVHdJPmTSckqWsesfbs8OxH6kBd-V-81pP8BLysaXnLwVfOjFF9pA05HGdiuTRJjYwuVZ_yA=s88-c-k-c0x00ffffff-no-rj',
-    startTime: undefined,
-    isStudying: false,
-  });
-
-  mockUsers.set('佐藤花子', {
-    name: '佐藤花子',
-    studyTime: 1800, // 30分
-    profileImageUrl:
-      'https://yt3.ggpht.com/ToBVHdJPmTSckqWsesfbs8OxH6kBd-V-81pP8BLysaXnLwVfOjFF9pA05HGdiuTRJjYwuVZ_yA=s88-c-k-c0x00ffffff-no-rj',
-    startTime: new Date(Date.now() - 600000), // 10分前から勉強中
-    isStudying: true,
-  });
-
-  mockUsers.set('山田次郎', {
-    name: '山田次郎',
-    studyTime: 900, // 15分
-    profileImageUrl:
-      'https://yt3.ggpht.com/ToBVHdJPmTSckqWsesfbs8OxH6kBd-V-81pP8BLysaXnLwVfOjFF9pA05HGdiuTRJjYwuVZ_yA=s88-c-k-c0x00ffffff-no-rj',
-    startTime: undefined,
-    isStudying: false,
-  });
-
-  mockUsers.set('鈴木一郎', {
-    name: '鈴木一郎',
-    studyTime: 1200, // 20分
-    profileImageUrl:
-      'https://yt3.ggpht.com/ToBVHdJPmTSckqWsesfbs8OxH6kBd-V-81pP8BLysaXnLwVfOjFF9pA05HGdiuTRJjYwuVZ_yA=s88-c-k-c0x00ffffff-no-rj',
-    startTime: new Date(Date.now() - 300000), // 5分前から勉強中
-    isStudying: true,
-  });
-
-  mockUsers.set('高橋美咲', {
-    name: '高橋美咲',
-    studyTime: 600, // 10分
-    profileImageUrl:
-      'https://yt3.ggpht.com/ToBVHdJPmTSckqWsesfbs8OxH6kBd-V-81pP8BLysaXnLwVfOjFF9pA05HGdiuTRJjYwuVZ_yA=s88-c-k-c0x00ffffff-no-rj',
-    startTime: undefined,
-    isStudying: false,
-  });
-
-  return mockUsers;
-};
 
 export const useStudyTime = () => {
-  const [users, setUsers] = useState<Map<string, StudyTimeUser>>(
-    createTestMockUsers()
-  );
+  const [users, setUsers] = useState<Map<string, StudyTimeUser>>(new Map());
   const [lastUpdateTime, setLastUpdateTime] = useState<Date>(new Date());
   const [nextPageToken, setNextPageToken] = useState<string>('');
 
@@ -85,13 +35,13 @@ export const useStudyTime = () => {
         const messageText = message.displayMessage.toLowerCase().trim();
 
         if (existingUser) {
-          if (messageText.includes('start')) {
+          if (messageText.includes(START_STUDY_KEYWORDS)) {
             // 勉強開始
             if (!existingUser.isStudying) {
               existingUser.startTime = currentTime;
               existingUser.isStudying = true;
             }
-          } else if (messageText.includes('end')) {
+          } else if (messageText.includes(END_STUDY_KEYWORDS)) {
             // 勉強終了
             if (existingUser.isStudying && existingUser.startTime) {
               const studyDuration = Math.floor(
@@ -107,7 +57,7 @@ export const useStudyTime = () => {
           }
         } else {
           // 新規ユーザー
-          const isStarting = messageText.includes('start');
+          const isStarting = messageText.includes(START_STUDY_KEYWORDS);
           newUsers.set(message.authorDisplayName, {
             name: message.authorDisplayName,
             studyTime: 0,
@@ -157,23 +107,22 @@ export const useStudyTime = () => {
     }
   }, [updateStudyTime]);
 
-  // Temporarily disable API polling to test mock data
-  // useEffect(() => {
-  //   let timeoutId: NodeJS.Timeout;
+  useEffect(() => {
+    let timeoutId: NodeJS.Timeout;
 
-  //   const poll = async () => {
-  //     const interval = await fetchLiveChatMessages();
-  //     timeoutId = setTimeout(poll, interval);
-  //   };
+    const poll = async () => {
+      const interval = await fetchLiveChatMessages();
+      timeoutId = setTimeout(poll, interval);
+    };
 
-  //   poll();
+    poll();
 
-  //   return () => {
-  //     if (timeoutId) {
-  //       clearTimeout(timeoutId);
-  //     }
-  //   };
-  // }, []);
+    return () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
+  }, [fetchLiveChatMessages]);
 
   const formatTime = (seconds: number): string => {
     if (seconds === 0) {

@@ -45,9 +45,9 @@ export const StudyTimeDisplay = ({
       setIsTransitioning(true);
       setTimeout(() => {
         setCurrentPage((prev) => {
-          let totalViews = 1; // 個人進捗は常に表示
+          let totalViews = 2; // 個人進捗 + Study Time Tracker（ユーザー0人でも表示）
           if (users.length > 0) {
-            totalViews += totalPages; // ユーザーページ数を追加
+            totalViews = 1 + totalPages; // 個人進捗 + ユーザーページ数
             if (showProgressBar) {
               totalViews += 1; // プログレスバーページを追加
             }
@@ -68,7 +68,7 @@ export const StudyTimeDisplay = ({
             setShowPersonalProgress(false);
             setShowProgressBarState(true);
           } else {
-            // ユーザーページ
+            // ユーザーページまたは空のStudy Time Tracker
             setShowPersonalProgress(false);
             setShowProgressBarState(false);
           }
@@ -104,14 +104,14 @@ export const StudyTimeDisplay = ({
           <div className="flex justify-between items-center mb-4">
             <h1 className="text-4xl font-bold text-white">
               {showPersonalProgress
-                ? 'Progress on 基本情報技術者'
+                ? 'My Study Progress'
                 : showProgressBarState
                 ? `Everyone's Total Time`
                 : 'Study Time Tracker'}
             </h1>
             <div className="text-white text-2xl">
               {showPersonalProgress
-                ? `Updated: ${personalProgress.updateDate}`
+                ? `Updated Date: ${personalProgress.updateDate}`
                 : `Updated Time: ${
                     mounted ? formatUpdateTime(lastUpdateTime) : '--:--'
                   }`}
@@ -159,9 +159,9 @@ export const StudyTimeDisplay = ({
                 <div className="space-y-2">
                   <div>誰でも勉強時間の計測に参加することができます。</div>
                   <div>
-                    コメントで「start」で開始、「end」で終了で計測できます。
+                    コメント欄に<b>「start」</b>で開始、<b>「end」</b>で終了
                   </div>
-                  <div>複数回の「start」/「end」で時間が累積されます</div>
+                  <div>複数回の<b>「start」/「end」</b>で時間が累積されます</div>
                 </div>
               </div>
             ) : showProgressBar && showProgressBarState ? (
