@@ -98,7 +98,9 @@ export const StudyTimeDisplay = ({
   );
 
   return (
-    <div className="w-screen h-screen p-2 flex justify-start items-end">
+    <div className={`w-screen h-screen p-2 flex justify-start items-end transition-opacity duration-1000 ${
+      isTransitioning ? 'opacity-0' : 'opacity-100'
+    }`}>
       <div className="w-full max-w-2xl flex flex-col justify-end h-full">
         <div className="p-4 mb-2 h-96">
           <div className="flex justify-between items-center mb-4">
@@ -120,11 +122,7 @@ export const StudyTimeDisplay = ({
 
           <div className="flex flex-col h-80">
             {showPersonalProgress ? (
-              <div
-                className={`flex-1 transition-opacity duration-1000 ${
-                  isTransitioning ? 'opacity-0' : 'opacity-100'
-                } flex flex-col justify-start pt-8`}
-              >
+              <div className="flex-1 flex flex-col justify-start pt-8">
                 <div className="space-y-4">
                   <div className="flex justify-between items-center px-4 py-3 bg-white/10 rounded-lg">
                     <span className="text-white font-medium text-2xl">
@@ -155,7 +153,7 @@ export const StudyTimeDisplay = ({
                 </div>
               </div>
             ) : users.length === 0 ? (
-              <div className="text-white text-center text-2xl flex-1 flex items-center justify-center">
+              <div className="text-white text-center text-2xl flex-1 flex items-start justify-center pt-16">
                 <div className="space-y-2">
                   <div>誰でも勉強時間の計測に参加することができます。</div>
                   <div>
@@ -165,11 +163,7 @@ export const StudyTimeDisplay = ({
                 </div>
               </div>
             ) : showProgressBar && showProgressBarState ? (
-              <div
-                className={`flex-1 transition-opacity duration-1000 ${
-                  isTransitioning ? 'opacity-0' : 'opacity-100'
-                } flex flex-col justify-start pt-16 space-y-6`}
-              >
+              <div className="flex-1 flex flex-col justify-start pt-16 space-y-6">
                 <div className="text-white text-center text-5xl font-bold">
                   {formatTime(getTotalStudyTime())}
                 </div>
@@ -193,11 +187,7 @@ export const StudyTimeDisplay = ({
                 </div>
               </div>
             ) : (
-              <div
-                className={`space-y-1 flex-1 transition-opacity duration-1000 ${
-                  isTransitioning ? 'opacity-0' : 'opacity-100'
-                } overflow-hidden`}
-              >
+              <div className="space-y-1 flex-1 overflow-hidden">
                 {displayedUsers.map((user) => (
                   <div
                     key={user.name}
