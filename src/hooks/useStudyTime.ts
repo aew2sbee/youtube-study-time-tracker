@@ -11,7 +11,7 @@ const PERSONAL_STUDY_PROGRESS = {
   totalTime: 21 * 60 * 60, // 個人の累積勉強時間（秒）- 4時間
   examDate: 'Not scheduled yet', // 受験日
   testScore: '科目A: 47%, 科目B: 95%', // テスト結果
-  updateDate: '2025/07/03', // 更新日
+  updateDate: '07/03', // 更新日
 } as const;
 
 // Temporary mock data for testing progress bar

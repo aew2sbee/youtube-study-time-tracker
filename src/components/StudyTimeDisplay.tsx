@@ -103,12 +103,12 @@ export const StudyTimeDisplay = ({
         <div className="p-4 mb-2 h-96">
           <div className="flex justify-between items-center mb-4">
             <h1 className="text-4xl font-bold text-white">
-            {showPersonalProgress ? 'Progress on 基本情報技術者試験'
-          : showProgressBarState ?
-                'Everyone's Total Time' :
-                'Study Time Tracker'
-            }
-              </h1>
+              {showPersonalProgress
+                ? 'Progress on 基本情報技術者'
+                : showProgressBarState
+                ? `Everyone's Total Time`
+                : 'Study Time Tracker'}
+            </h1>
             <div className="text-white text-2xl">
               {showPersonalProgress
                 ? `Updated: ${personalProgress.updateDate}`
@@ -187,9 +187,9 @@ export const StudyTimeDisplay = ({
                   </div>
                 </div>
                 <div className="text-white text-center text-lg">
-                  目標: {formatTime(targetStudyTime)} (
+                  Target: {formatTime(targetStudyTime)} (
                   {Math.floor((getTotalStudyTime() / targetStudyTime) * 100)}%
-                  達成)
+                  achieved)
                 </div>
               </div>
             ) : (
