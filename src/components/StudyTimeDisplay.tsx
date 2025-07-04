@@ -18,6 +18,10 @@ interface StudyTimeDisplayProps {
   };
 }
 
+const USERS_PER_PAGE = 3;
+const TRANSITION_DURATION = 1 * 1000; // フェードトランジション時間（ミリ秒）
+const PAGE_DISPLAY_INTERVAL = 10 * 1000; // ページ表示間隔（ミリ秒）
+
 export const StudyTimeDisplay = ({
   users,
   formatTime,
@@ -33,7 +37,7 @@ export const StudyTimeDisplay = ({
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [showProgressBarState, setShowProgressBarState] = useState(false);
   const [showPersonalProgress, setShowPersonalProgress] = useState(true);
-  const usersPerPage = 3;
+  const usersPerPage = USERS_PER_PAGE;
   const totalPages = Math.ceil(users.length / usersPerPage);
 
   useEffect(() => {
@@ -76,8 +80,8 @@ export const StudyTimeDisplay = ({
           return nextPage;
         });
         setIsTransitioning(false);
-      }, 1000);
-    }, 10000);
+      }, TRANSITION_DURATION);
+    }, PAGE_DISPLAY_INTERVAL);
 
     return () => clearInterval(interval);
   }, [totalPages, users.length, showProgressBar]);
