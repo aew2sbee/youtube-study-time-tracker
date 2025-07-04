@@ -102,15 +102,13 @@ export const StudyTimeDisplay = ({
       <div className="w-full max-w-2xl flex flex-col justify-end h-full">
         <div className="p-4 mb-2 h-96">
           <div className="flex justify-between items-center mb-4">
-            {showPersonalProgress ? (
-              <h1 className="text-2xl font-bold text-white">
-                Progress on 基本情報技術者試験
+            <h1 className="text-4xl font-bold text-white">
+            {showPersonalProgress ? 'Progress on 基本情報技術者試験'
+          : showProgressBarState ?
+                'Everyone's Total Time' :
+                'Study Time Tracker'
+            }
               </h1>
-            ) : (
-              <h1 className="text-4xl font-bold text-white">
-                Study Time Tracker
-              </h1>
-            )}
             <div className="text-white text-2xl">
               {showPersonalProgress
                 ? `Updated: ${personalProgress.updateDate}`
@@ -170,11 +168,8 @@ export const StudyTimeDisplay = ({
               <div
                 className={`flex-1 transition-opacity duration-1000 ${
                   isTransitioning ? 'opacity-0' : 'opacity-100'
-                } flex flex-col justify-center space-y-6`}
+                } flex flex-col justify-start pt-16 space-y-6`}
               >
-                <div className="text-white text-center text-3xl font-bold">
-                  みんなの合計勉強時間
-                </div>
                 <div className="text-white text-center text-5xl font-bold">
                   {formatTime(getTotalStudyTime())}
                 </div>
