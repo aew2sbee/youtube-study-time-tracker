@@ -77,7 +77,7 @@ export const StudyTimeDisplay = ({
                         height={40}
                         className="w-10 h-10 rounded-full"
                       />
-                      <span className="text-white font-medium truncate max-w-[300px]" style={{fontSize: '40px'}}>
+                      <span className="text-white font-medium truncate max-w-[300px]" style={{fontSize: '32px'}}>
                         {user.name}
                       </span>
                     </div>
