@@ -57,7 +57,7 @@ const createMockUsers = (): Map<string, StudyTimeUser> => {
 };
 
 export const useStudyTime = () => {
-  const [users, setUsers] = useState<Map<string, StudyTimeUser>>(createMockUsers());
+  const [users, setUsers] = useState<Map<string, StudyTimeUser>>(new Map());
   const [lastUpdateTime, setLastUpdateTime] = useState<Date>(new Date());
   const [nextPageToken, setNextPageToken] = useState<string>('');
 
@@ -73,13 +73,13 @@ export const useStudyTime = () => {
         const messageText = message.displayMessage.toLowerCase().trim();
         
         if (existingUser) {
-          if (messageText === 'start') {
+          if (messageText.includes('start')) {
             // 勉強開始
             if (!existingUser.isStudying) {
               existingUser.startTime = currentTime;
               existingUser.isStudying = true;
             }
-          } else if (messageText === 'end') {
+          } else if (messageText.includes('end')) {
             // 勉強終了
             if (existingUser.isStudying && existingUser.startTime) {
               const studyDuration = Math.floor((currentTime.getTime() - existingUser.startTime.getTime()) / 1000);
@@ -92,7 +92,7 @@ export const useStudyTime = () => {
           }
         } else {
           // 新規ユーザー
-          const isStarting = messageText === 'start';
+          const isStarting = messageText.includes('start');
           newUsers.set(message.authorDisplayName, {
             name: message.authorDisplayName,
             studyTime: 0,
@@ -140,23 +140,22 @@ export const useStudyTime = () => {
     }
   }, [nextPageToken, updateStudyTime]);
 
-  // Temporarily disable API polling to show mock data
-  // useEffect(() => {
-  //   let timeoutId: NodeJS.Timeout;
+  useEffect(() => {
+    let timeoutId: NodeJS.Timeout;
     
-  //   const poll = async () => {
-  //     const interval = await fetchLiveChatMessages();
-  //     timeoutId = setTimeout(poll, interval);
-  //   };
+    const poll = async () => {
+      const interval = await fetchLiveChatMessages();
+      timeoutId = setTimeout(poll, interval);
+    };
     
-  //   poll();
+    poll();
     
-  //   return () => {
-  //     if (timeoutId) {
-  //       clearTimeout(timeoutId);
-  //     }
-  //   };
-  // }, [fetchLiveChatMessages]);
+    return () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
+  }, [fetchLiveChatMessages]);
 
   const formatTime = (seconds: number): string => {
     const hours = Math.floor(seconds / 3600);

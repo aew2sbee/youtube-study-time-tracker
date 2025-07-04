@@ -45,15 +45,16 @@ export const StudyTimeDisplay = ({
   );
 
   return (
-    <div className="w-screen h-screen p-2 flex justify-start items-center">
-      <div className="w-full max-w-2xl flex flex-col justify-start h-full">
-        <div className="p-4 mb-2 min-h-fit mt-[50vh] transform translate-y-6">
-          <h1 className="text-4xl font-bold text-white text-center mb-4">
-            Study Time Tracker
-          </h1>
-          
-          <div className="text-white text-center text-xl mb-4">
-            Updated: {mounted ? formatUpdateTime(lastUpdateTime) : '--:--'}
+    <div className="w-screen h-screen p-2 flex justify-start items-end">
+      <div className="w-full max-w-2xl flex flex-col justify-end h-full">
+        <div className="p-4 mb-2 min-h-fit">
+          <div className="flex justify-between items-center mb-4">
+            <h1 className="text-4xl font-bold text-white">
+              Study Time Tracker
+            </h1>
+            <div className="text-white text-2xl">
+              Updated: {mounted ? formatUpdateTime(lastUpdateTime) : '--:--'}
+            </div>
           </div>
           
           <div className="flex flex-col">
