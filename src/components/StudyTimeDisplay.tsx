@@ -206,28 +206,24 @@ export const StudyTimeDisplay = ({
                         className="w-10 h-10 rounded-full"
                       />
                       <span
-                        className="text-white font-medium truncate max-w-[300px]"
-                        style={{ fontSize: '32px' }}
+                        className="text-white font-medium truncate max-w-[300px] text-3xl"
                       >
                         {user.name}
                       </span>
                     </div>
 
                     <div
-                      className="text-white font-bold flex items-center space-x-3"
-                      style={{ fontSize: '40px' }}
+                      className="text-white font-bold flex items-center space-x-3 text-4xl"
                     >
                       {user.isStudying ? (
                         <span
-                          className="text-green-400 animate-pulse w-24 text-center"
-                          style={{ fontSize: '24px' }}
+                          className="text-green-400 animate-pulse w-24 text-center text-2xl"
                         >
                           Focusing
                         </span>
                       ) : user.studyTime > 0 ? (
                         <span
-                          className="text-blue-400 w-24 text-center"
-                          style={{ fontSize: '24px' }}
+                          className="text-blue-400 w-24 text-center text-2xl"
                         >
                           Finished
                         </span>
