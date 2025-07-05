@@ -193,10 +193,7 @@ export const StudyTimeDisplay = ({
             ) : (
               <div className="space-y-1 flex-1 overflow-hidden">
                 {displayedUsers.map((user) => (
-                  <div
-                    key={user.name}
-                    className="flex items-center justify-between p-4"
-                  >
+                  <div key={user.name} className="flex items-center justify-between p-4">
                     <div className="flex items-center space-x-4">
                       <Image
                         src={user.profileImageUrl}
@@ -205,26 +202,20 @@ export const StudyTimeDisplay = ({
                         height={40}
                         className="w-10 h-10 rounded-full"
                       />
-                      <span
-                        className="text-white font-medium truncate max-w-[300px] text-3xl"
-                      >
+                      <span className="text-white font-medium truncate max-w-[300px] text-3xl">
                         {user.name}
                       </span>
                     </div>
 
                     <div
-                      className="text-white font-bold flex items-center space-x-3 text-4xl"
+                      className="text-white font-bold flex items-center text-4xl"
                     >
                       {user.isStudying ? (
-                        <span
-                          className="text-green-400 animate-pulse w-24 text-center text-2xl"
-                        >
+                        <span className="text-green-400 w-32 text-center text-2xl mr-8 animate-pulse">
                           Focusing
                         </span>
                       ) : user.studyTime > 0 ? (
-                        <span
-                          className="text-blue-400 w-24 text-center text-2xl"
-                        >
+                        <span className="text-blue-400 w-32 text-center text-2xl mr-8">
                           Finished
                         </span>
                       ) : null}
