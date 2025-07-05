@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { StudyTimeUser, YouTubeLiveChatMessage } from '@/types/youtube';
+import { PERSONAL_STUDY_PROGRESS } from '@/constants/personalProgress';
 
 const START_STUDY_KEYWORDS = 'start';
 const END_STUDY_KEYWORDS = 'end';
@@ -9,13 +10,6 @@ const ADDITIONAL_STUDY_TIME = 1 * 60 * 60; // 追加の勉強時間（秒: h * m
 const TARGET_STUDY_TIME = 2 * 60 * 60; // 目標勉強時間（秒:h * m + sec ）- 2時間
 const SHOW_PROGRESS_BAR = false; // みんなの勉強時間表示の表示/非表示
 
-// 個人の勉強進捗データ
-const PERSONAL_STUDY_PROGRESS = {
-  totalTime: 22 * 60 * 60, // 個人の累積勉強時間（秒）- 4時間
-  examDate: 'Not scheduled yet', // 受験日
-  testScore: '科目A: 47%, 科目B: 95%', // テスト結果
-  updateDate: '2025/07/05', // 更新日
-} as const;
 
 
 export const useStudyTime = () => {
