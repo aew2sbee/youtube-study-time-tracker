@@ -5,7 +5,7 @@ import { StudyTimeUser } from '@/types/youtube';
 interface StudyTimeDisplayProps {
   users: StudyTimeUser[];
   formatTime: (seconds: number) => string;
-  lastUpdateTime: Date;
+  nextUpdateTime: Date;
   formatUpdateTime: (date: Date) => string;
   getTotalStudyTime: () => number;
   targetStudyTime: number;
@@ -25,7 +25,7 @@ const PAGE_DISPLAY_INTERVAL = 10 * 1000; // ページ表示間隔（ミリ秒）
 export const StudyTimeDisplay = ({
   users,
   formatTime,
-  lastUpdateTime,
+  nextUpdateTime,
   formatUpdateTime,
   getTotalStudyTime,
   targetStudyTime,
@@ -118,8 +118,8 @@ export const StudyTimeDisplay = ({
             <div className="text-white text-2xl">
               {showPersonalProgress
                 ? `Updated Date: ${personalProgress.updateDate}`
-                : `Updated Time: ${
-                    mounted ? formatUpdateTime(lastUpdateTime) : '--:--'
+                : `Next Update: ${
+                    mounted ? formatUpdateTime(nextUpdateTime) : '--:--'
                   }`}
             </div>
           </div>

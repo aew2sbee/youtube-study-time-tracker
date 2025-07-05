@@ -181,9 +181,14 @@ export const useStudyTime = () => {
     return usersTotal + ADDITIONAL_STUDY_TIME;
   };
 
+  const getNextUpdateTime = (): Date => {
+    const nextUpdate = new Date(lastUpdateTime.getTime() + API_POLLING_INTERVAL);
+    return nextUpdate;
+  };
+
   return {
     users: getSortedUsers(),
-    lastUpdateTime,
+    nextUpdateTime: getNextUpdateTime(),
     formatTime,
     formatUpdateTime,
     getTotalStudyTime,
