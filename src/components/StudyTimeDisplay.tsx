@@ -113,7 +113,7 @@ export const StudyTimeDisplay = ({
                 ? 'My Study Progress'
                 : showProgressBarState
                 ? `Everyone's Total Time`
-                : 'Study Time Tracker'}
+                : 'Focus Time Tracker'}
             </h1>
             <div className="text-white text-2xl">
               {showPersonalProgress
@@ -222,7 +222,7 @@ export const StudyTimeDisplay = ({
                           className="text-green-400 animate-pulse w-24 text-center"
                           style={{ fontSize: '24px' }}
                         >
-                          Studying
+                          Focusing
                         </span>
                       ) : user.studyTime > 0 ? (
                         <span
