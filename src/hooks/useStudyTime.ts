@@ -11,10 +11,10 @@ const SHOW_PROGRESS_BAR = false; // みんなの勉強時間表示の表示/非�
 
 // 個人の勉強進捗データ
 const PERSONAL_STUDY_PROGRESS = {
-  totalTime: 21 * 60 * 60, // 個人の累積勉強時間（秒）- 4時間
+  totalTime: 22 * 60 * 60, // 個人の累積勉強時間（秒）- 4時間
   examDate: 'Not scheduled yet', // 受験日
   testScore: '科目A: 47%, 科目B: 95%', // テスト結果
-  updateDate: '2025/07/03', // 更新日
+  updateDate: '2025/07/05', // 更新日
 } as const;
 
 
@@ -143,9 +143,22 @@ export const useStudyTime = () => {
   };
 
   const getSortedUsers = (): StudyTimeUser[] => {
-    // return Array.from(users.values()).sort((a, b) => b.studyTime - a.studyTime);
+    const now = new Date();
     return Array.from(users.values())
       .filter((user) => user.studyTime > 0 || user.isStudying)
+      .map((user) => {
+        // リアルタイム計算: 勉強中の場合は現在時刻までの時間を追加
+        if (user.isStudying && user.startTime) {
+          const currentStudyTime = Math.floor(
+            (now.getTime() - user.startTime.getTime()) / 1000
+          );
+          return {
+            ...user,
+            studyTime: user.studyTime + currentStudyTime,
+          };
+        }
+        return user;
+      })
       .sort((a, b) => b.studyTime - a.studyTime);
   };
 
