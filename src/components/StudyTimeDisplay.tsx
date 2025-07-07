@@ -211,11 +211,11 @@ export const StudyTimeDisplay = ({
                       className="text-white font-bold flex items-center text-4xl"
                     >
                       {user.isStudying ? (
-                        <span className="text-green-400 w-32 text-center text-2xl mr-8 animate-pulse">
+                        <span className="text-green-400 w-32 text-center text-2xl mr-4 animate-pulse">
                           Focusing
                         </span>
                       ) : user.studyTime > 0 ? (
-                        <span className="text-blue-400 w-32 text-center text-2xl mr-8">
+                        <span className="text-blue-400 w-32 text-center text-2xl mr-4">
                           Finished
                         </span>
                       ) : null}
