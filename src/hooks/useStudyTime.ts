@@ -39,9 +39,7 @@ export const useStudyTime = () => {
             // 勉強終了
             if (existingUser.isStudying && existingUser.startTime) {
               const studyDuration = Math.floor(
-                (currentTime.getTime() - existingUser.startTime.getTime()) /
-                  1000
-              );
+                (currentTime.getTime() - existingUser.startTime.getTime()) / 1000);
               if (studyDuration > 0) {
                 existingUser.studyTime += studyDuration;
               }
