@@ -5,7 +5,7 @@ import { StudyTimeUser } from '@/types/youtube';
 interface StudyTimeDisplayProps {
   users: StudyTimeUser[];
   formatTime: (seconds: number) => string;
-  lastUpdateTime: Date;
+  nextUpdateTime: Date;
   formatUpdateTime: (date: Date) => string;
   getTotalStudyTime: () => number;
   targetStudyTime: number;
@@ -15,6 +15,7 @@ interface StudyTimeDisplayProps {
     examDate: string;
     testScore: string;
     updateDate: string;
+    currentStudy: string;
   };
 }
 
@@ -25,7 +26,7 @@ const PAGE_DISPLAY_INTERVAL = 10 * 1000; // ページ表示間隔（ミリ秒）
 export const StudyTimeDisplay = ({
   users,
   formatTime,
-  lastUpdateTime,
+  nextUpdateTime,
   formatUpdateTime,
   getTotalStudyTime,
   targetStudyTime,
@@ -118,16 +119,25 @@ export const StudyTimeDisplay = ({
             <div className="text-white text-2xl">
               {showPersonalProgress
                 ? `Updated Date: ${personalProgress.updateDate}`
-                : `Updated Time: ${
-                    mounted ? formatUpdateTime(lastUpdateTime) : '--:--'
+                : `Next Update: ${
+                    mounted ? formatUpdateTime(nextUpdateTime) : '--:--'
                   }`}
             </div>
           </div>
 
           <div className="flex flex-col h-80">
             {showPersonalProgress ? (
-              <div className="flex-1 flex flex-col justify-start pt-8">
+              <div className="flex-1 flex flex-col justify-start pt-4">
                 <div className="space-y-4">
+                  <div className="flex justify-between items-center px-4 py-3 bg-white/10 rounded-lg">
+                    <span className="text-white font-medium text-2xl">
+                      Current Study
+                    </span>
+                    <span className="text-white font-bold text-2xl">
+                      {personalProgress.currentStudy}
+                    </span>
+                  </div>
+
                   <div className="flex justify-between items-center px-4 py-3 bg-white/10 rounded-lg">
                     <span className="text-white font-medium text-2xl">
                       Total Time
@@ -193,10 +203,7 @@ export const StudyTimeDisplay = ({
             ) : (
               <div className="space-y-1 flex-1 overflow-hidden">
                 {displayedUsers.map((user) => (
-                  <div
-                    key={user.name}
-                    className="flex items-center justify-between p-4"
-                  >
+                  <div key={user.name} className="flex items-center justify-between p-4">
                     <div className="flex items-center space-x-4">
                       <Image
                         src={user.profileImageUrl}
@@ -205,30 +212,20 @@ export const StudyTimeDisplay = ({
                         height={40}
                         className="w-10 h-10 rounded-full"
                       />
-                      <span
-                        className="text-white font-medium truncate max-w-[300px]"
-                        style={{ fontSize: '32px' }}
-                      >
+                      <span className="text-white font-medium truncate max-w-[300px] text-3xl">
                         {user.name}
                       </span>
                     </div>
 
                     <div
-                      className="text-white font-bold flex items-center space-x-3"
-                      style={{ fontSize: '40px' }}
+                      className="text-white font-bold flex items-center text-4xl"
                     >
                       {user.isStudying ? (
-                        <span
-                          className="text-green-400 animate-pulse w-24 text-center"
-                          style={{ fontSize: '24px' }}
-                        >
+                        <span className="text-green-400 w-32 text-center text-2xl mr-4 animate-pulse">
                           Focusing
                         </span>
                       ) : user.studyTime > 0 ? (
-                        <span
-                          className="text-blue-400 w-24 text-center"
-                          style={{ fontSize: '24px' }}
-                        >
+                        <span className="text-blue-400 w-32 text-center text-2xl mr-4">
                           Finished
                         </span>
                       ) : null}

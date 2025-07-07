@@ -1,5 +1,6 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { StudyTimeUser, YouTubeLiveChatMessage } from '@/types/youtube';
+import { PERSONAL_STUDY_PROGRESS } from '@/constants/personalProgress';
 
 const START_STUDY_KEYWORDS = 'start';
 const END_STUDY_KEYWORDS = 'end';
@@ -9,19 +10,13 @@ const ADDITIONAL_STUDY_TIME = 1 * 60 * 60; // 追加の勉強時間（秒: h * m
 const TARGET_STUDY_TIME = 2 * 60 * 60; // 目標勉強時間（秒:h * m + sec ）- 2時間
 const SHOW_PROGRESS_BAR = false; // みんなの勉強時間表示の表示/非表示
 
-// 個人の勉強進捗データ
-const PERSONAL_STUDY_PROGRESS = {
-  totalTime: 21 * 60 * 60, // 個人の累積勉強時間（秒）- 4時間
-  examDate: 'Not scheduled yet', // 受験日
-  testScore: '科目A: 47%, 科目B: 95%', // テスト結果
-  updateDate: '2025/07/03', // 更新日
-} as const;
 
 
 export const useStudyTime = () => {
   const [users, setUsers] = useState<Map<string, StudyTimeUser>>(new Map());
   const [lastUpdateTime, setLastUpdateTime] = useState<Date>(new Date());
   const [nextPageToken, setNextPageToken] = useState<string>('');
+  const processedMessagesRef = useRef<Set<string>>(new Set());
 
   const updateStudyTime = useCallback((messages: YouTubeLiveChatMessage[]) => {
     const now = new Date();
@@ -30,34 +25,45 @@ export const useStudyTime = () => {
       const newUsers = new Map(prevUsers);
 
       messages.forEach((message) => {
-        const existingUser = newUsers.get(message.authorDisplayName);
-        const currentTime = new Date(message.publishedAt);
         const messageText = message.displayMessage.toLowerCase().trim();
 
+        // startとendを含まないメッセージはスキップ
+        if (messageText !== START_STUDY_KEYWORDS && messageText !== END_STUDY_KEYWORDS) return
+
+        // 処理済みメッセージをスキップ
+        const messageId = `${message.authorDisplayName}-${message.publishedAt}-${messageText}`;
+        if (processedMessagesRef.current.has(messageId)) return;
+
+        const existingUser = newUsers.get(message.authorDisplayName);
+        const currentTime = new Date(message.publishedAt);
+
         if (existingUser) {
-          if (messageText.includes(START_STUDY_KEYWORDS)) {
+          if (messageText === START_STUDY_KEYWORDS) {
             // 勉強開始
             if (!existingUser.isStudying) {
-              existingUser.startTime = currentTime;
-              existingUser.isStudying = true;
+              newUsers.set(message.authorDisplayName, {
+                ...existingUser,
+                startTime: currentTime,
+                isStudying: true,
+              });
             }
-          } else if (messageText.includes(END_STUDY_KEYWORDS)) {
+          } else if (messageText === END_STUDY_KEYWORDS) {
             // 勉強終了
             if (existingUser.isStudying && existingUser.startTime) {
               const studyDuration = Math.floor(
-                (currentTime.getTime() - existingUser.startTime.getTime()) /
-                  1000
-              );
-              if (studyDuration > 0) {
-                existingUser.studyTime += studyDuration;
-              }
-              existingUser.isStudying = false;
-              existingUser.startTime = undefined;
+                (currentTime.getTime() - existingUser.startTime.getTime()) / 1000);
+              const additionalTime = studyDuration > 0 ? studyDuration : 0;
+              newUsers.set(message.authorDisplayName, {
+                ...existingUser,
+                studyTime: existingUser.studyTime + additionalTime,
+                isStudying: false,
+                startTime: undefined,
+              });
             }
           }
         } else {
           // 新規ユーザー
-          const isStarting = messageText.includes(START_STUDY_KEYWORDS);
+          const isStarting = messageText === START_STUDY_KEYWORDS;
           newUsers.set(message.authorDisplayName, {
             name: message.authorDisplayName,
             studyTime: 0,
@@ -71,14 +77,21 @@ export const useStudyTime = () => {
       return newUsers;
     });
 
+    // 処理済みメッセージを更新
+    messages.forEach(message => {
+      const messageText = message.displayMessage.toLowerCase().trim();
+      if (messageText === START_STUDY_KEYWORDS || messageText === END_STUDY_KEYWORDS) {
+        const messageId = `${message.authorDisplayName}-${message.publishedAt}-${messageText}`;
+        processedMessagesRef.current.add(messageId);
+      }
+    });
+
     setLastUpdateTime(now);
   }, []);
 
   const fetchLiveChatMessages = useCallback(async () => {
     try {
-      const url = `/api/youtube${
-        nextPageToken ? `?pageToken=${nextPageToken}` : ''
-      }`;
+      const url = `/api/youtube${nextPageToken ? `?pageToken=${nextPageToken}` : ''}`;
       const response = await fetch(url);
 
       if (!response.ok) {
@@ -125,9 +138,7 @@ export const useStudyTime = () => {
   }, [fetchLiveChatMessages]);
 
   const formatTime = (seconds: number): string => {
-    if (seconds === 0) {
-      return '00:00';
-    }
+    if (seconds === 0) return '00:00';
     const hours = Math.floor(seconds / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
     return `${hours.toString().padStart(2, '0')}:${minutes
@@ -143,9 +154,22 @@ export const useStudyTime = () => {
   };
 
   const getSortedUsers = (): StudyTimeUser[] => {
-    // return Array.from(users.values()).sort((a, b) => b.studyTime - a.studyTime);
+    const now = new Date();
     return Array.from(users.values())
       .filter((user) => user.studyTime > 0 || user.isStudying)
+      .map((user) => {
+        // リアルタイム計算: 勉強中の場合は現在時刻までの時間を追加
+        if (user.isStudying && user.startTime) {
+          const currentStudyTime = Math.floor(
+            (now.getTime() - user.startTime.getTime()) / 1000
+          );
+          return {
+            ...user,
+            studyTime: user.studyTime + currentStudyTime,
+          };
+        }
+        return user;
+      })
       .sort((a, b) => b.studyTime - a.studyTime);
   };
 
@@ -168,9 +192,14 @@ export const useStudyTime = () => {
     return usersTotal + ADDITIONAL_STUDY_TIME;
   };
 
+  const getNextUpdateTime = (): Date => {
+    const nextUpdate = new Date(lastUpdateTime.getTime() + API_POLLING_INTERVAL);
+    return nextUpdate;
+  };
+
   return {
     users: getSortedUsers(),
-    lastUpdateTime,
+    nextUpdateTime: getNextUpdateTime(),
     formatTime,
     formatUpdateTime,
     getTotalStudyTime,
