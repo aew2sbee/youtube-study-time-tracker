@@ -15,6 +15,7 @@ interface StudyTimeDisplayProps {
     examDate: string;
     testScore: string;
     updateDate: string;
+    currentStudy: string;
   };
 }
 
@@ -126,8 +127,17 @@ export const StudyTimeDisplay = ({
 
           <div className="flex flex-col h-80">
             {showPersonalProgress ? (
-              <div className="flex-1 flex flex-col justify-start pt-8">
+              <div className="flex-1 flex flex-col justify-start pt-4">
                 <div className="space-y-4">
+                  <div className="flex justify-between items-center px-4 py-3 bg-white/10 rounded-lg">
+                    <span className="text-white font-medium text-2xl">
+                      Current Study
+                    </span>
+                    <span className="text-white font-bold text-2xl">
+                      {personalProgress.currentStudy}
+                    </span>
+                  </div>
+
                   <div className="flex justify-between items-center px-4 py-3 bg-white/10 rounded-lg">
                     <span className="text-white font-medium text-2xl">
                       Total Time

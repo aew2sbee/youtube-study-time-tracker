@@ -4,4 +4,5 @@ export const PERSONAL_STUDY_PROGRESS = {
   examDate: 'Not scheduled yet', // 受験日
   testScore: '科目A: 47%, 科目B: 95%', // テスト結果
   updateDate: '2025/07/05', // 更新日
+  currentStudy: '基本情報技術者試験 (FE)', // 現在勉強している内容
 } as const;
