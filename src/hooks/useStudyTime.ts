@@ -24,9 +24,12 @@ export const useStudyTime = () => {
       const newUsers = new Map(prevUsers);
 
       messages.forEach((message) => {
+        const messageText = message.displayMessage.toLowerCase().trim();
+
+        // startとendを含まないメッセージはスキップ
+        if (!messageText.includes(START_STUDY_KEYWORDS) && !messageText.includes(END_STUDY_KEYWORDS)) return
         const existingUser = newUsers.get(message.authorDisplayName);
         const currentTime = new Date(message.publishedAt);
-        const messageText = message.displayMessage.toLowerCase().trim();
 
         if (existingUser) {
           if (messageText.includes(START_STUDY_KEYWORDS)) {
@@ -120,9 +123,7 @@ export const useStudyTime = () => {
   }, [fetchLiveChatMessages]);
 
   const formatTime = (seconds: number): string => {
-    if (seconds === 0) {
-      return '00:00';
-    }
+    if (seconds === 0) return '00:00';
     const hours = Math.floor(seconds / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
     return `${hours.toString().padStart(2, '0')}:${minutes
