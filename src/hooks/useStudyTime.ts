@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { StudyTimeUser, YouTubeLiveChatMessage } from '@/types/youtube';
 import { PERSONAL_STUDY_PROGRESS } from '@/constants/personalProgress';
 
@@ -16,7 +16,7 @@ export const useStudyTime = () => {
   const [users, setUsers] = useState<Map<string, StudyTimeUser>>(new Map());
   const [lastUpdateTime, setLastUpdateTime] = useState<Date>(new Date());
   const [nextPageToken, setNextPageToken] = useState<string>('');
-  const [processedMessages, setProcessedMessages] = useState<Set<string>>(new Set());
+  const processedMessagesRef = useRef<Set<string>>(new Set());
 
   const updateStudyTime = useCallback((messages: YouTubeLiveChatMessage[]) => {
     const now = new Date();
@@ -32,7 +32,7 @@ export const useStudyTime = () => {
 
         // 処理済みメッセージをスキップ
         const messageId = `${message.authorDisplayName}-${message.publishedAt}-${messageText}`;
-        if (processedMessages.has(messageId)) return;
+        if (processedMessagesRef.current.has(messageId)) return;
 
         const existingUser = newUsers.get(message.authorDisplayName);
         const currentTime = new Date(message.publishedAt);
@@ -78,20 +78,16 @@ export const useStudyTime = () => {
     });
 
     // 処理済みメッセージを更新
-    setProcessedMessages(prev => {
-      const newProcessed = new Set(prev);
-      messages.forEach(message => {
-        const messageText = message.displayMessage.toLowerCase().trim();
-        if (messageText === START_STUDY_KEYWORDS || messageText === END_STUDY_KEYWORDS) {
-          const messageId = `${message.authorDisplayName}-${message.publishedAt}-${messageText}`;
-          newProcessed.add(messageId);
-        }
-      });
-      return newProcessed;
+    messages.forEach(message => {
+      const messageText = message.displayMessage.toLowerCase().trim();
+      if (messageText === START_STUDY_KEYWORDS || messageText === END_STUDY_KEYWORDS) {
+        const messageId = `${message.authorDisplayName}-${message.publishedAt}-${messageText}`;
+        processedMessagesRef.current.add(messageId);
+      }
     });
 
     setLastUpdateTime(now);
-  }, [processedMessages]);
+  }, []);
 
   const fetchLiveChatMessages = useCallback(async () => {
     try {
