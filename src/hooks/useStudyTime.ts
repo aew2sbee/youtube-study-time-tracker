@@ -68,9 +68,7 @@ export const useStudyTime = () => {
 
   const fetchLiveChatMessages = useCallback(async () => {
     try {
-      const url = `/api/youtube${
-        nextPageToken ? `?pageToken=${nextPageToken}` : ''
-      }`;
+      const url = `/api/youtube${nextPageToken ? `?pageToken=${nextPageToken}` : ''}`;
       const response = await fetch(url);
 
       if (!response.ok) {
