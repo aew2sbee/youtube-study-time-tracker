@@ -128,7 +128,7 @@ export const StudyTimeDisplay = ({
           <div className="flex flex-col h-80">
             {showPersonalProgress ? (
               <div className="flex-1 flex flex-col justify-start pt-4">
-                <div className="space-y-4">
+                <div className="space-y-1">
                   <div className="flex justify-between items-center px-4 py-3 bg-white/10 rounded-lg">
                     <span className="text-white font-medium text-2xl">
                       Current Study
@@ -168,7 +168,7 @@ export const StudyTimeDisplay = ({
               </div>
             ) : users.length === 0 ? (
               <div className="text-white text-center text-2xl flex-1 flex items-start justify-center pt-16">
-                <div className="space-y-2">
+                <div className="space-y-1">
                   <div>誰でも勉強時間の計測に参加することができます。</div>
                   <div>
                     コメント欄に<b>「start」</b>で開始、<b>「end」</b>で終了
