@@ -8,7 +8,7 @@ jest.useFakeTimers();
 // Mock fetch
 global.fetch = jest.fn();
 
-describe('useStudyTime', () => {
+describe('useStudyTime フック', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     jest.clearAllTimers();
@@ -28,12 +28,12 @@ describe('useStudyTime', () => {
     jest.useFakeTimers();
   });
 
-  test('should initialize with empty users', () => {
+  test('空のユーザーリストで初期化される', () => {
     const { result } = renderHook(() => useStudyTime());
     expect(result.current.users).toEqual([]);
   });
 
-  test('should format time correctly', () => {
+  test('時間フォーマットが正しく動作する', () => {
     const { result } = renderHook(() => useStudyTime());
     expect(result.current.formatTime(0)).toBe('00:00');
     expect(result.current.formatTime(3600)).toBe('01:00');
@@ -41,24 +41,24 @@ describe('useStudyTime', () => {
     expect(result.current.formatTime(3661)).toBe('01:01');
   });
 
-  test('should format update time correctly', () => {
+  test('更新時間フォーマットが正しく動作する', () => {
     const { result } = renderHook(() => useStudyTime());
     const testDate = new Date('2025-01-01T10:30:00');
     expect(result.current.formatUpdateTime(testDate)).toBe('10:30');
   });
 
-  test('should calculate total study time with additional time', () => {
+  test('追加勉強時間を含む合計勉強時間を計算する', () => {
     const { result } = renderHook(() => useStudyTime());
     const totalTime = result.current.getTotalStudyTime();
     expect(totalTime).toBe(3600); // ADDITIONAL_STUDY_TIME = 1 hour
   });
 
-  test('should have correct target study time', () => {
+  test('正しい目標勉強時間を持つ', () => {
     const { result } = renderHook(() => useStudyTime());
     expect(result.current.targetStudyTime).toBe(7200); // 2 hours in seconds
   });
 
-  test('should process study messages through API calls', async () => {
+  test('API呼び出しを通じて勉強メッセージを処理する', async () => {
     const mockMessages: YouTubeLiveChatMessage[] = [
       {
         id: '1',
@@ -96,7 +96,7 @@ describe('useStudyTime', () => {
     });
   });
 
-  test('should handle API errors gracefully', async () => {
+  test('APIエラーを適切に処理する', async () => {
     (global.fetch as jest.Mock).mockResolvedValueOnce({
       ok: false,
       status: 500,
@@ -120,7 +120,7 @@ describe('useStudyTime', () => {
     consoleErrorSpy.mockRestore();
   });
 
-  test('should handle study time calculation correctly', () => {
+  test('勉強時間の計算が正しく動作する', () => {
     const { result } = renderHook(() => useStudyTime());
     
     // Test base calculation (additional time only)
@@ -128,12 +128,12 @@ describe('useStudyTime', () => {
     expect(totalTime).toBe(3600); // 1 hour additional time
   });
 
-  test('should show correct progress bar setting', () => {
+  test('正しいプログレスバー設定を表示する', () => {
     const { result } = renderHook(() => useStudyTime());
     expect(result.current.showProgressBar).toBe(false); // Based on the constant SHOW_PROGRESS_BAR
   });
 
-  test('should have personal progress data', () => {
+  test('個人進捗データを持つ', () => {
     const { result } = renderHook(() => useStudyTime());
     expect(result.current.personalProgress).toBeDefined();
     expect(result.current.personalProgress.totalTime).toBeGreaterThan(0);

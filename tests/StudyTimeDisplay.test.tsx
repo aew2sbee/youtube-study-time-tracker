@@ -14,7 +14,7 @@ jest.mock('next/image', () => ({
 // Mock timers
 jest.useFakeTimers();
 
-describe('StudyTimeDisplay', () => {
+describe('StudyTimeDisplay コンポーネント', () => {
   const mockFormatTime = (seconds: number) => {
     const hours = Math.floor(seconds / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
@@ -70,7 +70,7 @@ describe('StudyTimeDisplay', () => {
     jest.clearAllTimers();
   });
 
-  test('should render personal progress initially', () => {
+  test('初期表示で個人進捗が表示される', () => {
     render(<StudyTimeDisplay {...defaultProps} />);
     
     expect(screen.getByText('My Study Progress')).toBeInTheDocument();
@@ -80,7 +80,7 @@ describe('StudyTimeDisplay', () => {
     expect(screen.getByText('科目A: 47%, 科目B: 95%')).toBeInTheDocument();
   });
 
-  test('should display studying user correctly', () => {
+  test('勉強中のユーザーが正しく表示される', () => {
     // Force display of user page by setting different initial state
     const { rerender } = render(<StudyTimeDisplay {...defaultProps} />);
     
@@ -96,7 +96,7 @@ describe('StudyTimeDisplay', () => {
     expect(screen.getByText('01:00')).toBeInTheDocument();
   });
 
-  test('should display finished user correctly', () => {
+  test('勉強を終了したユーザーが正しく表示される', () => {
     const usersWithFinishedUser: StudyTimeUser[] = [
       {
         name: 'FinishedUser',
@@ -118,7 +118,7 @@ describe('StudyTimeDisplay', () => {
     expect(screen.getByText('00:30')).toBeInTheDocument();
   });
 
-  test('should show empty state when no users', () => {
+  test('ユーザーがいない場合の空状態が表示される', () => {
     render(<StudyTimeDisplay {...{ ...defaultProps, users: [] }} />);
     
     // Simulate page transition to show empty state
@@ -132,7 +132,7 @@ describe('StudyTimeDisplay', () => {
     expect(screen.getByText('「end」')).toBeInTheDocument();
   });
 
-  test('should show progress bar when enabled', () => {
+  test('プログレスバーが有効な場合に表示される', () => {
     const propsWithProgressBar = { ...defaultProps, showProgressBar: true };
     render(<StudyTimeDisplay {...propsWithProgressBar} />);
     
@@ -143,7 +143,7 @@ describe('StudyTimeDisplay', () => {
     expect(propsWithProgressBar.showProgressBar).toBe(true);
   });
 
-  test('should handle pagination correctly', () => {
+  test('ページネーションが正しく処理される', () => {
     const manyUsers: StudyTimeUser[] = Array.from({ length: 5 }, (_, i) => ({
       name: `User${i + 1}`,
       studyTime: 1800,
@@ -161,20 +161,20 @@ describe('StudyTimeDisplay', () => {
     expect(screen.getByText('1 / 2')).toBeInTheDocument();
   });
 
-  test('should format time correctly', () => {
+  test('時間フォーマットが正しく動作する', () => {
     expect(mockFormatTime(0)).toBe('00:00');
     expect(mockFormatTime(3600)).toBe('01:00');
     expect(mockFormatTime(7200)).toBe('02:00');
     expect(mockFormatTime(3661)).toBe('01:01');
   });
 
-  test('should format update time correctly', () => {
+  test('更新時間フォーマットが正しく動作する', () => {
     const testDate = new Date('2025-01-01T10:30:00Z');
     const expectedTime = mockFormatUpdateTime(testDate);
     expect(expectedTime).toMatch(/^\d{2}:\d{2}$/); // Just check format, not exact time due to timezone
   });
 
-  test('should handle transitions correctly', () => {
+  test('ページ遷移が正しく処理される', () => {
     render(<StudyTimeDisplay {...defaultProps} />);
     
     // Initially should show personal progress
@@ -188,7 +188,7 @@ describe('StudyTimeDisplay', () => {
     expect(screen.getByText('Focus Time Tracker')).toBeInTheDocument();
   });
 
-  test('should display progress bar with correct percentage', () => {
+  test('プログレスバーのパーセンテージが正しく表示される', () => {
     const halfProgressProps = {
       ...defaultProps,
       getTotalStudyTime: () => 3600, // 1 hour
@@ -204,7 +204,7 @@ describe('StudyTimeDisplay', () => {
     expect(halfProgressProps.showProgressBar).toBe(true);
   });
 
-  test('should not show progress bar when disabled', () => {
+  test('プログレスバーが無効な場合は表示されない', () => {
     render(<StudyTimeDisplay {...defaultProps} showProgressBar={false} />);
     
     // Even after multiple transitions, should not show progress bar

@@ -1,8 +1,8 @@
 // Simple test for YouTube API types and basic structure
 import { YouTubeLiveChatMessage, LiveChatResponse } from '../src/types/youtube';
 
-describe('YouTube API Types', () => {
-  test('should have correct message structure', () => {
+describe('YouTube API 型', () => {
+  test('正しいメッセージ構造を持つ', () => {
     const message: YouTubeLiveChatMessage = {
       id: 'test-id',
       authorDisplayName: 'TestUser',
@@ -18,7 +18,7 @@ describe('YouTube API Types', () => {
     expect(message.profileImageUrl).toBe('https://example.com/avatar.jpg');
   });
 
-  test('should have correct response structure', () => {
+  test('正しいレスポンス構造を持つ', () => {
     const response: LiveChatResponse = {
       messages: [
         {
@@ -38,7 +38,7 @@ describe('YouTube API Types', () => {
     expect(response.pollingIntervalMillis).toBe(5000);
   });
 
-  test('should handle messages with study keywords', () => {
+  test('勉強キーワードを含むメッセージを処理する', () => {
     const startMessage: YouTubeLiveChatMessage = {
       id: 'start-msg',
       authorDisplayName: 'StudyUser',

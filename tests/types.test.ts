@@ -1,7 +1,7 @@
 import { YouTubeLiveChatMessage, StudyTimeUser, LiveChatResponse } from '../src/types/youtube';
 
-describe('Type definitions', () => {
-  test('YouTubeLiveChatMessage should have correct structure', () => {
+describe('型定義', () => {
+  test('YouTubeLiveChatMessageが正しい構造を持つ', () => {
     const message: YouTubeLiveChatMessage = {
       id: 'test-id',
       authorDisplayName: 'TestUser',
@@ -17,7 +17,7 @@ describe('Type definitions', () => {
     expect(message.profileImageUrl).toBe('https://example.com/avatar.jpg');
   });
 
-  test('StudyTimeUser should have correct structure', () => {
+  test('StudyTimeUserが正しい構造を持つ', () => {
     const user: StudyTimeUser = {
       name: 'TestUser',
       studyTime: 3600,
@@ -33,7 +33,7 @@ describe('Type definitions', () => {
     expect(user.isStudying).toBe(true);
   });
 
-  test('StudyTimeUser should work without optional fields', () => {
+  test('StudyTimeUserがオプションフィールドなしで動作する', () => {
     const user: StudyTimeUser = {
       name: 'TestUser',
       studyTime: 0,
@@ -47,7 +47,7 @@ describe('Type definitions', () => {
     expect(user.isStudying).toBe(false);
   });
 
-  test('LiveChatResponse should have correct structure', () => {
+  test('LiveChatResponseが正しい構造を持つ', () => {
     const response: LiveChatResponse = {
       messages: [
         {
@@ -67,7 +67,7 @@ describe('Type definitions', () => {
     expect(response.pollingIntervalMillis).toBe(5000);
   });
 
-  test('LiveChatResponse should work without optional fields', () => {
+  test('LiveChatResponseがオプションフィールドなしで動作する', () => {
     const response: LiveChatResponse = {
       messages: [],
       pollingIntervalMillis: 5000,

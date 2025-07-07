@@ -1,7 +1,7 @@
 import { PERSONAL_STUDY_PROGRESS } from '../src/constants/personalProgress';
 
-describe('Personal Progress Constants', () => {
-  test('should have correct structure and values', () => {
+describe('個人進捗定数', () => {
+  test('正しい構造と値を持つ', () => {
     expect(PERSONAL_STUDY_PROGRESS).toBeDefined();
     expect(typeof PERSONAL_STUDY_PROGRESS.totalTime).toBe('number');
     expect(typeof PERSONAL_STUDY_PROGRESS.examDate).toBe('string');
@@ -9,26 +9,26 @@ describe('Personal Progress Constants', () => {
     expect(typeof PERSONAL_STUDY_PROGRESS.updateDate).toBe('string');
   });
 
-  test('should have reasonable total time value', () => {
+  test('適切な合計時間値を持つ', () => {
     expect(PERSONAL_STUDY_PROGRESS.totalTime).toBe(79200); // 22 hours in seconds
     expect(PERSONAL_STUDY_PROGRESS.totalTime).toBeGreaterThan(0);
   });
 
-  test('should have expected exam date format', () => {
+  test('期待される試験日フォーマットを持つ', () => {
     expect(PERSONAL_STUDY_PROGRESS.examDate).toBe('Not scheduled yet');
   });
 
-  test('should have test score information', () => {
+  test('テストスコア情報を持つ', () => {
     expect(PERSONAL_STUDY_PROGRESS.testScore).toBe('科目A: 47%, 科目B: 95%');
     expect(PERSONAL_STUDY_PROGRESS.testScore).toMatch(/科目[AB]:/);
   });
 
-  test('should have update date in expected format', () => {
+  test('期待されるフォーマットの更新日を持つ', () => {
     expect(PERSONAL_STUDY_PROGRESS.updateDate).toBe('2025/07/05');
     expect(PERSONAL_STUDY_PROGRESS.updateDate).toMatch(/^\d{4}\/\d{2}\/\d{2}$/);
   });
 
-  test('should be readonly (const assertion)', () => {
+  test('読み取り専用である（const アサーション）', () => {
     // This test ensures the const assertion is working
     // TypeScript will catch if someone tries to modify the object
     expect(() => {

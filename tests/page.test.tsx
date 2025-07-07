@@ -47,15 +47,15 @@ jest.mock('../src/components/StudyTimeDisplay', () => ({
   ),
 }));
 
-describe('Home Page', () => {
-  test('should render StudyTimeDisplay component', () => {
+describe('ホームページ', () => {
+  test('StudyTimeDisplayコンポーネントをレンダリングする', () => {
     render(<Home />);
     
     expect(screen.getByTestId('study-time-display')).toBeInTheDocument();
     expect(screen.getByText('Study Time Display')).toBeInTheDocument();
   });
 
-  test('should pass correct props to StudyTimeDisplay', () => {
+  test('StudyTimeDisplayに正しいプロパティを渡す', () => {
     render(<Home />);
     
     expect(screen.getByText('Users: 1')).toBeInTheDocument();
@@ -63,7 +63,7 @@ describe('Home Page', () => {
     expect(screen.getByText('Update Date: 2025/07/05')).toBeInTheDocument();
   });
 
-  test('should integrate useStudyTime hook correctly', () => {
+  test('useStudyTimeフックを正しく統合する', () => {
     render(<Home />);
     
     // Verify that the hook data is being passed to the component
