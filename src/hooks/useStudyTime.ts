@@ -5,7 +5,7 @@ import { PERSONAL_STUDY_PROGRESS } from '@/constants/personalProgress';
 const START_STUDY_KEYWORDS = 'start';
 const END_STUDY_KEYWORDS = 'end';
 
-const API_POLLING_INTERVAL = 5 * 60 * 1000; // 10分間隔 (10 * 60 * 1000 ms)
+const API_POLLING_INTERVAL = 10 * 60 * 1000; // 10分間隔 (10 * 60 * 1000 ms)
 const ADDITIONAL_STUDY_TIME = 1 * 60 * 60; // 追加の勉強時間（秒: h * m + sec）- 1時間
 const TARGET_STUDY_TIME = 2 * 60 * 60; // 目標勉強時間（秒:h * m + sec ）- 2時間
 const SHOW_PROGRESS_BAR = false; // みんなの勉強時間表示の表示/非表示
@@ -16,6 +16,7 @@ export const useStudyTime = () => {
   const [users, setUsers] = useState<Map<string, StudyTimeUser>>(new Map());
   const [lastUpdateTime, setLastUpdateTime] = useState<Date>(new Date());
   const [nextPageToken, setNextPageToken] = useState<string>('');
+  const [processedMessages, setProcessedMessages] = useState<Set<string>>(new Set());
 
   const updateStudyTime = useCallback((messages: YouTubeLiveChatMessage[]) => {
     const now = new Date();
@@ -27,12 +28,17 @@ export const useStudyTime = () => {
         const messageText = message.displayMessage.toLowerCase().trim();
 
         // startとendを含まないメッセージはスキップ
-        if (!messageText.includes(START_STUDY_KEYWORDS) && !messageText.includes(END_STUDY_KEYWORDS)) return
+        if (messageText !== START_STUDY_KEYWORDS && messageText !== END_STUDY_KEYWORDS) return
+
+        // 処理済みメッセージをスキップ
+        const messageId = `${message.authorDisplayName}-${message.publishedAt}-${messageText}`;
+        if (processedMessages.has(messageId)) return;
+
         const existingUser = newUsers.get(message.authorDisplayName);
         const currentTime = new Date(message.publishedAt);
 
         if (existingUser) {
-          if (messageText.includes(START_STUDY_KEYWORDS)) {
+          if (messageText === START_STUDY_KEYWORDS) {
             // 勉強開始
             if (!existingUser.isStudying) {
               newUsers.set(message.authorDisplayName, {
@@ -41,7 +47,7 @@ export const useStudyTime = () => {
                 isStudying: true,
               });
             }
-          } else if (messageText.includes(END_STUDY_KEYWORDS)) {
+          } else if (messageText === END_STUDY_KEYWORDS) {
             // 勉強終了
             if (existingUser.isStudying && existingUser.startTime) {
               const studyDuration = Math.floor(
@@ -57,7 +63,7 @@ export const useStudyTime = () => {
           }
         } else {
           // 新規ユーザー
-          const isStarting = messageText.includes(START_STUDY_KEYWORDS);
+          const isStarting = messageText === START_STUDY_KEYWORDS;
           newUsers.set(message.authorDisplayName, {
             name: message.authorDisplayName,
             studyTime: 0,
@@ -71,8 +77,21 @@ export const useStudyTime = () => {
       return newUsers;
     });
 
+    // 処理済みメッセージを更新
+    setProcessedMessages(prev => {
+      const newProcessed = new Set(prev);
+      messages.forEach(message => {
+        const messageText = message.displayMessage.toLowerCase().trim();
+        if (messageText === START_STUDY_KEYWORDS || messageText === END_STUDY_KEYWORDS) {
+          const messageId = `${message.authorDisplayName}-${message.publishedAt}-${messageText}`;
+          newProcessed.add(messageId);
+        }
+      });
+      return newProcessed;
+    });
+
     setLastUpdateTime(now);
-  }, []);
+  }, [processedMessages]);
 
   const fetchLiveChatMessages = useCallback(async () => {
     try {
