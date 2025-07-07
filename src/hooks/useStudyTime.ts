@@ -32,19 +32,24 @@ export const useStudyTime = () => {
           if (messageText.includes(START_STUDY_KEYWORDS)) {
             // 勉強開始
             if (!existingUser.isStudying) {
-              existingUser.startTime = currentTime;
-              existingUser.isStudying = true;
+              newUsers.set(message.authorDisplayName, {
+                ...existingUser,
+                startTime: currentTime,
+                isStudying: true,
+              });
             }
           } else if (messageText.includes(END_STUDY_KEYWORDS)) {
             // 勉強終了
             if (existingUser.isStudying && existingUser.startTime) {
               const studyDuration = Math.floor(
                 (currentTime.getTime() - existingUser.startTime.getTime()) / 1000);
-              if (studyDuration > 0) {
-                existingUser.studyTime += studyDuration;
-              }
-              existingUser.isStudying = false;
-              existingUser.startTime = undefined;
+              const additionalTime = studyDuration > 0 ? studyDuration : 0;
+              newUsers.set(message.authorDisplayName, {
+                ...existingUser,
+                studyTime: existingUser.studyTime + additionalTime,
+                isStudying: false,
+                startTime: undefined,
+              });
             }
           }
         } else {
