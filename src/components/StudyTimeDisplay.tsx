@@ -125,7 +125,7 @@ export const StudyTimeDisplay = ({
             </div>
           </div>
 
-          <div className="flex flex-col h-80">
+          <div className="flex flex-col h-90">
             {showPersonalProgress ? (
               <div className="flex-1 flex flex-col justify-start pt-4">
                 <div className="space-y-1">
