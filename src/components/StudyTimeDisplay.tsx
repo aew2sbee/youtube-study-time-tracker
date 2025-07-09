@@ -40,6 +40,7 @@ export const StudyTimeDisplay = ({
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [showProgressBarState, setShowProgressBarState] = useState(false);
   const [showPersonalProgress, setShowPersonalProgress] = useState(true);
+  const [animatedPercentage, setAnimatedPercentage] = useState(0);
   const usersPerPage = USERS_PER_PAGE;
   const totalPages = Math.ceil(users.length / usersPerPage);
 
@@ -88,6 +89,32 @@ export const StudyTimeDisplay = ({
 
     return () => clearInterval(interval);
   }, [totalPages, users.length, showProgressBar]);
+
+  // プログレスバーページでのカウントアップアニメーション
+  useEffect(() => {
+    if (showProgressBarState) {
+      const targetPercentage = Math.floor((getTotalStudyTime() / targetStudyTime) * 100);
+      setAnimatedPercentage(0);
+      
+      const duration = 2000; // 2秒間のアニメーション
+      const steps = 60; // 60フレーム
+      const stepTime = duration / steps;
+      const increment = targetPercentage / steps;
+      
+      let currentStep = 0;
+      const timer = setInterval(() => {
+        currentStep++;
+        const currentValue = Math.min(Math.round(increment * currentStep), targetPercentage);
+        setAnimatedPercentage(currentValue);
+        
+        if (currentStep >= steps) {
+          clearInterval(timer);
+        }
+      }, stepTime);
+      
+      return () => clearInterval(timer);
+    }
+  }, [showProgressBarState, getTotalStudyTime, targetStudyTime]);
 
   // ユーザー表示用のページ計算（個人進捗を除く）
   const getUserPageIndex = () => {
@@ -196,14 +223,14 @@ export const StudyTimeDisplay = ({
                   <div className="text-white text-center">
                     <div className="text-lg mb-2">Current Achieved</div>
                     <div className="text-5xl font-bold">
-                      {Math.floor((getTotalStudyTime() / targetStudyTime) * 100)}%
+                      {animatedPercentage}%
                     </div>
                   </div>
                 </div>
                 <div className="w-2/3 flex flex-col space-y-2 pl-8">
                   <div className="flex justify-center">
                     <Image
-                      src={`/flower/${CURRENT_YEAR_MONTH}/${Math.min(Math.floor((getTotalStudyTime() / targetStudyTime) * 10) + 1, 11)}.png`}
+                      src={`/flower/${CURRENT_YEAR_MONTH}/${Math.min(Math.floor((getTotalStudyTime() / targetStudyTime) * 100 / 10) + 1, 10)}.png`}
                       alt="Progress flower"
                       width={600}
                       height={600}
@@ -214,13 +241,11 @@ export const StudyTimeDisplay = ({
                     <div
                       className="bg-gradient-to-r from-blue-500 to-green-500 h-6 rounded-full transition-all duration-1000 relative overflow-hidden"
                       style={{
-                        width: `${Math.min(
-                          (getTotalStudyTime() / targetStudyTime) * 100,
-                          100
-                        )}%`,
+                        width: `${Math.min(animatedPercentage, 100)}%`,
                       }}
                     >
-                      <div className="absolute inset-0 bg-white opacity-20 animate-pulse"></div>
+                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-30 animate-shimmer"></div>
+                      <div className="absolute inset-0 bg-white opacity-10 animate-pulse"></div>
                     </div>
                   </div>
                 </div>
