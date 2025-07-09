@@ -41,6 +41,8 @@ export const StudyTimeDisplay = ({
   const [showProgressBarState, setShowProgressBarState] = useState(false);
   const [showPersonalProgress, setShowPersonalProgress] = useState(true);
   const [animatedPercentage, setAnimatedPercentage] = useState(0);
+  const [animatedFlowerLevel, setAnimatedFlowerLevel] = useState(1);
+  const [flowerTransitionKey, setFlowerTransitionKey] = useState(0);
   const usersPerPage = USERS_PER_PAGE;
   const totalPages = Math.ceil(users.length / usersPerPage);
 
@@ -77,18 +79,39 @@ export const StudyTimeDisplay = ({
 
             // プログレスバーページでのカウントアップアニメーション
             const targetPercentage = Math.floor((getTotalStudyTime() / targetStudyTime) * 100);
+            const targetFlowerLevel = Math.min(Math.floor(targetPercentage / 10) + 1, 10);
             setAnimatedPercentage(0);
+            setAnimatedFlowerLevel(1);
+            setFlowerTransitionKey(prev => prev + 1);
 
-            const duration = 2000; // 2秒間のアニメーション
-            const steps = 60; // 60フレーム
+            const duration = 3000; // 3秒間のアニメーション（より長く）
+            const steps = 180; // フレーム数をさらに増やして滑らかに
             const stepTime = duration / steps;
-            const increment = targetPercentage / steps;
+            // 花のレベルを段階的に変化させるための配列
+            const flowerLevels: Array<{ level: number; step: number }> = [];
+            for (let i = 1; i <= targetFlowerLevel; i++) {
+              const stepForLevel = Math.round((i / targetFlowerLevel) * steps);
+              flowerLevels.push({ level: i, step: stepForLevel });
+            }
 
             let currentStep = 0;
             animationTimer = setInterval(() => {
               currentStep++;
-              const currentValue = Math.min(Math.round(increment * currentStep), targetPercentage);
-              setAnimatedPercentage(currentValue);
+
+              // 線形に進行させる
+              const progress = Math.min(currentStep / steps, 1);
+              const currentPercentage = Math.min(Math.max(Math.round(targetPercentage * progress), 0), targetPercentage);
+
+              // 現在のステップに対応する花のレベルを見つける
+              let currentFlowerLevel = 1;
+              for (const flowerLevel of flowerLevels) {
+                if (currentStep >= flowerLevel.step) {
+                  currentFlowerLevel = flowerLevel.level;
+                }
+              }
+
+              setAnimatedPercentage(currentPercentage);
+              setAnimatedFlowerLevel(currentFlowerLevel);
 
               if (currentStep >= steps) {
                 clearInterval(animationTimer);
@@ -209,13 +232,13 @@ export const StudyTimeDisplay = ({
                   <div className="text-white text-center">
                     <div className="text-lg mb-2">Target Focus Time</div>
                     <div className="text-5xl font-bold">
-                      {formatTime(targetStudyTime)}
+                      {formatTime(targetStudyTime).slice(0, -3)} H
                     </div>
                   </div>
                   <div className="text-white text-center">
                     <div className="text-lg mb-2">Current Focus Time</div>
                     <div className="text-5xl font-bold">
-                      {formatTime(getTotalStudyTime())}
+                      {formatTime(getTotalStudyTime()).slice(0, -3)} H
                     </div>
                   </div>
                   <div className="text-white text-center">
@@ -228,16 +251,17 @@ export const StudyTimeDisplay = ({
                 <div className="w-2/3 flex flex-col space-y-2 pl-8">
                   <div className="flex justify-center">
                     <Image
-                      src={`/flower/${CURRENT_YEAR_MONTH}/${Math.min(Math.floor((getTotalStudyTime() / targetStudyTime) * 100 / 10) + 1, 10)}.png`}
+                      key={flowerTransitionKey}
+                      src={`/flower/${CURRENT_YEAR_MONTH}/${animatedFlowerLevel}.png`}
                       alt="Progress flower"
                       width={600}
                       height={600}
-                      className="w-64 h-64 object-contain"
+                      className="w-64 h-64 object-contain transition-all duration-300 ease-in-out"
                     />
                   </div>
                   <div className="w-full bg-gray-700 rounded-full h-6">
                     <div
-                      className="bg-gradient-to-r from-blue-500 to-green-500 h-6 rounded-full transition-all duration-1000 relative overflow-hidden"
+                      className="bg-gradient-to-r from-blue-500 to-green-500 h-6 rounded-full transition-all duration-200 ease-out relative overflow-hidden"
                       style={{
                         width: `${Math.min(animatedPercentage, 100)}%`,
                       }}
