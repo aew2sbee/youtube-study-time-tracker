@@ -19,9 +19,11 @@ interface StudyTimeDisplayProps {
   };
 }
 
+const now = new Date();
 const USERS_PER_PAGE = 3;
 const TRANSITION_DURATION = 1 * 1000; // フェードトランジション時間（ミリ秒）
-const PAGE_DISPLAY_INTERVAL = 10 * 1000; // ページ表示間隔（ミリ秒）
+const PAGE_DISPLAY_INTERVAL = 1 * 1000; // ページ表示間隔（ミリ秒）
+const CURRENT_YEAR_MONTH = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}`;
 
 export const StudyTimeDisplay = ({
   users,
@@ -177,27 +179,47 @@ export const StudyTimeDisplay = ({
                 </div>
               </div>
             ) : showProgressBar && showProgressBarState ? (
-              <div className="flex-1 flex flex-col justify-start pt-16 space-y-6">
-                <div className="text-white text-center text-5xl font-bold">
-                  {formatTime(getTotalStudyTime())}
-                </div>
-                <div className="w-full bg-gray-700 rounded-full h-8">
-                  <div
-                    className="bg-gradient-to-r from-blue-500 to-green-500 h-8 rounded-full transition-all duration-1000 relative overflow-hidden"
-                    style={{
-                      width: `${Math.min(
-                        (getTotalStudyTime() / targetStudyTime) * 100,
-                        100
-                      )}%`,
-                    }}
-                  >
-                    <div className="absolute inset-0 bg-white opacity-20 animate-pulse"></div>
+              <div className="flex-1 flex flex-row pt-4">
+                <div className="w-1/3 flex flex-col space-y-2 pr-8">
+                  <div className="text-white text-center">
+                    <div className="text-lg mb-2">Current Study Time</div>
+                    <div className="text-5xl font-bold">
+                      {formatTime(getTotalStudyTime())}
+                    </div>
+                  </div>
+                  <div className="text-white text-center">
+                    <div className="text-lg mb-2">Target Study Time</div>
+                    <div className="text-5xl font-bold">
+                      {formatTime(targetStudyTime)}
+                    </div>
                   </div>
                 </div>
-                <div className="text-white text-center text-lg">
-                  Target: {formatTime(targetStudyTime)} (
-                  {Math.floor((getTotalStudyTime() / targetStudyTime) * 100)}%
-                  Achieved)
+                <div className="w-2/3 flex flex-col space-y-2 pl-8">
+                  <div className="flex justify-center">
+                    <Image
+                      src={`/flower/${CURRENT_YEAR_MONTH}/${Math.min(Math.floor((getTotalStudyTime() / targetStudyTime) * 10) + 1, 11)}.png`}
+                      alt="Progress flower"
+                      width={600}
+                      height={600}
+                      className="w-64 h-64 object-contain"
+                    />
+                  </div>
+                  <div className="w-full bg-gray-700 rounded-full h-6">
+                    <div
+                      className="bg-gradient-to-r from-blue-500 to-green-500 h-6 rounded-full transition-all duration-1000 relative overflow-hidden"
+                      style={{
+                        width: `${Math.min(
+                          (getTotalStudyTime() / targetStudyTime) * 100,
+                          100
+                        )}%`,
+                      }}
+                    >
+                      <div className="absolute inset-0 bg-white opacity-20 animate-pulse"></div>
+                    </div>
+                  </div>
+                  <div className="text-white text-center text-lg">
+                    {Math.floor((getTotalStudyTime() / targetStudyTime) * 100)}% Achieved
+                  </div>
                 </div>
               </div>
             ) : (
