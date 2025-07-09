@@ -22,7 +22,7 @@ interface StudyTimeDisplayProps {
 const now = new Date();
 const USERS_PER_PAGE = 3;
 const TRANSITION_DURATION = 1 * 1000; // フェードトランジション時間（ミリ秒）
-const PAGE_DISPLAY_INTERVAL = 5 * 1000; // ページ表示間隔（ミリ秒）
+const PAGE_DISPLAY_INTERVAL = 10 * 1000; // ページ表示間隔（ミリ秒）
 const CURRENT_YEAR_MONTH = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}`;
 
 export const StudyTimeDisplay = ({
