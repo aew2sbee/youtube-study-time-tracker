@@ -22,7 +22,7 @@ interface StudyTimeDisplayProps {
 const now = new Date();
 const USERS_PER_PAGE = 3;
 const TRANSITION_DURATION = 1 * 1000; // フェードトランジション時間（ミリ秒）
-const PAGE_DISPLAY_INTERVAL =10 * 1000; // ページ表示間隔（ミリ秒）
+const PAGE_DISPLAY_INTERVAL = 5 * 1000; // ページ表示間隔（ミリ秒）
 const CURRENT_YEAR_MONTH = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}`;
 
 export const StudyTimeDisplay = ({
@@ -46,9 +46,8 @@ export const StudyTimeDisplay = ({
 
   useEffect(() => {
     setMounted(true);
-  }, []);
+    let animationTimer: NodeJS.Timeout;
 
-  useEffect(() => {
     const interval = setInterval(() => {
       setIsTransitioning(true);
       setTimeout(() => {
@@ -75,6 +74,26 @@ export const StudyTimeDisplay = ({
             // 最後のページがプログレスバー
             setShowPersonalProgress(false);
             setShowProgressBarState(true);
+
+            // プログレスバーページでのカウントアップアニメーション
+            const targetPercentage = Math.floor((getTotalStudyTime() / targetStudyTime) * 100);
+            setAnimatedPercentage(0);
+
+            const duration = 2000; // 2秒間のアニメーション
+            const steps = 60; // 60フレーム
+            const stepTime = duration / steps;
+            const increment = targetPercentage / steps;
+
+            let currentStep = 0;
+            animationTimer = setInterval(() => {
+              currentStep++;
+              const currentValue = Math.min(Math.round(increment * currentStep), targetPercentage);
+              setAnimatedPercentage(currentValue);
+
+              if (currentStep >= steps) {
+                clearInterval(animationTimer);
+              }
+            }, stepTime);
           } else {
             // ユーザーページまたは空のStudy Time Tracker
             setShowPersonalProgress(false);
@@ -87,34 +106,13 @@ export const StudyTimeDisplay = ({
       }, TRANSITION_DURATION);
     }, PAGE_DISPLAY_INTERVAL);
 
-    return () => clearInterval(interval);
-  }, [totalPages, users.length, showProgressBar]);
-
-  // プログレスバーページでのカウントアップアニメーション
-  useEffect(() => {
-    if (showProgressBarState) {
-      const targetPercentage = Math.floor((getTotalStudyTime() / targetStudyTime) * 100);
-      setAnimatedPercentage(0);
-      
-      const duration = 2000; // 2秒間のアニメーション
-      const steps = 60; // 60フレーム
-      const stepTime = duration / steps;
-      const increment = targetPercentage / steps;
-      
-      let currentStep = 0;
-      const timer = setInterval(() => {
-        currentStep++;
-        const currentValue = Math.min(Math.round(increment * currentStep), targetPercentage);
-        setAnimatedPercentage(currentValue);
-        
-        if (currentStep >= steps) {
-          clearInterval(timer);
-        }
-      }, stepTime);
-      
-      return () => clearInterval(timer);
-    }
-  }, [showProgressBarState, getTotalStudyTime, targetStudyTime]);
+    return () => {
+      clearInterval(interval);
+      if (animationTimer) {
+        clearInterval(animationTimer);
+      }
+    };
+  }, [totalPages, users.length, showProgressBar, getTotalStudyTime, targetStudyTime]);
 
   // ユーザー表示用のページ計算（個人進捗を除く）
   const getUserPageIndex = () => {
