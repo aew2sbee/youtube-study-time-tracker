@@ -22,7 +22,7 @@ interface StudyTimeDisplayProps {
 const now = new Date();
 const USERS_PER_PAGE = 3;
 const TRANSITION_DURATION = 1 * 1000; // フェードトランジション時間（ミリ秒）
-const PAGE_DISPLAY_INTERVAL = 1 * 1000; // ページ表示間隔（ミリ秒）
+const PAGE_DISPLAY_INTERVAL =10 * 1000; // ページ表示間隔（ミリ秒）
 const CURRENT_YEAR_MONTH = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}`;
 
 export const StudyTimeDisplay = ({
@@ -105,7 +105,7 @@ export const StudyTimeDisplay = ({
   );
 
   return (
-    <div className={`w-screen h-screen p-2 flex justify-start items-end transition-opacity duration-1000 ${
+    <div className={`w-screen h-screen p-2 flex justify-start items-end transition-opacity duration-1000 overflow-hidden ${
       isTransitioning ? 'opacity-0' : 'opacity-100'
     }`}>
       <div className="w-full max-w-2xl flex flex-col justify-end h-full">
@@ -182,15 +182,21 @@ export const StudyTimeDisplay = ({
               <div className="flex-1 flex flex-row pt-4">
                 <div className="w-1/3 flex flex-col space-y-2 pr-8">
                   <div className="text-white text-center">
-                    <div className="text-lg mb-2">Current Study Time</div>
+                    <div className="text-lg mb-2">Target Focus Time</div>
+                    <div className="text-5xl font-bold">
+                      {formatTime(targetStudyTime)}
+                    </div>
+                  </div>
+                  <div className="text-white text-center">
+                    <div className="text-lg mb-2">Current Focus Time</div>
                     <div className="text-5xl font-bold">
                       {formatTime(getTotalStudyTime())}
                     </div>
                   </div>
                   <div className="text-white text-center">
-                    <div className="text-lg mb-2">Target Study Time</div>
+                    <div className="text-lg mb-2">Current Achieved</div>
                     <div className="text-5xl font-bold">
-                      {formatTime(targetStudyTime)}
+                      {Math.floor((getTotalStudyTime() / targetStudyTime) * 100)}%
                     </div>
                   </div>
                 </div>
@@ -216,9 +222,6 @@ export const StudyTimeDisplay = ({
                     >
                       <div className="absolute inset-0 bg-white opacity-20 animate-pulse"></div>
                     </div>
-                  </div>
-                  <div className="text-white text-center text-lg">
-                    {Math.floor((getTotalStudyTime() / targetStudyTime) * 100)}% Achieved
                   </div>
                 </div>
               </div>
