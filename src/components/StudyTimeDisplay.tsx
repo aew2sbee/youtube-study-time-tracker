@@ -228,7 +228,7 @@ export const StudyTimeDisplay = ({
               </div>
             ) : showProgressBar && showProgressBarState ? (
               <div className="flex-1 flex flex-row pt-4">
-                <div className="w-2/5 flex flex-col space-y-2 pr-8">
+                <div className="w-2/5 flex flex-col justify-center space-y-2 pr-8">
                   <div className="text-white text-center">
                     <div className="text-lg mb-2">Current Progress</div>
                     <div className="text-5xl font-bold">
