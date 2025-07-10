@@ -163,7 +163,7 @@ export const StudyTimeDisplay = ({
               {showPersonalProgress
                 ? 'My Study Progress'
                 : showProgressBarState
-                ? `Everyone's Total Time`
+                ? `Monthly Challenge`
                 : 'Focus Time Tracker'}
             </h1>
             <div className="text-white text-2xl">
