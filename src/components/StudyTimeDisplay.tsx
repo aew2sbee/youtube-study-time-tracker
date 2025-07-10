@@ -178,7 +178,7 @@ export const StudyTimeDisplay = ({
           <div className="flex flex-col h-90">
             {showPersonalProgress ? (
               <div className="flex-1 flex flex-col justify-start pt-4">
-                <div className="space-y-3">
+                <div className="space-y-2">
                   <div className="flex justify-between items-center px-4 py-3 bg-white/10 rounded-lg">
                     <span className="text-white font-medium text-2xl">
                       Current Study
