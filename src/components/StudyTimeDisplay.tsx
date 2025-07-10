@@ -242,8 +242,8 @@ export const StudyTimeDisplay = ({
                     </div>
                   </div>
                 </div>
-                <div className="w-3/5 flex flex-col space-y-2 pl-8">
-                  <div className="flex justify-center relative">
+                <div className="w-3/5 flex flex-col pl-8 relative">
+                  <div className="flex relative">
                     <Image
                       key={flowerTransitionKey}
                       src={`/flower/${CURRENT_YEAR_MONTH}/${animatedFlowerLevel}.png`}
@@ -296,7 +296,7 @@ export const StudyTimeDisplay = ({
                       </div>
                     )}
                   </div>
-                  <div className="w-full bg-gray-700 rounded-full h-6">
+                  <div className="absolute bottom-2 left-8 right-8 bg-gray-700 rounded-full h-6">
                     <div
                       className="bg-gradient-to-r from-blue-500 to-green-500 h-6 rounded-full transition-all duration-200 ease-out relative overflow-hidden"
                       style={{
@@ -310,7 +310,7 @@ export const StudyTimeDisplay = ({
                 </div>
               </div>
             ) : (
-              <div className="space-y-1 flex-1 overflow-hidden">
+              <div className="space-y-2 flex-1 overflow-hidden">
                 {displayedUsers.map((user) => (
                   <div key={user.name} className="flex items-center justify-between p-4">
                     <div className="flex items-center space-x-4">
