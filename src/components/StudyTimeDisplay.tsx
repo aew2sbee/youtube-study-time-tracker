@@ -178,7 +178,7 @@ export const StudyTimeDisplay = ({
           <div className="flex flex-col h-90">
             {showPersonalProgress ? (
               <div className="flex-1 flex flex-col justify-start pt-4">
-                <div className="space-y-1">
+                <div className="space-y-3">
                   <div className="flex justify-between items-center px-4 py-3 bg-white/10 rounded-lg">
                     <span className="text-white font-medium text-2xl">
                       Current Study
@@ -218,7 +218,7 @@ export const StudyTimeDisplay = ({
               </div>
             ) : users.length === 0 ? (
               <div className="text-white text-center text-2xl flex-1 flex items-start justify-center pt-16">
-                <div className="space-y-1">
+                <div className="space-y-2">
                   <div>誰でも勉強時間の計測に参加することができます。</div>
                   <div>
                     コメント欄に<b>「start」</b>で開始、<b>「end」</b>で終了
@@ -228,27 +228,21 @@ export const StudyTimeDisplay = ({
               </div>
             ) : showProgressBar && showProgressBarState ? (
               <div className="flex-1 flex flex-row pt-4">
-                <div className="w-1/3 flex flex-col space-y-2 pr-8">
+                <div className="w-2/5 flex flex-col space-y-2 pr-8">
                   <div className="text-white text-center">
-                    <div className="text-lg mb-2">Target Focus Time</div>
+                    <div className="text-lg mb-2">Current Progress</div>
                     <div className="text-5xl font-bold">
-                      {formatTime(targetStudyTime).slice(0, -3)} H
+                      {parseInt(formatTime(getTotalStudyTime()).slice(0, -3))} / {parseInt(formatTime(targetStudyTime).slice(0, -3))} H
                     </div>
                   </div>
                   <div className="text-white text-center">
-                    <div className="text-lg mb-2">Current Focus Time</div>
-                    <div className="text-5xl font-bold">
-                      {formatTime(getTotalStudyTime()).slice(0, -3)} H
-                    </div>
-                  </div>
-                  <div className="text-white text-center">
-                    <div className="text-lg mb-2">Current Achieved</div>
+                    <div className="text-lg mb-2">Current Progress Percent</div>
                     <div className="text-5xl font-bold">
                       {animatedPercentage} %
                     </div>
                   </div>
                 </div>
-                <div className="w-2/3 flex flex-col space-y-2 pl-8">
+                <div className="w-3/5 flex flex-col space-y-2 pl-8">
                   <div className="flex justify-center relative">
                     <Image
                       key={flowerTransitionKey}
