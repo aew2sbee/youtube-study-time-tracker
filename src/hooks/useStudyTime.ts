@@ -168,7 +168,6 @@ export const useStudyTime = () => {
         }
         return user;
       })
-      .sort((a, b) => b.studyTime - a.studyTime);
   };
 
   const getTotalStudyTime = (): number => {
