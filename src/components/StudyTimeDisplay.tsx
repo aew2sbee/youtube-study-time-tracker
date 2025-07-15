@@ -243,7 +243,7 @@ export const StudyTimeDisplay = ({
                   </div>
                 </div>
                 <div className="w-3/5 flex flex-col pl-8 relative">
-                  <div className="flex relative">
+                  <div className="flex justify-center items-center relative">
                     <Image
                       key={flowerTransitionKey}
                       src={`/flower/${CURRENT_YEAR_MONTH}/${animatedFlowerLevel}.png`}
