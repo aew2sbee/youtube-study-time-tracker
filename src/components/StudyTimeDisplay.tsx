@@ -190,10 +190,10 @@ export const StudyTimeDisplay = ({
 
                   <div className="flex justify-between items-center px-4 py-3 bg-white/10 rounded-lg">
                     <span className="text-white font-medium text-2xl">
-                      Total Time
+                      Total Study Time
                     </span>
                     <span className="text-white font-bold text-2xl">
-                      {formatTime(personalProgress.totalTime)}
+                      {personalProgress.totalTime} / 150h
                     </span>
                   </div>
 
