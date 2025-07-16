@@ -232,7 +232,7 @@ export const StudyTimeDisplay = ({
                   <div className="text-white text-center">
                     <div className="text-lg mb-2">Current Progress</div>
                     <div className="text-5xl font-bold">
-                      {parseInt(formatTime(getTotalStudyTime()).slice(0, -3))} / {parseInt(formatTime(targetStudyTime).slice(0, -3))} H
+                      {parseInt(formatTime(getTotalStudyTime()).slice(0, -3))} / {parseInt(formatTime(targetStudyTime).slice(0, -3))} h
                     </div>
                   </div>
                   <div className="text-white text-center">
