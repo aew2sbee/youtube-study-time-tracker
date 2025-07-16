@@ -1,14 +1,12 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { StudyTimeUser, YouTubeLiveChatMessage } from '@/types/youtube';
 import { PERSONAL_STUDY_PROGRESS } from '@/constants/personalProgress';
+import { ADDITIONAL_STUDY_TIME, TARGET_STUDY_TIME, SHOW_PROGRESS_BAR } from '@/constants/config';
 
 const START_STUDY_KEYWORDS = 'start';
 const END_STUDY_KEYWORDS = 'end';
 
 const API_POLLING_INTERVAL = 5 * 60 * 1000; // 5分間隔 (5 * 60 * 1000 ms)
-const ADDITIONAL_STUDY_TIME = 1 * 60 * 60; // 追加の勉強時間（秒: h * m + sec）- 1時間
-const TARGET_STUDY_TIME = 2 * 60 * 60; // 目標勉強時間（秒:h * m + sec ）- 2時間
-const SHOW_PROGRESS_BAR = false; // みんなの勉強時間表示の表示/非表示
 
 
 
@@ -170,7 +168,6 @@ export const useStudyTime = () => {
         }
         return user;
       })
-      .sort((a, b) => b.studyTime - a.studyTime);
   };
 
   const getTotalStudyTime = (): number => {

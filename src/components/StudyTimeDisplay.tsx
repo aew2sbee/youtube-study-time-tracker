@@ -19,9 +19,11 @@ interface StudyTimeDisplayProps {
   };
 }
 
+const now = new Date();
 const USERS_PER_PAGE = 3;
 const TRANSITION_DURATION = 1 * 1000; // フェードトランジション時間（ミリ秒）
 const PAGE_DISPLAY_INTERVAL = 10 * 1000; // ページ表示間隔（ミリ秒）
+const CURRENT_YEAR_MONTH = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}`;
 
 export const StudyTimeDisplay = ({
   users,
@@ -38,14 +40,16 @@ export const StudyTimeDisplay = ({
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [showProgressBarState, setShowProgressBarState] = useState(false);
   const [showPersonalProgress, setShowPersonalProgress] = useState(true);
+  const [animatedPercentage, setAnimatedPercentage] = useState(0);
+  const [animatedFlowerLevel, setAnimatedFlowerLevel] = useState(1);
+  const [flowerTransitionKey, setFlowerTransitionKey] = useState(0);
   const usersPerPage = USERS_PER_PAGE;
   const totalPages = Math.ceil(users.length / usersPerPage);
 
   useEffect(() => {
     setMounted(true);
-  }, []);
+    let animationTimer: NodeJS.Timeout;
 
-  useEffect(() => {
     const interval = setInterval(() => {
       setIsTransitioning(true);
       setTimeout(() => {
@@ -72,6 +76,47 @@ export const StudyTimeDisplay = ({
             // 最後のページがプログレスバー
             setShowPersonalProgress(false);
             setShowProgressBarState(true);
+
+            // プログレスバーページでのカウントアップアニメーション
+            const targetPercentage = Math.floor((getTotalStudyTime() / targetStudyTime) * 100);
+            const targetFlowerLevel = Math.min(Math.floor(targetPercentage / 10) + 1, 10);
+            setAnimatedPercentage(0);
+            setAnimatedFlowerLevel(1);
+            setFlowerTransitionKey(prev => prev + 1);
+
+            const duration = 3000; // 3秒間のアニメーション（より長く）
+            const steps = 180; // フレーム数をさらに増やして滑らかに
+            const stepTime = duration / steps;
+            // 花のレベルを段階的に変化させるための配列
+            const flowerLevels: Array<{ level: number; step: number }> = [];
+            for (let i = 1; i <= targetFlowerLevel; i++) {
+              const stepForLevel = Math.round((i / targetFlowerLevel) * steps);
+              flowerLevels.push({ level: i, step: stepForLevel });
+            }
+
+            let currentStep = 0;
+            animationTimer = setInterval(() => {
+              currentStep++;
+
+              // 線形に進行させる
+              const progress = Math.min(currentStep / steps, 1);
+              const currentPercentage = Math.min(Math.max(Math.round(targetPercentage * progress), 0), targetPercentage);
+
+              // 現在のステップに対応する花のレベルを見つける
+              let currentFlowerLevel = 1;
+              for (const flowerLevel of flowerLevels) {
+                if (currentStep >= flowerLevel.step) {
+                  currentFlowerLevel = flowerLevel.level;
+                }
+              }
+
+              setAnimatedPercentage(currentPercentage);
+              setAnimatedFlowerLevel(currentFlowerLevel);
+
+              if (currentStep >= steps) {
+                clearInterval(animationTimer);
+              }
+            }, stepTime);
           } else {
             // ユーザーページまたは空のStudy Time Tracker
             setShowPersonalProgress(false);
@@ -84,8 +129,13 @@ export const StudyTimeDisplay = ({
       }, TRANSITION_DURATION);
     }, PAGE_DISPLAY_INTERVAL);
 
-    return () => clearInterval(interval);
-  }, [totalPages, users.length, showProgressBar]);
+    return () => {
+      clearInterval(interval);
+      if (animationTimer) {
+        clearInterval(animationTimer);
+      }
+    };
+  }, [totalPages, users.length, showProgressBar, getTotalStudyTime, targetStudyTime]);
 
   // ユーザー表示用のページ計算（個人進捗を除く）
   const getUserPageIndex = () => {
@@ -103,7 +153,7 @@ export const StudyTimeDisplay = ({
   );
 
   return (
-    <div className={`w-screen h-screen p-2 flex justify-start items-end transition-opacity duration-1000 ${
+    <div className={`w-screen h-screen p-2 flex justify-start items-end transition-opacity duration-1000 overflow-hidden ${
       isTransitioning ? 'opacity-0' : 'opacity-100'
     }`}>
       <div className="w-full max-w-2xl flex flex-col justify-end h-full">
@@ -113,7 +163,7 @@ export const StudyTimeDisplay = ({
               {showPersonalProgress
                 ? 'My Study Progress'
                 : showProgressBarState
-                ? `Everyone's Total Time`
+                ? `Monthly Challenge`
                 : 'Focus Time Tracker'}
             </h1>
             <div className="text-white text-2xl">
@@ -128,7 +178,7 @@ export const StudyTimeDisplay = ({
           <div className="flex flex-col h-90">
             {showPersonalProgress ? (
               <div className="flex-1 flex flex-col justify-start pt-4">
-                <div className="space-y-1">
+                <div className="space-y-2">
                   <div className="flex justify-between items-center px-4 py-3 bg-white/10 rounded-lg">
                     <span className="text-white font-medium text-2xl">
                       Current Study
@@ -168,7 +218,7 @@ export const StudyTimeDisplay = ({
               </div>
             ) : users.length === 0 ? (
               <div className="text-white text-center text-2xl flex-1 flex items-start justify-center pt-16">
-                <div className="space-y-1">
+                <div className="space-y-2">
                   <div>誰でも勉強時間の計測に参加することができます。</div>
                   <div>
                     コメント欄に<b>「start」</b>で開始、<b>「end」</b>で終了
@@ -177,31 +227,90 @@ export const StudyTimeDisplay = ({
                 </div>
               </div>
             ) : showProgressBar && showProgressBarState ? (
-              <div className="flex-1 flex flex-col justify-start pt-16 space-y-6">
-                <div className="text-white text-center text-5xl font-bold">
-                  {formatTime(getTotalStudyTime())}
-                </div>
-                <div className="w-full bg-gray-700 rounded-full h-8">
-                  <div
-                    className="bg-gradient-to-r from-blue-500 to-green-500 h-8 rounded-full transition-all duration-1000 relative overflow-hidden"
-                    style={{
-                      width: `${Math.min(
-                        (getTotalStudyTime() / targetStudyTime) * 100,
-                        100
-                      )}%`,
-                    }}
-                  >
-                    <div className="absolute inset-0 bg-white opacity-20 animate-pulse"></div>
+              <div className="flex-1 flex flex-row pt-4">
+                <div className="w-2/5 flex flex-col justify-center space-y-2 pr-8">
+                  <div className="text-white text-center">
+                    <div className="text-lg mb-2">Current Progress</div>
+                    <div className="text-5xl font-bold">
+                      {parseInt(formatTime(getTotalStudyTime()).slice(0, -3))} / {parseInt(formatTime(targetStudyTime).slice(0, -3))} H
+                    </div>
+                  </div>
+                  <div className="text-white text-center">
+                    <div className="text-lg mb-2">Current Progress Percent</div>
+                    <div className="text-5xl font-bold">
+                      {animatedPercentage} %
+                    </div>
                   </div>
                 </div>
-                <div className="text-white text-center text-lg">
-                  Target: {formatTime(targetStudyTime)} (
-                  {Math.floor((getTotalStudyTime() / targetStudyTime) * 100)}%
-                  Achieved)
+                <div className="w-3/5 flex flex-col pl-8 relative">
+                  <div className="flex justify-center items-center relative">
+                    <Image
+                      key={flowerTransitionKey}
+                      src={`/flower/${CURRENT_YEAR_MONTH}/${animatedFlowerLevel}.png`}
+                      alt="Progress flower"
+                      width={600}
+                      height={600}
+                      className="w-64 h-64 object-contain transition-all duration-300 ease-in-out"
+                    />
+                    {animatedFlowerLevel === 10 && (
+                      <div className="absolute inset-0 pointer-events-none">
+                        {/* キラキラエフェクト - 花の画像内に収まるよう配置 */}
+                        <div className="absolute top-36 left-28 w-3 h-3 bg-yellow-200 rounded-full animate-ping opacity-70 animation-delay-1300"></div>
+                        <div className="absolute top-32 left-24 w-3 h-3 bg-yellow-200 rounded-full animate-bounce opacity-70 animation-delay-500"></div>
+                        <div className="absolute top-16 left-20 w-3 h-3 bg-yellow-300 rounded-full animate-ping opacity-75"></div>
+                        <div className="absolute top-7 left-40 w-3 h-3 bg-yellow-300 rounded-full animate-pulse opacity-75 animation-delay-900"></div>
+                        <div className="absolute top-3 left-32 w-2 h-2 bg-yellow-400 rounded-full animate-pulse opacity-80 animation-delay-300"></div>
+                        <div className="absolute top-28 left-64 w-2 h-2 bg-yellow-400 rounded-full animate-bounce opacity-80 animation-delay-1100"></div>
+                        <div className="absolute top-40 left-36 w-2 h-2 bg-yellow-500 rounded-full animate-ping opacity-85 animation-delay-700"></div>
+                        <div className="absolute top-44 left-60 w-2 h-2 bg-yellow-500 rounded-full animate-pulse opacity-85 animation-delay-1500"></div>
+
+                        {/* 右側エリア */}
+                        <div className="absolute top-4 left-60 w-3 h-3 bg-yellow-200 rounded-full animate-bounce opacity-70 animation-delay-1600"></div>
+                        <div className="absolute top-44 left-10 w-2 h-2 bg-yellow-200 rounded-full animate-pulse opacity-70 animation-delay-800"></div>
+                        <div className="absolute top-10 left-72 w-2 h-2 bg-yellow-300 rounded-full animate-bounce opacity-75 animation-delay-200"></div>
+                        <div className="absolute top-12 left-60 w-2 h-2 bg-yellow-300 rounded-full animate-ping opacity-75 animation-delay-1200"></div>
+                        <div className="absolute top-40 left-80 w-3 h-3 bg-yellow-400 rounded-full animate-ping opacity-80 animation-delay-600"></div>
+                        <div className="absolute top-20 left-20 w-2 h-2 bg-yellow-400 rounded-full animate-pulse opacity-80 animation-delay-1400"></div>
+                        <div className="absolute top-16 left-32 w-2 h-2 bg-yellow-500 rounded-full animate-ping opacity-85 animation-delay-1800"></div>
+                        <div className="absolute top-80 left-12 w-3 h-3 bg-yellow-500 rounded-full animate-bounce opacity-85 animation-delay-1000"></div>
+
+                        {/* 下側エリア */}
+                        <div className="absolute top-56 left-28 w-2 h-2 bg-yellow-200 rounded-full animate-pulse opacity-70 animation-delay-750"></div>
+                        <div className="absolute top-48 left-32 w-3 h-3 bg-yellow-200 rounded-full animate-ping opacity-70 animation-delay-350"></div>
+                        <div className="absolute top-48 left-20 w-2 h-2 bg-yellow-300 rounded-full animate-pulse opacity-75 animation-delay-100"></div>
+                        <div className="absolute top-12 left-14 w-2 h-2 bg-yellow-300 rounded-full animate-bounce opacity-75 animation-delay-550"></div>
+                        <div className="absolute top-52 left-64 w-3 h-3 bg-yellow-400 rounded-full animate-ping opacity-80 animation-delay-650"></div>
+                        <div className="absolute top-24 left-72 w-2 h-2 bg-yellow-400 rounded-full animate-bounce opacity-80 animation-delay-250"></div>
+                        <div className="absolute top-14 left-40 w-2 h-2 bg-yellow-500 rounded-full animate-pulse opacity-85 animation-delay-450"></div>
+                        <div className="absolute top-56 left-48 w-2 h-2 bg-yellow-500 rounded-full animate-bounce opacity-85 animation-delay-850"></div>
+
+                        {/* 中央エリア */}
+                        <div className="absolute top-44 left-14 w-3 h-3 bg-yellow-200 rounded-full animate-ping opacity-70 animation-delay-1550"></div>
+                        <div className="absolute top-40 left-32 w-2 h-2 bg-yellow-200 rounded-full animate-bounce opacity-70 animation-delay-1150"></div>
+                        <div className="absolute top-32 left-28 w-3 h-3 bg-yellow-300 rounded-full animate-ping opacity-75 animation-delay-950"></div>
+                        <div className="absolute top-28 left-12 w-2 h-2 bg-yellow-300 rounded-full animate-pulse opacity-75 animation-delay-1350"></div>
+                        <div className="absolute top-36 left-64 w-2 h-2 bg-yellow-400 rounded-full animate-pulse opacity-80 animation-delay-1050"></div>
+                        <div className="absolute top-32 left-80 w-2 h-2 bg-yellow-400 rounded-full animate-bounce opacity-80 animation-delay-1450"></div>
+                        <div className="absolute top-44 left-72 w-3 h-3 bg-yellow-500 rounded-full animate-ping opacity-85 animation-delay-1250"></div>
+                        <div className="absolute top-44 left-80 w-2 h-2 bg-yellow-500 rounded-full animate-pulse opacity-85 animation-delay-1650"></div>
+                      </div>
+                    )}
+                  </div>
+                  <div className="absolute bottom-2 left-8 right-8 bg-gray-700 rounded-full h-6">
+                    <div
+                      className="bg-gradient-to-r from-blue-500 to-green-500 h-6 rounded-full transition-all duration-200 ease-out relative overflow-hidden"
+                      style={{
+                        width: `${Math.min(animatedPercentage, 100)}%`,
+                      }}
+                    >
+                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-30 animate-shimmer"></div>
+                      <div className="absolute inset-0 bg-white opacity-10 animate-pulse"></div>
+                    </div>
+                  </div>
                 </div>
               </div>
             ) : (
-              <div className="space-y-1 flex-1 overflow-hidden">
+              <div className="space-y-2 flex-1 overflow-hidden">
                 {displayedUsers.map((user) => (
                   <div key={user.name} className="flex items-center justify-between p-4">
                     <div className="flex items-center space-x-4">
