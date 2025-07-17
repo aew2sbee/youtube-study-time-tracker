@@ -231,7 +231,7 @@ export const StudyTimeDisplay = ({
                 <div className="w-2/5 flex flex-col justify-center space-y-2 pr-8">
                   <div className="text-white text-center">
                     <div className="text-lg mb-2">Current Progress</div>
-                    <div className="text-5xl font-bold">
+                    <div className="text-4xl font-bold">
                       {parseInt(formatTime(getTotalStudyTime()).slice(0, -3))} / {parseInt(formatTime(targetStudyTime).slice(0, -3))} h
                     </div>
                   </div>

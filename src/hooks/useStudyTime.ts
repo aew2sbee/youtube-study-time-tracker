@@ -136,12 +136,10 @@ export const useStudyTime = () => {
   }, [fetchLiveChatMessages]);
 
   const formatTime = (seconds: number): string => {
-    if (seconds === 0) return '00:00';
+    if (seconds === 0) return '0h 0min';
     const hours = Math.floor(seconds / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
-    return `${hours.toString().padStart(2, '0')}:${minutes
-      .toString()
-      .padStart(2, '0')}`;
+    return `${hours.toString()}h ${minutes.toString()}min`;
   };
 
   const formatUpdateTime = (date: Date): string => {
