@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { StudyTimeUser } from '@/types/youtube';
-import { CRON_TIME_1, CRON_TIME_2, CRON_TIME_3 } from '@/constants/config';
+import { CRON_TIME_GOLD, CRON_TIME_SILVER } from '@/constants/config';
 
 interface StudyTimeDisplayProps {
   users: StudyTimeUser[];
@@ -323,25 +323,17 @@ export const StudyTimeDisplay = ({
                           height={40}
                           className="w-10 h-10 rounded-full"
                         />
-                        {user.studyTime >= CRON_TIME_3 ? (
+                        {user.studyTime >= CRON_TIME_GOLD ? (
                           <Image
-                            src="/crown/3.png"
+                            src="/crown/mark_oukan_crown1_gold.png"
                             alt="crown"
                             width={50}
                             height={50}
                             className="absolute -top-7 left-1/2 transform -translate-x-1/2 w-8 h-8"
                           />
-                        ) : user.studyTime >= CRON_TIME_2 ? (
+                        ) : user.studyTime >= CRON_TIME_SILVER ? (
                           <Image
-                            src="/crown/2.png"
-                            alt="crown"
-                            width={50}
-                            height={50}
-                            className="absolute -top-7 left-1/2 transform -translate-x-1/2 w-8 h-8"
-                          />
-                        ) : user.studyTime >= CRON_TIME_1 ? (
-                          <Image
-                            src="/crown/1.png"
+                            src="/crown/mark_oukan_crown2_silver.png"
                             alt="crown"
                             width={50}
                             height={50}
@@ -387,33 +379,23 @@ export const StudyTimeDisplay = ({
                   <div className="flex justify-center items-center space-x-6">
                     <div className="flex items-center space-x-2">
                       <Image
-                        src="/crown/1.png"
-                        alt="Bronze Crown"
-                        width={24}
-                        height={24}
-                        className="w-6 h-6"
-                      />
-                      <span className="text-white text-sm">30min+</span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Image
-                        src="/crown/2.png"
-                        alt="Silver Crown"
-                        width={24}
-                        height={24}
-                        className="w-6 h-6"
-                      />
-                      <span className="text-white text-sm">60min+</span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Image
-                        src="/crown/3.png"
+                        src="/crown/mark_oukan_crown1_gold.png"
                         alt="Gold Crown"
                         width={24}
                         height={24}
                         className="w-6 h-6"
                       />
-                      <span className="text-white text-sm">120min+</span>
+                      <span className="text-white text-xl">60min+</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Image
+                        src="/crown/mark_oukan_crown2_silver.png"
+                        alt="Silver Crown"
+                        width={24}
+                        height={24}
+                        className="w-6 h-6"
+                      />
+                      <span className="text-white text-xl">30min+</span>
                     </div>
                   </div>
                 </div>

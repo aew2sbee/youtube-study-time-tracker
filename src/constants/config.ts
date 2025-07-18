@@ -7,6 +7,5 @@ export const TARGET_STUDY_TIME = 100 * 60 * 60;
 // みんなの勉強時間表示の表示/非表示
 export const SHOW_PROGRESS_BAR = true;
 
-export const CRON_TIME_1 = 1800; // 30分（秒）
-export const CRON_TIME_2 = 3600; // 1時間（秒）
-export const CRON_TIME_3 = 7200; // 2時間（秒）
+export const CRON_TIME_SILVER = 1800; // 30分（秒）
+export const CRON_TIME_GOLD = 3600; // 1時間（秒）
