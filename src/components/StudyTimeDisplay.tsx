@@ -403,6 +403,45 @@ export const StudyTimeDisplay = ({
                   {userPageIndex + 1} / {totalPages}
                 </div>
               )}
+
+            {users.length > 0 &&
+              !showPersonalProgress &&
+              !(showProgressBar && showProgressBarState) && (
+                <div className="mt-4 p-3 bg-white/10 rounded-lg">
+                  <div className="flex justify-center items-center space-x-6">
+                    <div className="flex items-center space-x-2">
+                      <Image
+                        src="/crown/1.png"
+                        alt="Bronze Crown"
+                        width={24}
+                        height={24}
+                        className="w-6 h-6"
+                      />
+                      <span className="text-white text-sm">30min+</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Image
+                        src="/crown/2.png"
+                        alt="Silver Crown"
+                        width={24}
+                        height={24}
+                        className="w-6 h-6"
+                      />
+                      <span className="text-white text-sm">60min+</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Image
+                        src="/crown/3.png"
+                        alt="Gold Crown"
+                        width={24}
+                        height={24}
+                        className="w-6 h-6"
+                      />
+                      <span className="text-white text-sm">120min+</span>
+                    </div>
+                  </div>
+                </div>
+              )}
           </div>
         </div>
       </div>
