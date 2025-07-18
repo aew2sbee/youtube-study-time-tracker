@@ -80,7 +80,7 @@ export const StudyTimeDisplay = ({
 
             // プログレスバーページでのカウントアップアニメーション
             const targetPercentage = Math.floor((getTotalStudyTime() / targetStudyTime) * 100);
-            const targetFlowerLevel = Math.min(Math.floor(targetPercentage / 20) + 1, 10);
+            const targetFlowerLevel = Math.min(Math.floor(targetPercentage / 10), 10);
             setAnimatedPercentage(0);
             setAnimatedFlowerLevel(1);
             setFlowerTransitionKey(prev => prev + 1);
