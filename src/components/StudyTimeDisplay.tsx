@@ -222,9 +222,7 @@ export const StudyTimeDisplay = ({
                   <div>
                     コメント欄に<b>「start」</b>で開始、<b>「end」</b>で終了
                   </div>
-                  <div>
-                    複数回の<b>「start」/「end」</b>で時間が累積されます
-                  </div>
+                  <div>複数回の<b>「start」/「end」</b>で時間が累積されます</div>
                 </div>
               </div>
             ) : showProgressBar && showProgressBarState ? (
@@ -233,8 +231,7 @@ export const StudyTimeDisplay = ({
                   <div className="text-white text-center">
                     <div className="text-lg mb-2">Current Progress</div>
                     <div className="text-4xl font-bold">
-                      {parseInt(formatTime(getTotalStudyTime()).slice(0, -3))} /{' '}
-                      {parseInt(formatTime(targetStudyTime).slice(0, -3))} h
+                      {parseInt(formatTime(getTotalStudyTime()).slice(0, -3))} / {parseInt(formatTime(targetStudyTime).slice(0, -3))} h
                     </div>
                   </div>
                   <div className="text-white text-center">
