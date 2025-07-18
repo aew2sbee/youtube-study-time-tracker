@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { StudyTimeUser } from '@/types/youtube';
+import { CRON_TIME_1, CRON_TIME_2, CRON_TIME_3 } from '@/constants/config';
 
 interface StudyTimeDisplayProps {
   users: StudyTimeUser[];
@@ -310,25 +311,50 @@ export const StudyTimeDisplay = ({
                 </div>
               </div>
             ) : (
-              <div className="space-y-2 flex-1 overflow-hidden">
+              <div className="space-y-4 flex-1 overflow-hidden p-2">
                 {displayedUsers.map((user) => (
                   <div key={user.name} className="flex items-center justify-between p-4">
                     <div className="flex items-center space-x-4">
-                      <Image
-                        src={user.profileImageUrl}
-                        alt={user.name}
-                        width={40}
-                        height={40}
-                        className="w-10 h-10 rounded-full"
-                      />
+                      <div className="relative">
+                        <Image
+                          src={user.profileImageUrl}
+                          alt={user.name}
+                          width={40}
+                          height={40}
+                          className="w-10 h-10 rounded-full"
+                        />
+                        {user.studyTime >= CRON_TIME_3 ? (
+                          <Image
+                            src="/crown/3.png"
+                            alt="crown"
+                            width={50}
+                            height={50}
+                            className="absolute -top-7 left-1/2 transform -translate-x-1/2 w-8 h-8"
+                          />
+                        ) : user.studyTime >= CRON_TIME_2 ? (
+                          <Image
+                            src="/crown/2.png"
+                            alt="crown"
+                            width={50}
+                            height={50}
+                            className="absolute -top-7 left-1/2 transform -translate-x-1/2 w-8 h-8"
+                          />
+                        ) : user.studyTime >= CRON_TIME_1 ? (
+                          <Image
+                            src="/crown/1.png"
+                            alt="crown"
+                            width={50}
+                            height={50}
+                            className="absolute -top-7 left-1/2 transform -translate-x-1/2 w-8 h-8"
+                          />
+                        ) : null}
+                      </div>
                       <span className="text-white font-medium truncate max-w-[300px] text-3xl">
                         {user.name}
                       </span>
                     </div>
 
-                    <div
-                      className="text-white font-bold flex items-center text-4xl"
-                    >
+                    <div className="text-white font-bold flex items-center text-4xl">
                       {user.isStudying ? (
                         <span className="text-green-400 w-32 text-center text-2xl mr-4 animate-pulse">
                           Focusing
@@ -351,6 +377,45 @@ export const StudyTimeDisplay = ({
               totalPages > 1 && (
                 <div className="text-white text-center mt-3 text-xl">
                   {userPageIndex + 1} / {totalPages}
+                </div>
+              )}
+
+            {users.length > 0 &&
+              !showPersonalProgress &&
+              !(showProgressBar && showProgressBarState) && (
+                <div className="mt-4 p-3 bg-white/10 rounded-lg">
+                  <div className="flex justify-center items-center space-x-6">
+                    <div className="flex items-center space-x-2">
+                      <Image
+                        src="/crown/1.png"
+                        alt="Bronze Crown"
+                        width={24}
+                        height={24}
+                        className="w-6 h-6"
+                      />
+                      <span className="text-white text-sm">30min+</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Image
+                        src="/crown/2.png"
+                        alt="Silver Crown"
+                        width={24}
+                        height={24}
+                        className="w-6 h-6"
+                      />
+                      <span className="text-white text-sm">60min+</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Image
+                        src="/crown/3.png"
+                        alt="Gold Crown"
+                        width={24}
+                        height={24}
+                        className="w-6 h-6"
+                      />
+                      <span className="text-white text-sm">120min+</span>
+                    </div>
+                  </div>
                 </div>
               )}
           </div>
