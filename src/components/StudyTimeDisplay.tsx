@@ -313,10 +313,7 @@ export const StudyTimeDisplay = ({
             ) : (
               <div className="space-y-4 flex-1 overflow-hidden p-2">
                 {displayedUsers.map((user) => (
-                  <div
-                    key={user.name}
-                    className="flex items-center justify-between p-4"
-                  >
+                  <div key={user.name} className="flex items-center justify-between p-4">
                     <div className="flex items-center space-x-4">
                       <div className="relative">
                         <Image
