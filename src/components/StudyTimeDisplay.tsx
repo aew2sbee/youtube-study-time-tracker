@@ -24,9 +24,7 @@ const now = new Date();
 const USERS_PER_PAGE = 3;
 const TRANSITION_DURATION = 1 * 1000; // フェードトランジション時間（ミリ秒）
 const PAGE_DISPLAY_INTERVAL = 10 * 1000; // ページ表示間隔（ミリ秒）
-const CURRENT_YEAR_MONTH = `${now.getFullYear()}${String(
-  now.getMonth() + 1
-).padStart(2, '0')}`;
+const CURRENT_YEAR_MONTH = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}`;
 
 export const StudyTimeDisplay = ({
   users,
@@ -81,16 +79,11 @@ export const StudyTimeDisplay = ({
             setShowProgressBarState(true);
 
             // プログレスバーページでのカウントアップアニメーション
-            const targetPercentage = Math.floor(
-              (getTotalStudyTime() / targetStudyTime) * 100
-            );
-            const targetFlowerLevel = Math.min(
-              Math.floor(targetPercentage / 10) + 1,
-              10
-            );
+            const targetPercentage = Math.floor((getTotalStudyTime() / targetStudyTime) * 100);
+            const targetFlowerLevel = Math.min(Math.floor(targetPercentage / 10) + 1, 10);
             setAnimatedPercentage(0);
             setAnimatedFlowerLevel(1);
-            setFlowerTransitionKey((prev) => prev + 1);
+            setFlowerTransitionKey(prev => prev + 1);
 
             const duration = 3000; // 3秒間のアニメーション（より長く）
             const steps = 180; // フレーム数をさらに増やして滑らかに
@@ -108,10 +101,7 @@ export const StudyTimeDisplay = ({
 
               // 線形に進行させる
               const progress = Math.min(currentStep / steps, 1);
-              const currentPercentage = Math.min(
-                Math.max(Math.round(targetPercentage * progress), 0),
-                targetPercentage
-              );
+              const currentPercentage = Math.min(Math.max(Math.round(targetPercentage * progress), 0), targetPercentage);
 
               // 現在のステップに対応する花のレベルを見つける
               let currentFlowerLevel = 1;
@@ -146,13 +136,7 @@ export const StudyTimeDisplay = ({
         clearInterval(animationTimer);
       }
     };
-  }, [
-    totalPages,
-    users.length,
-    showProgressBar,
-    getTotalStudyTime,
-    targetStudyTime,
-  ]);
+}, [totalPages, users.length, showProgressBar, getTotalStudyTime, targetStudyTime]);
 
   // ユーザー表示用のページ計算（個人進捗を除く）
   const getUserPageIndex = () => {
@@ -170,11 +154,7 @@ export const StudyTimeDisplay = ({
   );
 
   return (
-    <div
-      className={`w-screen h-screen p-2 flex justify-start items-end transition-opacity duration-1000 overflow-hidden ${
-        isTransitioning ? 'opacity-0' : 'opacity-100'
-      }`}
-    >
+    <div className={`w-screen h-screen p-2 flex justify-start items-end transition-opacity duration-1000 overflow-hidden ${isTransitioning ? 'opacity-0' : 'opacity-100'}`}>
       <div className="w-full max-w-2xl flex flex-col justify-end h-full">
         <div className="p-4 mb-2 h-96">
           <div className="flex justify-between items-center mb-4">
