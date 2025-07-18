@@ -80,7 +80,7 @@ export const StudyTimeDisplay = ({
 
             // プログレスバーページでのカウントアップアニメーション
             const targetPercentage = Math.floor((getTotalStudyTime() / targetStudyTime) * 100);
-            const targetFlowerLevel = Math.min(Math.floor(targetPercentage / 10) + 1, 10);
+            const targetFlowerLevel = Math.min(Math.floor(targetPercentage / 20) + 1, 10);
             setAnimatedPercentage(0);
             setAnimatedFlowerLevel(1);
             setFlowerTransitionKey(prev => prev + 1);
@@ -220,7 +220,7 @@ export const StudyTimeDisplay = ({
             ) : users.length === 0 ? (
               <div className="text-white text-center text-2xl flex-1 flex items-start justify-center pt-16">
                 <div className="space-y-2">
-                  <div>誰でも勉強時間の計測に参加することができます。</div>
+                  <div>誰でも集中時間の計測に参加することができます。</div>
                   <div>
                     コメント欄に<b>「start」</b>で開始、<b>「end」</b>で終了
                   </div>
