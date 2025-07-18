@@ -136,7 +136,7 @@ export const StudyTimeDisplay = ({
         clearInterval(animationTimer);
       }
     };
-}, [totalPages, users.length, showProgressBar, getTotalStudyTime, targetStudyTime]);
+  }, [totalPages, users.length, showProgressBar, getTotalStudyTime, targetStudyTime]);
 
   // ユーザー表示用のページ計算（個人進捗を除く）
   const getUserPageIndex = () => {
@@ -154,7 +154,9 @@ export const StudyTimeDisplay = ({
   );
 
   return (
-    <div className={`w-screen h-screen p-2 flex justify-start items-end transition-opacity duration-1000 overflow-hidden ${isTransitioning ? 'opacity-0' : 'opacity-100'}`}>
+    <div className={`w-screen h-screen p-2 flex justify-start items-end transition-opacity duration-1000 overflow-hidden ${
+      isTransitioning ? 'opacity-0' : 'opacity-100'
+    }`}>
       <div className="w-full max-w-2xl flex flex-col justify-end h-full">
         <div className="p-4 mb-2 h-96">
           <div className="flex justify-between items-center mb-4">
