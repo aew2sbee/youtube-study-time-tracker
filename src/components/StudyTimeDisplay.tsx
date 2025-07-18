@@ -310,17 +310,26 @@ export const StudyTimeDisplay = ({
                 </div>
               </div>
             ) : (
-              <div className="space-y-2 flex-1 overflow-hidden">
+              <div className="space-y-4 flex-1 overflow-hidden p-2">
                 {displayedUsers.map((user) => (
                   <div key={user.name} className="flex items-center justify-between p-4">
                     <div className="flex items-center space-x-4">
-                      <Image
-                        src={user.profileImageUrl}
-                        alt={user.name}
-                        width={40}
-                        height={40}
-                        className="w-10 h-10 rounded-full"
-                      />
+                      <div className="relative">
+                        <Image
+                          src={user.profileImageUrl}
+                          alt={user.name}
+                          width={40}
+                          height={40}
+                          className="w-10 h-10 rounded-full"
+                        />
+                        <Image
+                          src="/crown/1.png"
+                          alt="crown"
+                          width={50}
+                          height={50}
+                          className="absolute -top-7 left-1/2 transform -translate-x-1/2 w-8 h-8"
+                        />
+                      </div>
                       <span className="text-white font-medium truncate max-w-[300px] text-3xl">
                         {user.name}
                       </span>
