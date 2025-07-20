@@ -217,4 +217,4 @@ interface YouTubeLiveChatMessage {
 
 
 ​​「Monthly Challenge」という企画でみなさんと100時間に挑戦中!!「start」「end」で誰でも参加できます！
-
+​​「Monthly Challenge」という企画をやっています。でみなさんと100時間に挑戦中!!「start」「end」で誰でも参加できます！
