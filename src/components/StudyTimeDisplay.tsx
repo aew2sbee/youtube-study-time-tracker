@@ -341,7 +341,7 @@ export const StudyTimeDisplay = ({
                           />
                         ) : null}
                       </div>
-                      <span className="text-white font-medium truncate max-w-[300px] text-3xl">
+                      <span className="text-white font-medium truncate max-w-[200px] text-3xl">
                         {user.name}
                       </span>
                     </div>
