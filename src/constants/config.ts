@@ -1,5 +1,5 @@
 // 追加の勉強時間（秒: h * m + sec）- 1時間
-export const ADDITIONAL_STUDY_TIME = 262 * 60 * 60;
+export const ADDITIONAL_STUDY_TIME = 282 * 60 * 60;
 
 // 目標勉強時間（秒:h * m + sec ）- 100時間
 export const TARGET_STUDY_TIME = 100 * 60 * 60;
