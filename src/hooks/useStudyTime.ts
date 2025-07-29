@@ -8,8 +8,6 @@ const END_STUDY_KEYWORDS = 'end';
 
 const API_POLLING_INTERVAL = 5 * 60 * 1000; // 5分間隔 (5 * 60 * 1000 ms)
 
-
-
 export const useStudyTime = () => {
   const [users, setUsers] = useState<Map<string, StudyTimeUser>>(new Map());
   const [lastUpdateTime, setLastUpdateTime] = useState<Date>(new Date());
@@ -116,7 +114,7 @@ export const useStudyTime = () => {
       console.error('Error fetching live chat messages:', error);
       return API_POLLING_INTERVAL;
     }
-  }, [updateStudyTime]);
+  }, [updateStudyTime, nextPageToken]);
 
   useEffect(() => {
     let timeoutId: NodeJS.Timeout;
@@ -135,19 +133,7 @@ export const useStudyTime = () => {
     };
   }, [fetchLiveChatMessages]);
 
-  const formatTime = (seconds: number): string => {
-    if (seconds === 0) return '0h 0min';
-    const hours = Math.floor(seconds / 3600);
-    const minutes = Math.floor((seconds % 3600) / 60);
-    return `${hours.toString()}h ${minutes.toString().padStart(2, '0')}min`;
-  };
 
-  const formatUpdateTime = (date: Date): string => {
-    return `${date.getHours().toString().padStart(2, '0')}:${date
-      .getMinutes()
-      .toString()
-      .padStart(2, '0')}`;
-  };
 
   const getSortedUsers = (): StudyTimeUser[] => {
     const now = new Date();
@@ -168,24 +154,7 @@ export const useStudyTime = () => {
       })
   };
 
-  const getTotalStudyTime = (): number => {
-    const usersTotal = Array.from(users.values())
-      .filter((user) => user.studyTime > 0 || user.isStudying)
-      .reduce((total, user) => {
-        let userTime = user.studyTime;
-        // 現在勉強中の場合は経過時間も追加
-        if (user.isStudying && user.startTime) {
-          const currentTime = Math.floor(
-            (new Date().getTime() - user.startTime.getTime()) / 1000
-          );
-          userTime += currentTime;
-        }
-        return total + userTime;
-      }, 0);
 
-    // 追加の勉強時間を合算
-    return usersTotal + ADDITIONAL_STUDY_TIME;
-  };
 
   const getNextUpdateTime = (): Date => {
     const nextUpdate = new Date(lastUpdateTime.getTime() + API_POLLING_INTERVAL);
