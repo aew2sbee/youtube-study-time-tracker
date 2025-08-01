@@ -2,13 +2,10 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { StudyTimeUser, YouTubeLiveChatMessage } from '@/types/youtube';
 import { PERSONAL_STUDY_PROGRESS } from '@/constants/personalProgress';
 import { ADDITIONAL_STUDY_TIME, TARGET_STUDY_TIME, SHOW_PROGRESS_BAR } from '@/constants/config';
-
-const START_STUDY_KEYWORDS = 'start';
-const END_STUDY_KEYWORDS = 'end';
+import { calcStudyDuration } from '@/utils/calc';
+import { isEndStudyMessage, isStartStudyMessage } from '@/utils/message';
 
 const API_POLLING_INTERVAL = 5 * 60 * 1000; // 5分間隔 (5 * 60 * 1000 ms)
-
-
 
 export const useStudyTime = () => {
   const [users, setUsers] = useState<Map<string, StudyTimeUser>>(new Map());
@@ -26,7 +23,7 @@ export const useStudyTime = () => {
         const messageText = message.displayMessage.toLowerCase().trim();
 
         // startとendを含まないメッセージはスキップ
-        if (messageText !== START_STUDY_KEYWORDS && messageText !== END_STUDY_KEYWORDS) return
+        if (!isStartStudyMessage(messageText) && !isEndStudyMessage(messageText)) return;
 
         // 処理済みメッセージをスキップ
         const messageId = `${message.authorDisplayName}-${message.publishedAt}-${messageText}`;
@@ -36,7 +33,7 @@ export const useStudyTime = () => {
         const currentTime = new Date(message.publishedAt);
 
         if (existingUser) {
-          if (messageText === START_STUDY_KEYWORDS) {
+          if (isStartStudyMessage(messageText)) {
             // 勉強開始
             if (!existingUser.isStudying) {
               newUsers.set(message.authorDisplayName, {
@@ -45,11 +42,10 @@ export const useStudyTime = () => {
                 isStudying: true,
               });
             }
-          } else if (messageText === END_STUDY_KEYWORDS) {
+          } else if (isEndStudyMessage(messageText)) {
             // 勉強終了
             if (existingUser.isStudying && existingUser.startTime) {
-              const studyDuration = Math.floor(
-                (currentTime.getTime() - existingUser.startTime.getTime()) / 1000);
+              const studyDuration = calcStudyDuration(currentTime, existingUser.startTime);
               const additionalTime = studyDuration > 0 ? studyDuration : 0;
               newUsers.set(message.authorDisplayName, {
                 ...existingUser,
@@ -61,7 +57,7 @@ export const useStudyTime = () => {
           }
         } else {
           // 新規ユーザー
-          const isStarting = messageText === START_STUDY_KEYWORDS;
+          const isStarting = isStartStudyMessage(messageText);
           newUsers.set(message.authorDisplayName, {
             name: message.authorDisplayName,
             studyTime: 0,
@@ -76,9 +72,9 @@ export const useStudyTime = () => {
     });
 
     // 処理済みメッセージを更新
-    messages.forEach(message => {
+    messages.forEach((message) => {
       const messageText = message.displayMessage.toLowerCase().trim();
-      if (messageText === START_STUDY_KEYWORDS || messageText === END_STUDY_KEYWORDS) {
+      if (isStartStudyMessage(messageText) || isEndStudyMessage(messageText)) {
         const messageId = `${message.authorDisplayName}-${message.publishedAt}-${messageText}`;
         processedMessagesRef.current.add(messageId);
       }
@@ -134,63 +130,6 @@ export const useStudyTime = () => {
       }
     };
   }, [fetchLiveChatMessages]);
-
-  const formatTime = (seconds: number): string => {
-    if (seconds === 0) return '0h 0min';
-    const hours = Math.floor(seconds / 3600);
-    const minutes = Math.floor((seconds % 3600) / 60);
-    return `${hours.toString()}h ${minutes.toString().padStart(2, '0')}min`;
-  };
-
-  const formatUpdateTime = (date: Date): string => {
-    return `${date.getHours().toString().padStart(2, '0')}:${date
-      .getMinutes()
-      .toString()
-      .padStart(2, '0')}`;
-  };
-
-  const getSortedUsers = (): StudyTimeUser[] => {
-    const now = new Date();
-    return Array.from(users.values())
-      .filter((user) => user.studyTime > 0 || user.isStudying)
-      .map((user) => {
-        // リアルタイム計算: 勉強中の場合は現在時刻までの時間を追加
-        if (user.isStudying && user.startTime) {
-          const currentStudyTime = Math.floor(
-            (now.getTime() - user.startTime.getTime()) / 1000
-          );
-          return {
-            ...user,
-            studyTime: user.studyTime + currentStudyTime,
-          };
-        }
-        return user;
-      })
-  };
-
-  const getTotalStudyTime = (): number => {
-    const usersTotal = Array.from(users.values())
-      .filter((user) => user.studyTime > 0 || user.isStudying)
-      .reduce((total, user) => {
-        let userTime = user.studyTime;
-        // 現在勉強中の場合は経過時間も追加
-        if (user.isStudying && user.startTime) {
-          const currentTime = Math.floor(
-            (new Date().getTime() - user.startTime.getTime()) / 1000
-          );
-          userTime += currentTime;
-        }
-        return total + userTime;
-      }, 0);
-
-    // 追加の勉強時間を合算
-    return usersTotal + ADDITIONAL_STUDY_TIME;
-  };
-
-  const getNextUpdateTime = (): Date => {
-    const nextUpdate = new Date(lastUpdateTime.getTime() + API_POLLING_INTERVAL);
-    return nextUpdate;
-  };
 
   return {
     users: getSortedUsers(),

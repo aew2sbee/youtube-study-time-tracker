@@ -62,15 +62,19 @@ const PersonalProgressPage = () => (
   </div>
 );
 
-const UserListPage = ({ users }: { users: typeof mockUsers }) => (
+const UserListPage = ({ users, pageIndex, totalPages }: { 
+  users: typeof mockUsers; 
+  pageIndex: number; 
+  totalPages: number;
+}) => (
   <div className="text-white space-y-3">
     <div className="text-center mb-4">
       <div className="text-3xl mb-2">👥</div>
       <h2 className="text-xl font-bold">Focus Time Tracker</h2>
     </div>
-    
+
     <div className="space-y-2">
-      {users.slice(0, 4).map((user, index) => (
+      {users.map((user, index) => (
         <div key={index} className="flex items-center justify-between bg-white/10 p-3 rounded-lg">
           <div className="flex items-center space-x-3">
             <div className="text-2xl">{user.avatar}</div>
@@ -95,7 +99,7 @@ const ProgressChartPage = () => (
       <div className="text-4xl mb-2">📊</div>
       <h2 className="text-xl font-bold">Monthly Challenge</h2>
     </div>
-    
+
     <div className="space-y-4">
       {/* Weekly Progress */}
       <div className="bg-blue-500/20 p-3 rounded-lg">
@@ -104,7 +108,7 @@ const ProgressChartPage = () => (
           <span>{mockProgressData.currentWeekTime}h / {mockProgressData.weeklyGoal}h</span>
         </div>
         <div className="w-full bg-blue-900/30 rounded-full h-2">
-          <motion.div 
+          <motion.div
             className="bg-blue-400 h-2 rounded-full"
             initial={{ width: 0 }}
             animate={{ width: `${(mockProgressData.currentWeekTime / mockProgressData.weeklyGoal) * 100}%` }}
@@ -120,7 +124,7 @@ const ProgressChartPage = () => (
           <span>{mockProgressData.currentMonthTime}h / {mockProgressData.monthlyGoal}h</span>
         </div>
         <div className="w-full bg-green-900/30 rounded-full h-2">
-          <motion.div 
+          <motion.div
             className="bg-green-400 h-2 rounded-full"
             initial={{ width: 0 }}
             animate={{ width: `${(mockProgressData.currentMonthTime / mockProgressData.monthlyGoal) * 100}%` }}
@@ -170,10 +174,33 @@ const WelcomePage = () => (
 export default function Home() {
   const [currentPage, setCurrentPage] = useState(0);
 
+  // 3人ずつでページ分割
+  const usersPerPage = 3;
+  const totalUserPages = Math.ceil(mockUsers.length / usersPerPage);
+  
+  // ユーザーページを動的に生成
+  const userPages = Array.from({ length: totalUserPages }, (_, pageIndex) => {
+    const startIndex = pageIndex * usersPerPage;
+    const endIndex = startIndex + usersPerPage;
+    const pageUsers = mockUsers.slice(startIndex, endIndex);
+    
+    return {
+      key: `users-${pageIndex}`,
+      title: totalUserPages > 1 ? `Focus Tracker (${pageIndex + 1}/${totalUserPages})` : 'Focus Tracker',
+      component: (
+        <UserListPage 
+          users={pageUsers} 
+          pageIndex={pageIndex} 
+          totalPages={totalUserPages} 
+        />
+      ),
+    };
+  });
+
   const pages = [
     { key: 'welcome', title: 'Welcome', component: <WelcomePage /> },
     { key: 'personal', title: 'My Progress', component: <PersonalProgressPage /> },
-    { key: 'users', title: 'Focus Tracker', component: <UserListPage users={mockUsers} /> },
+    ...userPages,
     { key: 'progress', title: 'Monthly Challenge', component: <ProgressChartPage /> },
   ];
 
@@ -192,7 +219,7 @@ export default function Home() {
       <div className="absolute bottom-0 left-0 w-[600px] h-[480px] p-4 pointer-events-auto">
         <div className="bg-black/30 backdrop-blur-md rounded-xl p-6 h-full border border-white/20 shadow-2xl">
           {/* Header */}
-          <motion.div 
+          <motion.div
             className="flex justify-between items-center mb-6"
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
