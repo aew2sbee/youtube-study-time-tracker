@@ -5,19 +5,30 @@ import ImageCrown from './ImageCrown';
 import ImageProfile from './ImageProfile';
 
 export default function FocusTimeTracker({ displayedUsers }: { displayedUsers: StudyTimeUser[] }) {
+  
+
+
+
+const totalUserPages = Math.ceil(user.length / parameter.USERS_PER_PAGE);
+
+
   return displayedUsers.length === 0 ? (
     <div className="text-white text-center text-2xl flex-1 flex items-start justify-center pt-16">
       <div className="space-y-2">
-        <div>誰でも集中時間の計測に参加することができます。</div>
+        <div>どなたでも集中時間の計測に参加できます</div>
         <div>
-          コメント欄に<b>「start」</b>で開始、<b>「end」</b>で終了
+          コメント欄に<strong>「start」</strong>で開始、<strong>「end」</strong>で終了
         </div>
         <div>
-          複数回の<b>「start」/「end」</b>で時間が累積されます
+          複数回の<strong>「start」/「end」</strong>で時間が累積されます
         </div>
       </div>
     </div>
-  ) : (
+  ) :
+  
+  
+  
+  (
     <div className="space-y-4 flex-1 overflow-hidden p-2">
       {displayedUsers.map((user) => (
         <div key={user.name} className="flex items-center justify-between p-4">

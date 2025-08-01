@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { parameter } from '@/config/system';
 
 // Mock data
 const mockUsers = [
@@ -171,17 +172,28 @@ const WelcomePage = () => (
   </div>
 );
 
+
+
+
+import HowToUse from "./HowToUse";
+
+const PAGES_COMPENENT = [
+  { key: 'My Progress', title: 'My Progress', component: <PersonalProgressPage /> },
+  { key: 'How to use', title: 'How to use', component: <HowToUse /> },
+  { key: 'Monthly Challenge', title: 'Monthly Challenge', component: <ProgressChartPage /> },
+  ...userPages,
+]
+
 export default function Home() {
   const [currentPage, setCurrentPage] = useState(0);
 
   // 3人ずつでページ分割
-  const usersPerPage = 3;
-  const totalUserPages = Math.ceil(mockUsers.length / usersPerPage);
+  const totalUserPages = Math.ceil(mockUsers.length / parameter.USERS_PER_PAGE);
   
   // ユーザーページを動的に生成
   const userPages = Array.from({ length: totalUserPages }, (_, pageIndex) => {
-    const startIndex = pageIndex * usersPerPage;
-    const endIndex = startIndex + usersPerPage;
+    const startIndex = pageIndex * parameter.USERS_PER_PAGE;
+    const endIndex = startIndex + parameter.USERS_PER_PAGE;
     const pageUsers = mockUsers.slice(startIndex, endIndex);
     
     return {
@@ -207,7 +219,7 @@ export default function Home() {
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentPage((prev) => (prev + 1) % pages.length);
-    }, 10000); // 10秒間隔
+    }, parameter.PAGE_DISPLAY_INTERVAL); // 10秒間隔
 
     return () => clearInterval(interval);
   }, [pages.length]);
