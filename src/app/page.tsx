@@ -7,6 +7,7 @@ import HowToUse from '@/components/HowToUse';
 import FocusTimeTracker from '@/components/FocusTimeTracker';
 import { useStudyTime } from '@/hooks/useStudyTime';
 import MyStudyProgress from '@/components/MyStudyProgress';
+import MonthlyChallenge from '@/components/MonthlyChallenge';
 
 
 // Mock data
@@ -192,7 +193,9 @@ const WelcomePage = () => (
 export default function Home() {
   const { currentTime, users, totalStudyTime } = useStudyTime();
 
-  const [currentPage, setCurrentPage] = useState(0);
+  const [currentPage, setCurrentPage] = useState<number>(0);
+  const [animatedPercentage, setAnimatedPercentage] = useState<number>(0);
+  const [animatedFlowerLevel, setAnimatedFlowerLevel] = useState<number>(1);
 
   // 3人ずつでページ分割
   const userArray = Array.from(users.values());
@@ -216,9 +219,9 @@ export default function Home() {
 
   const pages = [
     { key: 'How to use', title: 'How to use', component: <HowToUse /> },
-    { key: 'My study progress', title: 'My Study Progress', component: <MyStudyProgress /> },
     ...userPages,
-    // { key: 'progress', title: 'Monthly Challenge', component: <ProgressChartPage /> },
+    { key: 'Monthly Challenge', title: 'Monthly Challenge', component: <MonthlyChallenge(currentTime, animatedFlowerLevel, animatedPercentage) /> },
+    { key: 'My study progress', title: 'My Study Progress', component: <MyStudyProgress /> },
   ];
 
   useEffect(() => {

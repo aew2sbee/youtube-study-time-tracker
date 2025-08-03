@@ -2,21 +2,18 @@ import { calcTime } from '@/utils/calc';
 import FlowerImage from './ImageFlower';
 import AnimationStar from './AnimationStar';
 import ProgressBar from './ProgressBar';
+import { parameter } from '@/config/system';
 
 export default function MonthlyChallenge({
   now,
   animatedFlowerLevel,
   animatedPercentage,
-  flowerTransitionKey,
   totalStudyTime,
-  targetStudyTime,
 }: {
   now: Date;
   animatedFlowerLevel: number;
   animatedPercentage: number;
-  flowerTransitionKey: number;
   totalStudyTime: number;
-  targetStudyTime: number;
 }) {
   const CURRENT_YEAR_MONTH = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}`;
   return (
@@ -25,7 +22,7 @@ export default function MonthlyChallenge({
         <div className="text-white text-center">
           <div className="text-lg mb-2">Current Progress</div>
           <div className="text-4xl font-bold">
-            {parseInt(calcTime(totalStudyTime).slice(0, -3))} / {parseInt(calcTime(targetStudyTime).slice(0, -3))} h
+            {parseInt(calcTime(totalStudyTime).slice(0, -3))} / {parseInt(calcTime(parameter.TARGET_STUDY_TIME).slice(0, -3))} h
           </div>
         </div>
         <div className="text-white text-center">
@@ -36,7 +33,7 @@ export default function MonthlyChallenge({
       <div className="w-3/5 flex flex-col pl-8 relative">
         <div className="flex justify-center items-center relative">
           <FlowerImage
-            key={flowerTransitionKey}
+            key={animatedFlowerLevel}
             src={`/flower/${CURRENT_YEAR_MONTH}/${animatedFlowerLevel}.png`}
             alt="Progress flower"
           />
