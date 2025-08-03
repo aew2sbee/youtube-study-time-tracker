@@ -102,3 +102,10 @@ export const calcPercentage = (value: number, total: number): number => {
  * @returns {number} 10段階評価
  */
 export const calcRating10 = (value: number): number => Math.min(Math.floor(value / 10), 10);
+
+
+export const calculateTargetValues = (totalTime: number) => {
+    const targetPercentage = Math.floor((totalTime / parameter.TARGET_STUDY_TIME) * 100);
+    const targetFlowerLevel = Math.min(Math.floor(targetPercentage / 10), 10);
+    return { targetPercentage, targetFlowerLevel };
+  };
