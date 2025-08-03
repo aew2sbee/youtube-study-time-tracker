@@ -59,7 +59,7 @@ export const useStudyTime = () => {
       }
 
       const data = await response.json();
-      
+
       if (data.error) {
         console.error('API error:', data.error);
         // レートリミットエラーの場合は長めの間隔で再試行

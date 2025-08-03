@@ -1,9 +1,6 @@
 import { parameter } from '@/config/system';
 import { StudyTimeUser } from '@/types/youtube';
 
-// 追加の勉強時間（秒: h * m + sec）- 1時間
-const ADDITIONAL_STUDY_TIME = 350 * 60 * 60;
-
 /**
  * 最終更新時刻から次回更新時刻を計算します。
  * @param {Date} lastUpdateTime - 最終更新時刻
@@ -51,7 +48,7 @@ export const calcTotalStudyTime = (users: StudyTimeUser[]): number => {
     }, 0);
 
   // 追加の勉強時間を合算
-  return usersTotal + ADDITIONAL_STUDY_TIME;
+  return usersTotal + parameter.ADDITIONAL_STUDY_TIME;
 };
 
 /**
