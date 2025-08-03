@@ -54,7 +54,7 @@ export default function Home() {
 
   return (
     <div className="fixed inset-0 w-[1920px] h-[1080px] overflow-hidden pointer-events-none from-slate-900 via-slate-800 to-slate-900">
-      <div className="absolute bottom-0 left-0 w-[750px] h-[480px] p-4 pointer-events-auto">
+      <div className="absolute bottom-0 left-0 w-[850px] h-[480px] p-4 pointer-events-auto">
         <div className="bg-black/30 backdrop-blur-md rounded-xl p-6 h-full border border-white/20 shadow-2xl">
           {/* Header */}
           <motion.div
@@ -63,10 +63,10 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <h1 className="text-4xl font-bold text-white">
+            <h1 className="text-5xl font-bold text-white">
               {currentPageData.title}
             </h1>
-            <div className="text-white text-3xl bg-white/10 px-3 py-1 rounded-full">
+            <div className="text-white text-4xl bg-white/10 px-3 py-1 rounded-full">
               {currentTime.toLocaleTimeString('ja-JP', {
                 hour: '2-digit',
                 minute: '2-digit'

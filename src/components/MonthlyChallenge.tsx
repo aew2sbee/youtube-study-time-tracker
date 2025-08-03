@@ -62,10 +62,10 @@ export default function MonthlyChallenge({
         </div>
         <div className="text-white text-center">
           <div className="text-2xl mb-2">Current Progress Percent</div>
-          <div className="text-4xl font-bold">{animatedPercentage} %</div>
+          <div className="text-5xl font-bold">{animatedPercentage} %</div>
         </div>
       </div>
-      <div className="w-3/5 flex flex-col pl-8 relative justify-center items-center">
+      <div className="w-3/5 flex flex-col relative justify-center items-center">
         <div className="flex justify-center items-center relative mb-4">
           <FlowerImage
             key={animatedFlowerLevel}
