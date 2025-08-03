@@ -78,24 +78,32 @@ export const useStudyTime = () => {
       console.error('Error fetching live chat messages:', error);
       return parameter.API_POLLING_INTERVAL;
     }
-  }, [updateStudyTime, nextPageToken]);
+  }, [nextPageToken]);
 
   useEffect(() => {
     let timeoutId: NodeJS.Timeout;
+    let isMounted = true;
 
     const poll = async () => {
+      if (!isMounted) return;
+      
       const interval = await fetchLiveChatMessages();
-      timeoutId = setTimeout(poll, interval);
+      
+      if (isMounted) {
+        timeoutId = setTimeout(poll, interval);
+      }
     };
 
-    poll();
+    // 初回実行を少し遅延させる
+    timeoutId = setTimeout(poll, 1000);
 
     return () => {
+      isMounted = false;
       if (timeoutId) {
         clearTimeout(timeoutId);
       }
     };
-  }, [fetchLiveChatMessages]);
+  }, []);
 
   const totalStudyTime = calcTotalStudyTime(Array.from(users.values()));
 
