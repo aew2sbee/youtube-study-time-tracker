@@ -1,7 +1,7 @@
 export const parameter = {
   START_STUDY_KEYWORDS: 'start',
   END_STUDY_KEYWORDS: 'end',
-  API_POLLING_INTERVAL: 1 * 60 * 1000, // 1分間隔
+  API_POLLING_INTERVAL: 5 * 60 * 1000, // 5分間隔
   ADDITIONAL_STUDY_TIME: 550 * 60 * 60, // 追加の勉強時間（秒: h * m + sec）- 1時間
   TARGET_STUDY_TIME: 550 * 60 * 60, // 目標勉強時間（秒:h * m + sec ）- 100時間
   SHOW_PROGRESS_BAR: true, // 進捗バーの表示/非表示
