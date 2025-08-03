@@ -37,7 +37,7 @@ export default function FocusTimeTracker({ displayedUsers }: { displayedUsers: S
             ) : user.studyTime > 0 ? (
               <span className="text-blue-400 w-32 text-center text-3xl mr-4">Finished</span>
             ) : null}
-            <span>{calcTime(user.studyTime)}</span>
+            <span className="text-4xl">{calcTime(user.studyTime)}</span>
           </div>
         </div>
       ))}

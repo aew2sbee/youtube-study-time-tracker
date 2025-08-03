@@ -55,13 +55,13 @@ export default function MonthlyChallenge({
     <div className="flex-1 flex flex-row pt-4">
       <div className="w-2/5 flex flex-col justify-center space-y-2 pr-8">
         <div className="text-white text-center">
-          <div className="text-2xl mb-2">Current Progress</div>
+          <div className="text-3xl mb-2">Current Progress</div>
           <div className="text-4xl font-bold">
             {parseInt(calcTime(totalStudyTime).slice(0, -3))} / {parseInt(calcTime(parameter.TARGET_STUDY_TIME).slice(0, -3))} h
           </div>
         </div>
         <div className="text-white text-center">
-          <div className="text-2xl mb-2">Current Progress Percent</div>
+          <div className="text-3xl mb-2">Current Progress Percent</div>
           <div className="text-5xl font-bold">{animatedPercentage} %</div>
         </div>
       </div>
