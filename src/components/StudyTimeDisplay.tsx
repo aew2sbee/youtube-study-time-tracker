@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { StudyTimeUser } from '@/types/youtube';
 import { CRON_TIME_GOLD, CRON_TIME_SILVER } from '@/constants/config';
 import { calcPercentage, calcRating10, calcUpdateTime } from '@/utils/calc';
-import { system } from '@/config/parameter';
+import { parameter } from '@/config/system';
 import { MyStudyProgress } from './MyStudyProgress';
 import AnimationStar from './AnimationStar';
 import ImageProfile from './ImageProfile';
@@ -55,10 +55,10 @@ export const StudyTimeDisplay = ({
 
   const components = [
     { type: 'personalProgress', key: 'personal' },
-    ...users.length === 0 
+    ...(users.length === 0
       ? [{ type: 'emptyTracker', key: 'empty' }]
-      : Array.from({ length: totalPages }, (_, i) => ({ type: 'focusTracker', key: `focus-${i}`, pageIndex: i })),
-    ...(showProgressBar && users.length > 0 ? [{ type: 'progressBar', key: 'progress' }] : [])
+      : Array.from({ length: totalPages }, (_, i) => ({ type: 'focusTracker', key: `focus-${i}`, pageIndex: i }))),
+    ...(showProgressBar && users.length > 0 ? [{ type: 'progressBar', key: 'progress' }] : []),
   ];
 
   // ページ遷移・アニメーションの管理
@@ -66,26 +66,23 @@ export const StudyTimeDisplay = ({
     setCurrentPage((prev) => {
       const nextPage = (prev + 1) % components.length;
       const currentComponent = components[nextPage];
-      
+
       // 状態の更新
       setShowPersonalProgress(currentComponent.type === 'personalProgress');
       setShowProgressBarState(currentComponent.type === 'progressBar');
-      
+
       // プログレスバーの場合はアニメーション開始
       if (currentComponent.type === 'progressBar') {
         startProgressBarAnimation();
       }
-      
+
       return nextPage;
     });
   };
 
   // プログレスバーのアニメーション管理
   const startProgressBarAnimation = () => {
-    const targetPercentage = calcPercentage(
-      getTotalStudyTime(),
-      targetStudyTime
-    );
+    const targetPercentage = calcPercentage(getTotalStudyTime(), targetStudyTime);
     const targetFlowerLevel = calcRating10(targetPercentage);
     setAnimatedPercentage(0);
     setAnimatedFlowerLevel(1);
@@ -104,10 +101,7 @@ export const StudyTimeDisplay = ({
     const animationTimer = setInterval(() => {
       currentStep++;
       const progress = Math.min(currentStep / steps, 1);
-      const currentPercentage = Math.min(
-        Math.max(Math.round(targetPercentage * progress), 0),
-        targetPercentage
-      );
+      const currentPercentage = Math.min(Math.max(Math.round(targetPercentage * progress), 0), targetPercentage);
       let currentFlowerLevel = 1;
       for (const flowerLevel of flowerLevels) {
         if (currentStep >= flowerLevel.step) {
@@ -136,13 +130,7 @@ export const StudyTimeDisplay = ({
       clearInterval(interval);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    totalPages,
-    users.length,
-    showProgressBar,
-    getTotalStudyTime,
-    targetStudyTime,
-  ]);
+  }, [totalPages, users.length, showProgressBar, getTotalStudyTime, targetStudyTime]);
 
   // プログレスバーアニメーション用のクリーンアップ
   useEffect(() => {
@@ -156,17 +144,17 @@ export const StudyTimeDisplay = ({
   const getCurrentComponent = () => {
     const currentComponent = components[currentPage];
     if (!currentComponent) return null;
-    
+
     if (currentComponent.type === 'focusTracker' && currentComponent.pageIndex !== undefined) {
       const startIndex = currentComponent.pageIndex * system.USERS_PER_PAGE;
       const endIndex = (currentComponent.pageIndex + 1) * system.USERS_PER_PAGE;
       const displayedUsers = users.slice(startIndex, endIndex);
       return { ...currentComponent, displayedUsers };
     }
-    
+
     return currentComponent;
   };
-  
+
   const currentComponent = getCurrentComponent();
 
   const getTitle = () => {
@@ -240,18 +228,14 @@ export const StudyTimeDisplay = ({
     <div className="fixed inset-0 w-[1920px] h-[1080px] overflow-hidden pointer-events-none">
       <div className="absolute bottom-0 left-0 w-[600px] h-[480px] p-4 pointer-events-auto">
         <div className="bg-black/20 backdrop-blur-sm rounded-lg p-4 h-full border border-white/10">
-          <motion.div 
+          <motion.div
             className="flex justify-between items-center mb-3"
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <h1 className="text-2xl font-bold text-white">
-              {getTitle()}
-            </h1>
-            <div className="text-white text-sm">
-              {getSubtitle()}
-            </div>
+            <h1 className="text-2xl font-bold text-white">{getTitle()}</h1>
+            <div className="text-white text-sm">{getSubtitle()}</div>
           </motion.div>
 
           <div className="flex flex-col h-[calc(100%-60px)]">
@@ -261,7 +245,7 @@ export const StudyTimeDisplay = ({
                 initial={{ opacity: 0, x: 50 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -50 }}
-                transition={{ duration: 0.8, ease: "easeInOut" }}
+                transition={{ duration: 0.8, ease: 'easeInOut' }}
                 className="h-full overflow-hidden"
               >
                 {renderCurrentComponent()}

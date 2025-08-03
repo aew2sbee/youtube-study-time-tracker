@@ -1,43 +1,30 @@
-import { system } from '@/config/parameter';
+import { parameter } from '@/config/system';
 import { StudyTimeUser } from '@/types/youtube';
 import { calcTime } from '@/utils/calc';
 import ImageCrown from './ImageCrown';
 import ImageProfile from './ImageProfile';
 
 export default function FocusTimeTracker({ displayedUsers }: { displayedUsers: StudyTimeUser[] }) {
-  
-
-
-
-const totalUserPages = Math.ceil(user.length / parameter.USERS_PER_PAGE);
-
-
-  return displayedUsers.length === 0 ? (
-    <div className="text-white text-center text-2xl flex-1 flex items-start justify-center pt-16">
-      <div className="space-y-2">
-        <div>どなたでも集中時間の計測に参加できます</div>
-        <div>
-          コメント欄に<strong>「start」</strong>で開始、<strong>「end」</strong>で終了
-        </div>
-        <div>
-          複数回の<strong>「start」/「end」</strong>で時間が累積されます
+  if (!displayedUsers || displayedUsers.length === 0) {
+    return (
+      <div className="text-white text-center text-2xl flex-1 flex items-start justify-center pt-16">
+        <div className="space-y-2">
+          <div>集中時間の計測に参加しているユーザーがいません</div>
+          <div>まずは「start」で計測を開始しましょう</div>
         </div>
       </div>
-    </div>
-  ) :
-  
-  
-  
-  (
+    );
+  }
+  return (
     <div className="space-y-4 flex-1 overflow-hidden p-2">
       {displayedUsers.map((user) => (
         <div key={user.name} className="flex items-center justify-between p-4">
           <div className="flex items-center space-x-4">
             <div className="relative">
               <ImageProfile src={user.profileImageUrl} alt={user.name} />
-              {user.studyTime >= system.CRON_TIME_GOLD ? (
+              {user.studyTime >= parameter.CRON_TIME_GOLD ? (
                 <ImageCrown src="/crown/mark_oukan_crown1_gold.png" alt="crown gold" />
-              ) : user.studyTime >= system.CRON_TIME_SILVER ? (
+              ) : user.studyTime >= parameter.CRON_TIME_SILVER ? (
                 <ImageCrown src="/crown/mark_oukan_crown2_silver.png" alt="crown silver" />
               ) : null}
             </div>

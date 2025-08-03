@@ -1,4 +1,4 @@
-import { system } from '@/config/parameter';
+import { parameter } from '@/config/system';
 import { StudyTimeUser } from '@/types/youtube';
 
 // 追加の勉強時間（秒: h * m + sec）- 1時間
@@ -10,7 +10,7 @@ const ADDITIONAL_STUDY_TIME = 350 * 60 * 60;
  * @returns {Date} 次回更新時刻
  */
 export const calcNextUpdateTime = (lastUpdateTime: Date): Date =>
-  new Date(lastUpdateTime.getTime() + system.API_POLLING_INTERVAL);
+  new Date(lastUpdateTime.getTime() + parameter.API_POLLING_INTERVAL);
 
 /**
  * 現在時刻を「hh:mm」形式の文字列で返します。

@@ -3,6 +3,11 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { parameter } from '@/config/system';
+import HowToUse from '@/components/HowToUse';
+import FocusTimeTracker from '@/components/FocusTimeTracker';
+import { useStudyTime } from '@/hooks/useStudyTime';
+import MyStudyProgress from '@/components/MyStudyProgress';
+
 
 // Mock data
 const mockUsers = [
@@ -175,32 +180,33 @@ const WelcomePage = () => (
 
 
 
-import HowToUse from "./HowToUse";
 
-const PAGES_COMPENENT = [
-  { key: 'My Progress', title: 'My Progress', component: <PersonalProgressPage /> },
-  { key: 'How to use', title: 'How to use', component: <HowToUse /> },
-  { key: 'Monthly Challenge', title: 'Monthly Challenge', component: <ProgressChartPage /> },
-  ...userPages,
-]
+
+// const PAGES_COMPENENT = [
+//   { key: 'How to use', title: 'How to use', component: <HowToUse /> },
+//   { key: 'My Progress', title: 'My Progress', component: <PersonalProgressPage /> },
+//   { key: 'Monthly Challenge', title: 'Monthly Challenge', component: <ProgressChartPage /> },
+//   ...userPages,
+// ]
 
 export default function Home() {
+  const { currentTime, users, totalStudyTime } = useStudyTime();
   const [currentPage, setCurrentPage] = useState(0);
 
   // 3人ずつでページ分割
-  const totalUserPages = Math.ceil(mockUsers.length / parameter.USERS_PER_PAGE);
-  
+  const totalUserPages = Math.ceil(users.length / parameter.USERS_PER_PAGE);
+
   // ユーザーページを動的に生成
   const userPages = Array.from({ length: totalUserPages }, (_, pageIndex) => {
     const startIndex = pageIndex * parameter.USERS_PER_PAGE;
     const endIndex = startIndex + parameter.USERS_PER_PAGE;
-    const pageUsers = mockUsers.slice(startIndex, endIndex);
+    const pageUsers = users.slice(startIndex, endIndex);
     
     return {
       key: `users-${pageIndex}`,
       title: totalUserPages > 1 ? `Focus Tracker (${pageIndex + 1}/${totalUserPages})` : 'Focus Tracker',
       component: (
-        <UserListPage 
+        <FocusTimeTracker 
           users={pageUsers} 
           pageIndex={pageIndex} 
           totalPages={totalUserPages} 
@@ -210,10 +216,10 @@ export default function Home() {
   });
 
   const pages = [
-    { key: 'welcome', title: 'Welcome', component: <WelcomePage /> },
-    { key: 'personal', title: 'My Progress', component: <PersonalProgressPage /> },
+    { key: 'How to use', title: 'How to use', component: <HowToUse /> },
+    { key: 'My study progress', title: 'My Study Progress', component: <MyStudyProgress /> },
     ...userPages,
-    { key: 'progress', title: 'Monthly Challenge', component: <ProgressChartPage /> },
+    // { key: 'progress', title: 'Monthly Challenge', component: <ProgressChartPage /> },
   ];
 
   useEffect(() => {
@@ -228,7 +234,7 @@ export default function Home() {
 
   return (
     <div className="fixed inset-0 w-[1920px] h-[1080px] overflow-hidden pointer-events-none from-slate-900 via-slate-800 to-slate-900">
-      <div className="absolute bottom-0 left-0 w-[600px] h-[480px] p-4 pointer-events-auto">
+      <div className="absolute bottom-0 left-0 w-[750px] h-[480px] p-4 pointer-events-auto">
         <div className="bg-black/30 backdrop-blur-md rounded-xl p-6 h-full border border-white/20 shadow-2xl">
           {/* Header */}
           <motion.div
@@ -237,11 +243,11 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <h1 className="text-2xl font-bold text-white">
+            <h1 className="text-4xl font-bold text-white">
               {currentPageData.title}
             </h1>
-            <div className="text-white text-sm bg-white/10 px-3 py-1 rounded-full">
-              {new Date().toLocaleTimeString('ja-JP', {
+            <div className="text-white text-3xl bg-white/10 px-3 py-1 rounded-full">
+              {currentTime.toLocaleTimeString('ja-JP', {
                 hour: '2-digit',
                 minute: '2-digit'
               })}

@@ -1,15 +1,12 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { StudyTimeUser, YouTubeLiveChatMessage } from '@/types/youtube';
-import { PERSONAL_STUDY_PROGRESS } from '@/constants/personalProgress';
-import { ADDITIONAL_STUDY_TIME, TARGET_STUDY_TIME, SHOW_PROGRESS_BAR } from '@/constants/config';
-import { calcStudyDuration } from '@/utils/calc';
-import { isEndStudyMessage, isStartStudyMessage } from '@/utils/message';
-
-const API_POLLING_INTERVAL = 5 * 60 * 1000; // 5分間隔 (5 * 60 * 1000 ms)
+import { parameter } from '@/config/system';
+import { calcTotalStudyTime } from '@/utils/calc';
+import { buildApiUrl, createMessageId, createNewUser, handleExistingUser, isValidStudyMessage } from './utils';
 
 export const useStudyTime = () => {
   const [users, setUsers] = useState<Map<string, StudyTimeUser>>(new Map());
-  const [lastUpdateTime, setLastUpdateTime] = useState<Date>(new Date());
+  const [currentTime, setCurrentTime] = useState<Date>(new Date());
   const [nextPageToken, setNextPageToken] = useState<string>('');
   const processedMessagesRef = useRef<Set<string>>(new Set());
 
@@ -22,70 +19,39 @@ export const useStudyTime = () => {
       messages.forEach((message) => {
         const messageText = message.displayMessage.toLowerCase().trim();
 
-        // startとendを含まないメッセージはスキップ
-        if (!isStartStudyMessage(messageText) && !isEndStudyMessage(messageText)) return;
+        if (!isValidStudyMessage(messageText)) return;
 
-        // 処理済みメッセージをスキップ
-        const messageId = `${message.authorDisplayName}-${message.publishedAt}-${messageText}`;
+        const messageId = createMessageId(message, messageText);
         if (processedMessagesRef.current.has(messageId)) return;
 
         const existingUser = newUsers.get(message.authorDisplayName);
-        const currentTime = new Date(message.publishedAt);
 
         if (existingUser) {
-          if (isStartStudyMessage(messageText)) {
-            // 勉強開始
-            if (!existingUser.isStudying) {
-              newUsers.set(message.authorDisplayName, {
-                ...existingUser,
-                startTime: currentTime,
-                isStudying: true,
-              });
-            }
-          } else if (isEndStudyMessage(messageText)) {
-            // 勉強終了
-            if (existingUser.isStudying && existingUser.startTime) {
-              const studyDuration = calcStudyDuration(currentTime, existingUser.startTime);
-              const additionalTime = studyDuration > 0 ? studyDuration : 0;
-              newUsers.set(message.authorDisplayName, {
-                ...existingUser,
-                studyTime: existingUser.studyTime + additionalTime,
-                isStudying: false,
-                startTime: undefined,
-              });
-            }
-          }
+          const updatedUser = handleExistingUser(existingUser, message, messageText);
+          newUsers.set(message.authorDisplayName, updatedUser);
         } else {
-          // 新規ユーザー
-          const isStarting = isStartStudyMessage(messageText);
-          newUsers.set(message.authorDisplayName, {
-            name: message.authorDisplayName,
-            studyTime: 0,
-            profileImageUrl: message.profileImageUrl,
-            startTime: isStarting ? currentTime : undefined,
-            isStudying: isStarting,
-          });
+          const newUser = createNewUser(message, messageText);
+          newUsers.set(message.authorDisplayName, newUser);
         }
       });
 
       return newUsers;
     });
 
-    // 処理済みメッセージを更新
     messages.forEach((message) => {
       const messageText = message.displayMessage.toLowerCase().trim();
-      if (isStartStudyMessage(messageText) || isEndStudyMessage(messageText)) {
-        const messageId = `${message.authorDisplayName}-${message.publishedAt}-${messageText}`;
+      if (isValidStudyMessage(messageText)) {
+        const messageId = createMessageId(message, messageText);
         processedMessagesRef.current.add(messageId);
       }
     });
-
-    setLastUpdateTime(now);
+    setCurrentTime(now);
   }, []);
 
-  const fetchLiveChatMessages = useCallback(async () => {
+
+  const fetchLiveChatMessages = useCallback(async (): Promise<number> => {
     try {
-      const url = `/api/youtube${nextPageToken ? `?pageToken=${nextPageToken}` : ''}`;
+      const url = buildApiUrl(nextPageToken);
       const response = await fetch(url);
 
       if (!response.ok) {
@@ -93,13 +59,12 @@ export const useStudyTime = () => {
       }
 
       const data = await response.json();
-
       if (data.error) {
         console.error('API error:', data.error);
-        return API_POLLING_INTERVAL;
+        return parameter.API_POLLING_INTERVAL;
       }
 
-      if (data.messages && data.messages.length > 0) {
+      if (data.messages?.length > 0) {
         updateStudyTime(data.messages);
       }
 
@@ -107,12 +72,12 @@ export const useStudyTime = () => {
         setNextPageToken(data.nextPageToken);
       }
 
-      return API_POLLING_INTERVAL;
+      return parameter.API_POLLING_INTERVAL;
     } catch (error) {
       console.error('Error fetching live chat messages:', error);
-      return API_POLLING_INTERVAL;
+      return parameter.API_POLLING_INTERVAL;
     }
-  }, [updateStudyTime]);
+  }, [updateStudyTime, nextPageToken]);
 
   useEffect(() => {
     let timeoutId: NodeJS.Timeout;
@@ -131,14 +96,12 @@ export const useStudyTime = () => {
     };
   }, [fetchLiveChatMessages]);
 
+  const totalStudyTime = calcTotalStudyTime(Array.from(users.values()));
+
   return {
-    users: getSortedUsers(),
-    nextUpdateTime: getNextUpdateTime(),
-    formatTime,
-    formatUpdateTime,
-    getTotalStudyTime,
-    targetStudyTime: TARGET_STUDY_TIME,
-    showProgressBar: SHOW_PROGRESS_BAR,
-    personalProgress: PERSONAL_STUDY_PROGRESS,
+    currentTime,
+    users,
+    totalStudyTime,
   };
 };
+

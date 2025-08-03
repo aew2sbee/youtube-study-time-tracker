@@ -1,14 +1,12 @@
-import { system } from '@/config/parameter'; // 必要に応じて定数の場所を調整
+import { parameter } from '@/config/system'; // 必要に応じて定数の場所を調整
 import { YouTubeLiveChatMessage } from '@/types/youtube';
 
 export const fetchLiveChatMessages = async (
   nextPageToken: string,
-  updateStudyTime: (messages: YouTubeLiveChatMessage[]) => void
+  updateStudyTime: (messages: YouTubeLiveChatMessage[]) => void,
 ) => {
   try {
-    const url = `/api/youtube${
-      nextPageToken ? `?pageToken=${nextPageToken}` : ''
-    }`;
+    const url = `/api/youtube${nextPageToken ? `?pageToken=${nextPageToken}` : ''}`;
     const response = await fetch(url);
 
     if (!response.ok) {
