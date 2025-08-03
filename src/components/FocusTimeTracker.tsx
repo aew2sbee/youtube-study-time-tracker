@@ -7,7 +7,7 @@ import ImageProfile from './ImageProfile';
 export default function FocusTimeTracker({ displayedUsers }: { displayedUsers: StudyTimeUser[] }) {
   if (!displayedUsers || displayedUsers.length === 0) {
     return (
-      <div className="text-white text-center text-2xl flex-1 flex items-start justify-center pt-16">
+      <div className="text-white text-center text-3xl flex-1 flex items-start justify-center pt-16">
         <div className="space-y-2">
           <div>集中時間の計測に参加しているユーザーがいません</div>
           <div>まずは「start」で計測を開始しましょう</div>
@@ -28,14 +28,14 @@ export default function FocusTimeTracker({ displayedUsers }: { displayedUsers: S
                 <ImageCrown src="/crown/mark_oukan_crown2_silver.png" alt="crown silver" />
               ) : null}
             </div>
-            <span className="text-white font-medium truncate max-w-[200px] text-3xl">{user.name}</span>
+            <span className="text-white font-medium truncate max-w-[200px] text-4xl">{user.name}</span>
           </div>
 
           <div className="text-white font-bold flex items-center text-4xl">
             {user.isStudying ? (
-              <span className="text-green-400 w-32 text-center text-2xl mr-4 animate-pulse">Focusing</span>
+              <span className="text-green-400 w-32 text-center text-3xl mr-4 animate-pulse">Focusing</span>
             ) : user.studyTime > 0 ? (
-              <span className="text-blue-400 w-32 text-center text-2xl mr-4">Finished</span>
+              <span className="text-blue-400 w-32 text-center text-3xl mr-4">Finished</span>
             ) : null}
             <span>{calcTime(user.studyTime)}</span>
           </div>

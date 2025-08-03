@@ -191,25 +191,24 @@ const WelcomePage = () => (
 
 export default function Home() {
   const { currentTime, users, totalStudyTime } = useStudyTime();
+
   const [currentPage, setCurrentPage] = useState(0);
 
   // 3人ずつでページ分割
-  const totalUserPages = Math.ceil(users.length / parameter.USERS_PER_PAGE);
+  const userArray = Array.from(users.values());
+  const totalUserPages = Math.ceil(userArray.length / parameter.USERS_PER_PAGE);
 
-  // ユーザーページを動的に生成
   const userPages = Array.from({ length: totalUserPages }, (_, pageIndex) => {
     const startIndex = pageIndex * parameter.USERS_PER_PAGE;
     const endIndex = startIndex + parameter.USERS_PER_PAGE;
-    const pageUsers = users.slice(startIndex, endIndex);
-    
+    const pageUsers = userArray.slice(startIndex, endIndex);
+
     return {
       key: `users-${pageIndex}`,
       title: totalUserPages > 1 ? `Focus Tracker (${pageIndex + 1}/${totalUserPages})` : 'Focus Tracker',
       component: (
-        <FocusTimeTracker 
-          users={pageUsers} 
-          pageIndex={pageIndex} 
-          totalPages={totalUserPages} 
+        <FocusTimeTracker
+          displayedUsers={pageUsers}
         />
       ),
     };
