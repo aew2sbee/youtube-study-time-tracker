@@ -11,12 +11,12 @@ import MonthlyChallenge from '@/components/MonthlyChallenge';
 
 
 export default function Home() {
-  const { currentTime, users, totalStudyTime } = useStudyTime();
+  const { currentTime, displayedUsers, totalStudyTime } = useStudyTime();
 
   const [currentPage, setCurrentPage] = useState<number>(0);
 
   // 3人ずつでページ分割
-  const userArray = Array.from(users.values());
+  const userArray = Array.from(displayedUsers.values());
   const totalUserPages = Math.ceil(userArray.length / parameter.USERS_PER_PAGE);
 
   const userPages = Array.from({ length: totalUserPages }, (_, pageIndex) => {

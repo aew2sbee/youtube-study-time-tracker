@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { StudyTimeUser, YouTubeLiveChatMessage } from '@/types/youtube';
 import { parameter } from '@/config/system';
-import { calcTotalStudyTime } from '@/utils/calc';
+import { calcTotalStudyTime, calcUsersStudyTime } from '@/utils/calc';
 import { buildApiUrl, createMessageId, createNewUser, handleExistingUser, isValidStudyMessage } from './utils';
 
 export const useStudyTime = () => {
@@ -105,11 +105,12 @@ export const useStudyTime = () => {
     };
   }, []);
 
+  const displayedUsers = calcUsersStudyTime(currentTime, Array.from(users.values()));
   const totalStudyTime = calcTotalStudyTime(Array.from(users.values()));
 
   return {
     currentTime,
-    users,
+    displayedUsers,
     totalStudyTime,
   };
 };
