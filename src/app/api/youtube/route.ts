@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { YouTubeLiveChatMessage, LiveChatResponse } from '@/types/youtube';
 import { google } from 'googleapis';
+import { parameter } from '@/config/system';
 
 // 公式ドキュメント：https://developers.google.com/youtube/v3/live/docs/liveChatMessages/list?hl=ja
 
@@ -42,7 +43,7 @@ export async function GET(request: NextRequest) {
     const result: LiveChatResponse = {
       messages,
       nextPageToken: liveChatMessages.data.nextPageToken || undefined,
-      pollingIntervalMillis: liveChatMessages.data.pollingIntervalMillis || 5000,
+      pollingIntervalMillis: liveChatMessages.data.pollingIntervalMillis || parameter.API_POLLING_INTERVAL,
     };
 
     return NextResponse.json(result);

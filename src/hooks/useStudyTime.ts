@@ -62,14 +62,10 @@ export const useStudyTime = () => {
 
       if (data.error) {
         console.error('API error:', data.error);
-        // レートリミットエラーの場合は長めの間隔で再試行
-        if (data.error.includes('request was sent too soon') || data.error.includes('rate limit')) {
-          return parameter.API_POLLING_INTERVAL * 2;
-        }
         return parameter.API_POLLING_INTERVAL;
       }
 
-      if (data.messages?.length > 0) {
+      if (data.messages && data.messages.length > 0) {
         updateStudyTime(data.messages);
       }
 
@@ -80,10 +76,6 @@ export const useStudyTime = () => {
       return parameter.API_POLLING_INTERVAL;
     } catch (error) {
       console.error('Error fetching live chat messages:', error);
-      // HTTPエラーの場合も長めの間隔で再試行
-      if (error instanceof Error && error.message.includes('403')) {
-        return parameter.API_POLLING_INTERVAL * 3;
-      }
       return parameter.API_POLLING_INTERVAL;
     }
   }, [updateStudyTime, nextPageToken]);
