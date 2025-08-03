@@ -86,9 +86,9 @@ export const useStudyTime = () => {
 
     const poll = async () => {
       if (!isMounted) return;
-      
+
       const interval = await fetchLiveChatMessages();
-      
+
       if (isMounted) {
         timeoutId = setTimeout(poll, interval);
       }
