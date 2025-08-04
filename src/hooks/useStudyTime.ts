@@ -48,7 +48,6 @@ export const useStudyTime = () => {
     setCurrentTime(now);
   }, []);
 
-
   const fetchLiveChatMessages = useCallback(async (): Promise<number> => {
     try {
       const url = buildApiUrl(nextPageToken);
@@ -103,6 +102,7 @@ export const useStudyTime = () => {
         clearTimeout(timeoutId);
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const displayedUsers = calcUsersStudyTime(currentTime, Array.from(users.values()));
@@ -114,4 +114,3 @@ export const useStudyTime = () => {
     totalStudyTime,
   };
 };
-
