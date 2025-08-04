@@ -23,9 +23,9 @@ export default function FocusTimeTracker({ displayedUsers }: { displayedUsers: S
             <div className="relative">
               <ImageProfile src={user.profileImageUrl} alt={user.name} />
               {user.studyTime >= parameter.CRON_TIME_GOLD ? (
-                <ImageCrown src="/crown/mark_oukan_crown1_gold.png" alt="crown gold" />
+                <ImageCrown src="/crown/gold.png" alt="crown gold" />
               ) : user.studyTime >= parameter.CRON_TIME_SILVER ? (
-                <ImageCrown src="/crown/mark_oukan_crown2_silver.png" alt="crown silver" />
+                <ImageCrown src="/crown/silver.png" alt="crown silver" />
               ) : null}
             </div>
             <span className="text-white font-medium truncate max-w-[200px] text-4xl">{user.name}</span>
