@@ -9,6 +9,7 @@ export default function FlowerImage({ key, src, alt }: { key: number; src: strin
       width={600}
       height={600}
       className="w-64 h-64 object-contain transition-all duration-300 ease-in-out"
+      onError={e => { e.currentTarget.src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8Xw8AAnMB9QkQeQAAAABJRU5ErkJggg=="; }}
     />
   );
 }
