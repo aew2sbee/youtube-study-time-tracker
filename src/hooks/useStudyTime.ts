@@ -78,7 +78,7 @@ export const useStudyTime = () => {
       console.error('Error fetching live chat messages:', error);
       return parameter.API_POLLING_INTERVAL;
     }
-  }, [nextPageToken]);
+  }, [nextPageToken, updateStudyTime]);
 
   useEffect(() => {
     let timeoutId: NodeJS.Timeout;
@@ -103,7 +103,7 @@ export const useStudyTime = () => {
         clearTimeout(timeoutId);
       }
     };
-  }, []);
+  }, [fetchLiveChatMessages]);
 
   const displayedUsers = calcUsersStudyTime(currentTime, Array.from(users.values()));
   const totalStudyTime = calcTotalStudyTime(Array.from(users.values()));
