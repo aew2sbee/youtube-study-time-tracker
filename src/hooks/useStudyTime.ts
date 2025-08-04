@@ -103,7 +103,7 @@ export const useStudyTime = () => {
         clearTimeout(timeoutId);
       }
     };
-  }, [fetchLiveChatMessages]);
+  }, []);
 
   const displayedUsers = calcUsersStudyTime(currentTime, Array.from(users.values()));
   const totalStudyTime = calcTotalStudyTime(Array.from(users.values()));
