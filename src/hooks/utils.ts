@@ -48,7 +48,7 @@ export const handleStudyStart = (user: StudyTimeUser, messageTime: Date): StudyT
 
 export const handleStudyEnd = (user: StudyTimeUser, messageTime: Date): StudyTimeUser => {
   if (user.isStudying && user.startTime) {
-    const studyDuration = calcStudyDuration(messageTime, user.startTime);
+    const studyDuration = calcStudyDuration(user.startTime, messageTime);
     const additionalTime = Math.max(studyDuration, 0);
     return {
       ...user,
