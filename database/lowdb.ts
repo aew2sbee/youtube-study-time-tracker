@@ -26,11 +26,9 @@ const defaultData: DatabaseData = {
 
 // データを保存する関数
 export const savedb = async (currentTime:Date, userData: StudyTimeUser[], totalTimeSec:number) => {
-    // 現在の日付を取得（YYYYMMDD形式）
-    const date = new Date(currentTime);
-    const dateKey = date.toISOString().slice(0, 10).replace(/-/g, '');
+    const dateKey = getdateKey(currentTime)
     // 現在の月を取得（YYYYMM形式）
-    const monthKey = date.toISOString().slice(0, 7).replace('-', '');
+    const monthKey = getmonthKey(currentTime)
 
   // データベースを初期化
   const db = await JSONFilePreset<DatabaseData>('database/db.json', defaultData);
@@ -55,3 +53,25 @@ export const savedb = async (currentTime:Date, userData: StudyTimeUser[], totalT
   console.log('データが保存されました:', db.data.monthlyTotalTimeSec[monthKey]);
   console.log('データが保存されました:', db.data.users[dateKey].length);
 }
+
+// 月別の合計時間を取得する関数
+export const getMonthlyTotalTime = async (monthKey: string): Promise<number> => {
+  // データベースを初期化
+  const db = await JSONFilePreset<DatabaseData>('database/db.json', defaultData);
+  // monthKeyが存在しない場合は0を返す
+  if (!db.data.monthlyTotalTimeSec[monthKey]) {
+    return 0;
+  }
+
+  return db.data.monthlyTotalTimeSec[monthKey];
+}
+
+// 現在の月の合計時間を取得する関数
+export const getCurrentMonthTotalTime = async (now: Date): Promise<number> => {
+  const monthKey = getmonthKey(now)
+  return await getMonthlyTotalTime(monthKey);
+}
+
+
+const getdateKey = (now: Date) => now.toISOString().slice(0, 10).replace(/-/g, '');
+const getmonthKey = (now: Date) => now.toISOString().slice(0, 7).replace('-', '');

@@ -11,7 +11,7 @@ import MonthlyChallenge from '@/components/MonthlyChallenge';
 
 
 export default function Home() {
-  const { currentTime, displayedUsers, totalStudyTime } = useStudyTime();
+  const { currentTime, displayedUsers, currentMonthTotalTime } = useStudyTime();
 
   const [currentPage, setCurrentPage] = useState<number>(0);
 
@@ -38,7 +38,7 @@ export default function Home() {
   const pages = [
     { key: 'How to use', title: 'How to use', component: <HowToUse /> },
     ...userPages,
-    { key: 'Monthly Challenge', title: 'Monthly Challenge', component: <MonthlyChallenge now={currentTime} totalStudyTime={totalStudyTime} /> },
+    { key: 'Monthly Challenge', title: 'Monthly Challenge', component: <MonthlyChallenge now={currentTime} totalStudyTime={currentMonthTotalTime} /> },
     { key: 'My study progress', title: 'My Study Progress', component: <MyStudyProgress /> },
   ];
 

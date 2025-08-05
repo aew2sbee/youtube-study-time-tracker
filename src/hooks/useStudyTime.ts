@@ -7,8 +7,27 @@ import { buildApiUrl, createMessageId, createNewUser, handleExistingUser, isVali
 export const useStudyTime = () => {
   const [users, setUsers] = useState<Map<string, StudyTimeUser>>(new Map());
   const [currentTime, setCurrentTime] = useState<Date>(new Date());
+  const [currentMonthTotalTime, setMonthTotalTime] = useState<number>(0);
   const [nextPageToken, setNextPageToken] = useState<string>('');
   const processedMessagesRef = useRef<Set<string>>(new Set());
+
+  // 月別合計時間を取得する関数
+  const fetchMonthlyTime = useCallback(async () => {
+    try {
+      const response = await fetch('/api/get-monthly-time');
+      if (response.ok) {
+        const data = await response.json();
+        setMonthTotalTime(data.currentMonthTotalTime);
+      }
+    } catch (error) {
+      console.error('Error fetching monthly time:', error);
+    }
+  }, []);
+
+  // 初期化時に月別合計時間を取得
+  useEffect(() => {
+    fetchMonthlyTime();
+  }, [fetchMonthlyTime]);
 
   const updateStudyTime = useCallback((messages: YouTubeLiveChatMessage[]) => {
     const now = new Date();
@@ -126,10 +145,13 @@ export const useStudyTime = () => {
       if (!response.ok) {
         throw new Error('Failed to save data');
       }
+
+      // 保存後に月別合計時間を更新
+      await fetchMonthlyTime();
     } catch (error) {
       console.error('Error saving data:', error);
     }
-  }, [currentTime, displayedUsers, totalStudyTime]);
+  }, [currentTime, displayedUsers, totalStudyTime, fetchMonthlyTime]);
 
   // データが更新されたときに保存
   useEffect(() => {
@@ -141,6 +163,6 @@ export const useStudyTime = () => {
   return {
     currentTime,
     displayedUsers,
-    totalStudyTime,
+    currentMonthTotalTime,
   };
 };
