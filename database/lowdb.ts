@@ -25,7 +25,7 @@ const defaultData: DatabaseData = {
 
 
 // データを保存する関数
-export const savedb = async (currentTime:Date, userData: StudyTimeUser[], totalTimeSec:number) => {
+export const savedb = async (currentTime: Date, userData: StudyTimeUser[], totalTimeSec:number) => {
     const dateKey = getdateKey(currentTime)
     // 現在の月を取得（YYYYMM形式）
     const monthKey = getmonthKey(currentTime)
@@ -67,11 +67,10 @@ export const getMonthlyTotalTime = async (monthKey: string): Promise<number> => 
 }
 
 // 現在の月の合計時間を取得する関数
-export const getCurrentMonthTotalTime = async (now: Date): Promise<number> => {
-  const monthKey = getmonthKey(now)
+export const getCurrentMonthTotalTime = async (currentTime: Date): Promise<number> => {
+  const monthKey = getmonthKey(currentTime)
   return await getMonthlyTotalTime(monthKey);
 }
-
 
 const getdateKey = (now: Date) => now.toISOString().slice(0, 10).replace(/-/g, '');
 const getmonthKey = (now: Date) => now.toISOString().slice(0, 7).replace('-', '');
