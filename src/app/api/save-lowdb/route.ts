@@ -4,9 +4,10 @@ import { savedb } from '../../../../database/lowdb';
 
 export async function POST(request: NextRequest) {
   try {
-    const { currentTime, displayedUsers, totalStudyTime } = await request.json();
+    const { displayedUsers, totalStudyTime } = await request.json();
     // ファイルに書き込み
-    await savedb(currentTime, displayedUsers, totalStudyTime);
+    const now = new Date();
+    await savedb(now, displayedUsers, totalStudyTime);
 
     return NextResponse.json({ success: true, message: 'Data saved successfully' });
 
