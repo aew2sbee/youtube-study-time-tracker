@@ -1,0 +1,60 @@
+{
+  "monthlyTotalTimeSec": {
+    "202507": 1350000,
+    "202508": 303969
+  },
+  "users": {
+    "20250801": [],
+    "20250802": [],
+    "20250803": [],
+    "20250804": [],
+    "20250805": [
+      {
+        "channelId": "UCDV95uUZlqOmxJ0hONnoALw",
+        "name": "小倉あん",
+        "studyTime": 15252,
+        "profileImageUrl": "https://yt3.ggpht.com/ToBVHdJPmTSckqWsesfbs8OxH6kBd-V-81pP8BLysaXnLwVfOjFF9pA05HGdiuTRJjYwuVZ_yA=s88-c-k-c0x00ffffff-no-rj",
+        "startTime": "2025-08-05T03:51:05.849Z",
+        "isStudying": true
+      },
+      {
+        "channelId": "UCd6QtfSvwrB3JJlfbE1WiKg",
+        "name": "ちぃ",
+        "studyTime": 14819,
+        "profileImageUrl": "https://yt3.ggpht.com/9ezTjwTy7CvEmLFN1kI-4ZYivDTF3uIyKRS1r1fu2-khio5sOkzss0g61n2xdLhhr4O0apbHxCo=s88-c-k-c0x00ffffff-no-rj",
+        "startTime": "2025-08-05T04:13:51.183Z",
+        "isStudying": true
+      },
+      {
+        "channelId": "UCsys2iqH6uQatXuYH3-4mhw",
+        "name": "れんぞく",
+        "studyTime": 11903,
+        "profileImageUrl": "https://yt3.ggpht.com/glG2MmeKWT9WDb9TQh8LgCnO8fPFXKvu6x8ALWaE--LbMUXELB0jij6KCR8PLyeB_fJqiyEP=s88-c-k-c0x00ffffff-no-rj",
+        "startTime": "2025-08-05T04:02:32.691Z",
+        "isStudying": true
+      },
+      {
+        "channelId": "UCRpDj4kKe4V0C6omqA7Nmug",
+        "name": "masmut",
+        "studyTime": 11861,
+        "profileImageUrl": "https://yt3.ggpht.com/Is0_6v9ZaGg1Pc--GjDfeaI0JuhQ8flmh19S6O43CFrRuR_bG3seQexeutwqNCfDoJ_X0UIo=s88-c-k-c0x00ffffff-no-rj",
+        "isStudying": false
+      },
+      {
+        "channelId": "UC6dzpfLDOZpgLEbD6RjR-oQ",
+        "name": "がんばろ",
+        "studyTime": 3858,
+        "profileImageUrl": "https://yt3.ggpht.com/ytc/AIdro_nI2TXBv0oWalo70g3fdue_1_mcR9O1Dd0zoZaptgWX_a9lSPw0lZ69_0YFv5bcNuHCeZ-A=s88-c-k-c0x00ffffff-no-rj",
+        "isStudying": false
+      },
+      {
+        "channelId": "UCEMSNOYTYJ5iSwwSU7oP9ug",
+        "name": "ar",
+        "studyTime": 5002,
+        "profileImageUrl": "https://yt3.ggpht.com/ytc/AIdro_kVssoNZkZkFVFx_MpTAQUE8Hq7qsda-vMaR9m-16c=s88-c-k-c0x00ffffff-no-rj",
+        "startTime": "2025-08-05T03:46:29.502Z",
+        "isStudying": true
+      }
+    ]
+  }
+}

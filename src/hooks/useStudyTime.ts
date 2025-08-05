@@ -108,6 +108,36 @@ export const useStudyTime = () => {
   const displayedUsers = calcUsersStudyTime(currentTime, Array.from(users.values()));
   const totalStudyTime = calcTotalStudyTime(Array.from(users.values()));
 
+  // データを保存する関数
+  const saveData = useCallback(async () => {
+    try {
+      const response = await fetch('/api/save-lowdb', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          currentTime,
+          displayedUsers,
+          totalStudyTime,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to save data');
+      }
+    } catch (error) {
+      console.error('Error saving data:', error);
+    }
+  }, [currentTime, displayedUsers, totalStudyTime]);
+
+  // データが更新されたときに保存
+  useEffect(() => {
+    if (displayedUsers.length > 0) {
+      saveData();
+    }
+  }, [displayedUsers, saveData]);
+
   return {
     currentTime,
     displayedUsers,
