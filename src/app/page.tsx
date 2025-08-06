@@ -66,12 +66,6 @@ export default function Home() {
             <h1 className="text-5xl font-bold text-white">
               {currentPageData.title}
             </h1>
-            <div className="text-white text-4xl bg-white/10 px-3 py-1 rounded-full">
-              {currentTime.toLocaleTimeString('ja-JP', {
-                hour: '2-digit',
-                minute: '2-digit'
-              })}
-            </div>
           </motion.div>
 
           {/* Page Content */}
