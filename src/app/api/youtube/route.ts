@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { YouTubeLiveChatMessage, LiveChatResponse } from '@/types/youtube';
 import { google } from 'googleapis';
 import { parameter } from '@/config/system';
+import { isEndStudyMessage, isStartStudyMessage } from '@/hooks/utils';
 
 // 公式ドキュメント：https://developers.google.com/youtube/v3/live/docs/liveChatMessages/list?hl=ja
 
@@ -31,15 +32,23 @@ export async function GET(request: NextRequest) {
     });
 
     const messages: YouTubeLiveChatMessage[] =
-      liveChatMessages.data.items?.map((item) => ({
-        id: item.id || '',
-        channelId: item.authorDetails?.channelId || '',
-        authorDisplayName: item.authorDetails?.displayName || '',
-        displayMessage: item.snippet?.displayMessage || '',
-        publishedAt: item.snippet?.publishedAt || '',
-        profileImageUrl: item.authorDetails?.profileImageUrl || '',
-      })) || [];
+      liveChatMessages.data.items
+        ?.filter((item) => {
+          const displayMessage = item.snippet?.displayMessage || '';
+          return isStartStudyMessage(displayMessage) || isEndStudyMessage(displayMessage);
+        })
+        .map((item) => ({
+          id: item.id || '',
+          channelId: item.authorDetails?.channelId || '',
+          authorDisplayName: item.authorDetails?.displayName || '',
+          displayMessage: item.snippet?.displayMessage || '',
+          publishedAt: item.snippet?.publishedAt || '',
+          profileImageUrl: item.authorDetails?.profileImageUrl || '',
+        })) || [];
 
+    messages.forEach((message) => {
+      console.log(message.publishedAt, message.authorDisplayName, message.displayMessage);
+    });
     const result: LiveChatResponse = {
       messages,
       nextPageToken: liveChatMessages.data.nextPageToken || undefined,
