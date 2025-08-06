@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { StudyTimeUser, YouTubeLiveChatMessage } from '@/types/youtube';
 import { parameter } from '@/config/system';
 import { calcTotalStudyTime, calcUsersStudyTime } from '@/utils/calc';
-import { buildApiUrl, createMessageId, createNewUser, handleExistingUser, isValidStudyMessage } from './utils';
+import { buildApiUrl, createMessageId, createNewUser, handleExistingUser } from './utils';
 
 export const useStudyTime = () => {
   const [users, setUsers] = useState<Map<string, StudyTimeUser>>(new Map());
@@ -18,8 +18,6 @@ export const useStudyTime = () => {
 
       messages.forEach((message) => {
         const messageText = message.displayMessage.toLowerCase().trim();
-
-        if (!isValidStudyMessage(messageText)) return;
 
         const messageId = createMessageId(message, messageText);
         if (processedMessagesRef.current.has(messageId)) return;
@@ -40,10 +38,8 @@ export const useStudyTime = () => {
 
     messages.forEach((message) => {
       const messageText = message.displayMessage.toLowerCase().trim();
-      if (isValidStudyMessage(messageText)) {
-        const messageId = createMessageId(message, messageText);
-        processedMessagesRef.current.add(messageId);
-      }
+      const messageId = createMessageId(message, messageText);
+      processedMessagesRef.current.add(messageId);
     });
     setCurrentTime(now);
   }, []);

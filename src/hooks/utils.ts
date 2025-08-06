@@ -7,14 +7,14 @@ import { calcStudyDuration } from "@/utils/calc";
  * @param {string} messageText - 判定するメッセージテキスト
  * @returns {boolean} 学習開始メッセージの場合はtrue
  */
-export const isStartStudyMessage = (messageText: string): boolean => messageText === parameter.START_STUDY_KEYWORDS;
+export const isStartStudyMessage = (messageText: string): boolean => messageText.toLowerCase().trim() === parameter.START_STUDY_KEYWORDS;
 
 /**
  * 指定されたメッセージが学習終了メッセージかどうかを判定します。
  * @param {string} messageText - 判定するメッセージテキスト
  * @returns {boolean} 学習終了メッセージの場合はtrue
  */
-export const isEndStudyMessage = (messageText: string): boolean => messageText === parameter.END_STUDY_KEYWORDS;
+export const isEndStudyMessage = (messageText: string): boolean => messageText.toLowerCase().trim() === parameter.END_STUDY_KEYWORDS;
 
 
 export const buildApiUrl = (pageToken?: string): string => {
@@ -62,10 +62,6 @@ export const handleStudyEnd = (user: StudyTimeUser, messageTime: Date): StudyTim
 
 export const createMessageId = (message: YouTubeLiveChatMessage, messageText: string): string => {
   return `${message.authorDisplayName}-${message.publishedAt}-${messageText}`;
-};
-
-export const isValidStudyMessage = (messageText: string): boolean => {
-  return isStartStudyMessage(messageText) || isEndStudyMessage(messageText);
 };
 
 export const handleExistingUser = (
