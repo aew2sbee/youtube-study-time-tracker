@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { StudyTimeUser, YouTubeLiveChatMessage } from '@/types/youtube';
 import { parameter } from '@/config/system';
 import { calcTotalStudyTime, calcUsersStudyTime } from '@/utils/calc';
-import { buildApiUrl, createMessageId, createNewUser, handleExistingUser, isValidStudyMessage } from './utils';
+import { buildApiUrl, createMessageId, createNewUser, handleExistingUser, isValidStudyMessage, isEndStudyMessage } from './utils';
 
 export const useStudyTime = () => {
   const [users, setUsers] = useState<Map<string, StudyTimeUser>>(new Map());
@@ -62,10 +62,15 @@ export const useStudyTime = () => {
       if (isValidStudyMessage(messageText)) {
         const messageId = createMessageId(message, messageText);
         processedMessagesRef.current.add(messageId);
+
+        // endメッセージの場合、自動でお疲れ様コメントを送信
+        if (isEndStudyMessage(messageText)) {
+          sendPraiseComment(users);
+        }
       }
     });
     setCurrentTime(now);
-  }, []);
+  }, [sendPraiseComment]);
 
   const fetchLiveChatMessages = useCallback(async (): Promise<number> => {
     try {
