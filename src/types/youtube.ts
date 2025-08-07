@@ -18,6 +18,5 @@ export interface StudyTimeUser {
 
 export interface LiveChatResponse {
   messages: YouTubeLiveChatMessage[];
-  nextPageToken?: string;
   pollingIntervalMillis: number;
 }

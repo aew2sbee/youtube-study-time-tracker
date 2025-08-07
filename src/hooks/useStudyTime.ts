@@ -2,12 +2,11 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { StudyTimeUser, YouTubeLiveChatMessage } from '@/types/youtube';
 import { parameter } from '@/config/system';
 import { calcTotalStudyTime, calcUsersStudyTime } from '@/utils/calc';
-import { buildApiUrl, createMessageId, createNewUser, handleExistingUser } from './utils';
+import { createMessageId, createNewUser, handleExistingUser } from './utils';
 
 export const useStudyTime = () => {
   const [users, setUsers] = useState<Map<string, StudyTimeUser>>(new Map());
   const [currentTime, setCurrentTime] = useState<Date>(new Date());
-  const [nextPageToken, setNextPageToken] = useState<string>('');
   const processedMessagesRef = useRef<Set<string>>(new Set());
 
   const updateStudyTime = useCallback((messages: YouTubeLiveChatMessage[]) => {
@@ -46,8 +45,7 @@ export const useStudyTime = () => {
 
   const fetchLiveChatMessages = useCallback(async (): Promise<number> => {
     try {
-      const url = buildApiUrl(nextPageToken);
-      const response = await fetch(url);
+      const response = await fetch('/api/youtube');
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -64,16 +62,12 @@ export const useStudyTime = () => {
         updateStudyTime(data.messages);
       }
 
-      if (data.nextPageToken) {
-        setNextPageToken(data.nextPageToken);
-      }
-
       return parameter.API_POLLING_INTERVAL;
     } catch (error) {
       console.error('Error fetching live chat messages:', error);
       return parameter.API_POLLING_INTERVAL;
     }
-  }, [nextPageToken, updateStudyTime]);
+  }, [updateStudyTime]);
 
   useEffect(() => {
     let timeoutId: NodeJS.Timeout;
