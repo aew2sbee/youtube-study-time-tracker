@@ -1,5 +1,6 @@
 export interface YouTubeLiveChatMessage {
   id: string;
+  channelId: string;
   authorDisplayName: string;
   displayMessage: string;
   publishedAt: string;
@@ -7,6 +8,7 @@ export interface YouTubeLiveChatMessage {
 }
 
 export interface StudyTimeUser {
+  channelId: string;
   name: string;
   studyTime: number; // in seconds
   profileImageUrl: string;

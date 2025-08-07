@@ -1,18 +1,12 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { StudyTimeUser, YouTubeLiveChatMessage } from '@/types/youtube';
-import { PERSONAL_STUDY_PROGRESS } from '@/constants/personalProgress';
-import { ADDITIONAL_STUDY_TIME, TARGET_STUDY_TIME, SHOW_PROGRESS_BAR } from '@/constants/config';
-
-const START_STUDY_KEYWORDS = 'start';
-const END_STUDY_KEYWORDS = 'end';
-
-const API_POLLING_INTERVAL = 5 * 60 * 1000; // 5分間隔 (5 * 60 * 1000 ms)
-
-
+import { parameter } from '@/config/system';
+import { calcTotalStudyTime, calcUsersStudyTime } from '@/utils/calc';
+import { buildApiUrl, createMessageId, createNewUser, handleExistingUser } from './utils';
 
 export const useStudyTime = () => {
   const [users, setUsers] = useState<Map<string, StudyTimeUser>>(new Map());
-  const [lastUpdateTime, setLastUpdateTime] = useState<Date>(new Date());
+  const [currentTime, setCurrentTime] = useState<Date>(new Date());
   const [nextPageToken, setNextPageToken] = useState<string>('');
   const processedMessagesRef = useRef<Set<string>>(new Set());
 
@@ -25,71 +19,34 @@ export const useStudyTime = () => {
       messages.forEach((message) => {
         const messageText = message.displayMessage.toLowerCase().trim();
 
-        // startとendを含まないメッセージはスキップ
-        if (messageText !== START_STUDY_KEYWORDS && messageText !== END_STUDY_KEYWORDS) return
-
-        // 処理済みメッセージをスキップ
-        const messageId = `${message.authorDisplayName}-${message.publishedAt}-${messageText}`;
+        const messageId = createMessageId(message, messageText);
         if (processedMessagesRef.current.has(messageId)) return;
 
         const existingUser = newUsers.get(message.authorDisplayName);
-        const currentTime = new Date(message.publishedAt);
 
         if (existingUser) {
-          if (messageText === START_STUDY_KEYWORDS) {
-            // 勉強開始
-            if (!existingUser.isStudying) {
-              newUsers.set(message.authorDisplayName, {
-                ...existingUser,
-                startTime: currentTime,
-                isStudying: true,
-              });
-            }
-          } else if (messageText === END_STUDY_KEYWORDS) {
-            // 勉強終了
-            if (existingUser.isStudying && existingUser.startTime) {
-              const studyDuration = Math.floor(
-                (currentTime.getTime() - existingUser.startTime.getTime()) / 1000);
-              const additionalTime = studyDuration > 0 ? studyDuration : 0;
-              newUsers.set(message.authorDisplayName, {
-                ...existingUser,
-                studyTime: existingUser.studyTime + additionalTime,
-                isStudying: false,
-                startTime: undefined,
-              });
-            }
-          }
+          const updatedUser = handleExistingUser(existingUser, message, messageText);
+          newUsers.set(message.authorDisplayName, updatedUser);
         } else {
-          // 新規ユーザー
-          const isStarting = messageText === START_STUDY_KEYWORDS;
-          newUsers.set(message.authorDisplayName, {
-            name: message.authorDisplayName,
-            studyTime: 0,
-            profileImageUrl: message.profileImageUrl,
-            startTime: isStarting ? currentTime : undefined,
-            isStudying: isStarting,
-          });
+          const newUser = createNewUser(message, messageText);
+          newUsers.set(message.authorDisplayName, newUser);
         }
       });
 
       return newUsers;
     });
 
-    // 処理済みメッセージを更新
-    messages.forEach(message => {
+    messages.forEach((message) => {
       const messageText = message.displayMessage.toLowerCase().trim();
-      if (messageText === START_STUDY_KEYWORDS || messageText === END_STUDY_KEYWORDS) {
-        const messageId = `${message.authorDisplayName}-${message.publishedAt}-${messageText}`;
-        processedMessagesRef.current.add(messageId);
-      }
+      const messageId = createMessageId(message, messageText);
+      processedMessagesRef.current.add(messageId);
     });
-
-    setLastUpdateTime(now);
+    setCurrentTime(now);
   }, []);
 
-  const fetchLiveChatMessages = useCallback(async () => {
+  const fetchLiveChatMessages = useCallback(async (): Promise<number> => {
     try {
-      const url = `/api/youtube${nextPageToken ? `?pageToken=${nextPageToken}` : ''}`;
+      const url = buildApiUrl(nextPageToken);
       const response = await fetch(url);
 
       if (!response.ok) {
@@ -100,7 +57,7 @@ export const useStudyTime = () => {
 
       if (data.error) {
         console.error('API error:', data.error);
-        return API_POLLING_INTERVAL;
+        return parameter.API_POLLING_INTERVAL;
       }
 
       if (data.messages && data.messages.length > 0) {
@@ -111,95 +68,45 @@ export const useStudyTime = () => {
         setNextPageToken(data.nextPageToken);
       }
 
-      return API_POLLING_INTERVAL;
+      return parameter.API_POLLING_INTERVAL;
     } catch (error) {
       console.error('Error fetching live chat messages:', error);
-      return API_POLLING_INTERVAL;
+      return parameter.API_POLLING_INTERVAL;
     }
-  }, [updateStudyTime]);
+  }, [nextPageToken, updateStudyTime]);
 
   useEffect(() => {
     let timeoutId: NodeJS.Timeout;
+    let isMounted = true;
 
     const poll = async () => {
+      if (!isMounted) return;
+
       const interval = await fetchLiveChatMessages();
-      timeoutId = setTimeout(poll, interval);
+
+      if (isMounted) {
+        timeoutId = setTimeout(poll, interval);
+      }
     };
 
-    poll();
+    // 初回実行を少し遅延させる
+    timeoutId = setTimeout(poll, 1000);
 
     return () => {
+      isMounted = false;
       if (timeoutId) {
         clearTimeout(timeoutId);
       }
     };
-  }, [fetchLiveChatMessages]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  const formatTime = (seconds: number): string => {
-    if (seconds === 0) return '0h 0min';
-    const hours = Math.floor(seconds / 3600);
-    const minutes = Math.floor((seconds % 3600) / 60);
-    return `${hours.toString()}h ${minutes.toString().padStart(2, '0')}min`;
-  };
-
-  const formatUpdateTime = (date: Date): string => {
-    return `${date.getHours().toString().padStart(2, '0')}:${date
-      .getMinutes()
-      .toString()
-      .padStart(2, '0')}`;
-  };
-
-  const getSortedUsers = (): StudyTimeUser[] => {
-    const now = new Date();
-    return Array.from(users.values())
-      .filter((user) => user.studyTime > 0 || user.isStudying)
-      .map((user) => {
-        // リアルタイム計算: 勉強中の場合は現在時刻までの時間を追加
-        if (user.isStudying && user.startTime) {
-          const currentStudyTime = Math.floor(
-            (now.getTime() - user.startTime.getTime()) / 1000
-          );
-          return {
-            ...user,
-            studyTime: user.studyTime + currentStudyTime,
-          };
-        }
-        return user;
-      })
-  };
-
-  const getTotalStudyTime = (): number => {
-    const usersTotal = Array.from(users.values())
-      .filter((user) => user.studyTime > 0 || user.isStudying)
-      .reduce((total, user) => {
-        let userTime = user.studyTime;
-        // 現在勉強中の場合は経過時間も追加
-        if (user.isStudying && user.startTime) {
-          const currentTime = Math.floor(
-            (new Date().getTime() - user.startTime.getTime()) / 1000
-          );
-          userTime += currentTime;
-        }
-        return total + userTime;
-      }, 0);
-
-    // 追加の勉強時間を合算
-    return usersTotal + ADDITIONAL_STUDY_TIME;
-  };
-
-  const getNextUpdateTime = (): Date => {
-    const nextUpdate = new Date(lastUpdateTime.getTime() + API_POLLING_INTERVAL);
-    return nextUpdate;
-  };
+  const displayedUsers = calcUsersStudyTime(currentTime, Array.from(users.values()));
+  const totalStudyTime = calcTotalStudyTime(Array.from(users.values()));
 
   return {
-    users: getSortedUsers(),
-    nextUpdateTime: getNextUpdateTime(),
-    formatTime,
-    formatUpdateTime,
-    getTotalStudyTime,
-    targetStudyTime: TARGET_STUDY_TIME,
-    showProgressBar: SHOW_PROGRESS_BAR,
-    personalProgress: PERSONAL_STUDY_PROGRESS,
+    currentTime,
+    displayedUsers,
+    totalStudyTime,
   };
 };
