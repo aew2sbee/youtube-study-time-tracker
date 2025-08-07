@@ -14,10 +14,6 @@ import { useUsers } from '@/hooks/useUsers';
 
 export default function Home() {
   const { currentTime, users, totalStudyTime, isLoading, isError } = useUsers();
-
-  if (isLoading) return <LoadingSpinner />;
-  if (isError) return <ErrorMessage error={isError} />;
-
   const [currentPage, setCurrentPage] = useState<number>(0);
 
   // 3人ずつでページ分割
@@ -34,7 +30,7 @@ export default function Home() {
       title: totalUserPages > 1 ? `Focus Tracker (${pageIndex + 1}/${totalUserPages})` : 'Focus Tracker',
       component: (
         <FocusTimeTracker
-          displayedUsers={pageUsers}
+          user={pageUsers}
         />
       ),
     };
@@ -54,6 +50,9 @@ export default function Home() {
 
     return () => clearInterval(interval);
   }, [pages.length]);
+
+  if (isLoading) return <LoadingSpinner />;
+  if (isError) return <ErrorMessage error={isError} />;
 
   const currentPageData = pages[currentPage];
 

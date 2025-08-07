@@ -1,11 +1,11 @@
 import { parameter } from '@/config/system';
-import { StudyTimeUser } from '@/types/youtube';
 import { calcTime } from '@/utils/calc';
 import ImageCrown from './ImageCrown';
 import ImageProfile from './ImageProfile';
+import { User } from '@/types/users';
 
-export default function FocusTimeTracker({ displayedUsers }: { displayedUsers: StudyTimeUser[] }) {
-  if (!displayedUsers || displayedUsers.length === 0) {
+export default function FocusTimeTracker({ user }: { user: User[] }) {
+  if (!user || user.length === 0) {
     return (
       <div className="text-white text-center text-3xl flex-1 flex items-start justify-center pt-16">
         <div className="space-y-2">
@@ -17,7 +17,7 @@ export default function FocusTimeTracker({ displayedUsers }: { displayedUsers: S
   }
   return (
     <div className="space-y-4 flex-1 overflow-hidden p-2">
-      {displayedUsers.map((user) => (
+      {user.map((user) => (
         <div key={user.name} className="flex items-center justify-between p-4">
           <div className="flex items-center space-x-4">
             <div className="relative">
