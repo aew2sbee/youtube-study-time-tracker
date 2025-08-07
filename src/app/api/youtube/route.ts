@@ -46,6 +46,7 @@ export async function GET() {
     };
 
     console.debug(`nextPageToken: ${nextPageToken}`);
+    console.debug(`result: ${result.messages.length}`);
     return NextResponse.json(result);
   } catch (error) {
     console.error('Error fetching live chat messages', error);

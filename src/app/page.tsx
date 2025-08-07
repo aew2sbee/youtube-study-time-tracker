@@ -13,17 +13,17 @@ import { useUsers } from '@/hooks/useUsers';
 
 
 export default function Home() {
-  const { currentTime, users, totalStudyTime, isLoading, isError } = useUsers();
   const [currentPage, setCurrentPage] = useState<number>(0);
 
+  const { currentTime, users, totalStudyTime, isLoading, isError } = useUsers();
+
   // 3人ずつでページ分割
-  const userArray = Array.from(users.values());
-  const totalUserPages = Math.ceil(userArray.length / parameter.USERS_PER_PAGE);
+  const totalUserPages = Math.ceil(users.length / parameter.USERS_PER_PAGE);
 
   const userPages = Array.from({ length: totalUserPages }, (_, pageIndex) => {
     const startIndex = pageIndex * parameter.USERS_PER_PAGE;
     const endIndex = startIndex + parameter.USERS_PER_PAGE;
-    const pageUsers = userArray.slice(startIndex, endIndex);
+    const pageUsers = users.slice(startIndex, endIndex);
 
     return {
       key: `users-${pageIndex}`,
