@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { YouTubeLiveChatMessage, LiveChatResponse } from '@/types/youtube';
 import { google } from 'googleapis';
 import { parameter } from '@/config/system';
-import { isEndStudyMessage, isStartStudyMessage } from '@/hooks/utils';
+import { isEndMessage, isStartMessage } from '@/utils/liveChatMessage';
 
 // 公式ドキュメント：https://developers.google.com/youtube/v3/live/docs/liveChatMessages/list?hl=ja
 let nextPageToken: string | undefined;
@@ -23,7 +23,7 @@ export async function GET() {
     const messages: YouTubeLiveChatMessage[] = liveChatMessages.data.items
       ?.filter((item) => {
         const displayMessage = item.snippet?.displayMessage || '';
-        return isStartStudyMessage(displayMessage) || isEndStudyMessage(displayMessage);
+        return isStartMessage(displayMessage) || isEndMessage(displayMessage);
       })
       .map((item) => ({
         id: item.id || '',
