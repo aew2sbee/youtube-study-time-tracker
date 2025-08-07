@@ -57,8 +57,8 @@ export const useUsers = () => {
       // 新規ユーザー
     } else {
       if (isStartMessage(messageText)) {
-        const newUser = startTime(message);
-        setUser((prev) => [...prev, newUser]);
+        const startUser = startTime(message);
+        setUser((prev) => [...prev, startUser]);
       }
     }
   });
@@ -96,21 +96,29 @@ const restartTime = (user: User, startTime: Date): User => {
 };
 
 const stopTime = (user: User, endTime: Date): User => {
-  const stopUser ={
-    ...user,
-    studyTime: calcStudyTime(user.startTime, endTime),
-    isStudying: false,
-    startTime: undefined,
+  if (user.startTime) {
+    const stopUser = {
+      ...user,
+      studyTime: calcStudyTime(user.startTime, endTime),
+      isStudying: false,
+      startTime: undefined,
+    };
+    console.debug(`stopUser: ${stopUser.name}`);
+    return stopUser;
   }
-  console.debug(`stopUser: ${stopUser.name}`);
-  return stopUser;
+  console.warn(`No stopUser: ${user.name}`);
+  return user;
 };
 
 const updateTime = (user: User, currentTime: Date): User => {
-  const updatedUser = {
-    ...user,
-    studyTime: calcStudyTime(user.startTime, currentTime),
+  if (user.startTime) {
+    const updatedUser = {
+      ...user,
+      studyTime: calcStudyTime(user.startTime, currentTime),
+    };
+    console.debug(`updatedUser: ${updatedUser.name}`);
+    return updatedUser;
   }
-  console.debug(`updatedUser: ${updatedUser.name}`);
-  return updatedUser
+  console.warn(`No updateUser: ${user.name}`);
+  return user;
 };
