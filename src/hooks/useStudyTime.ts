@@ -58,9 +58,11 @@ export const useStudyTime = () => {
         return parameter.API_POLLING_INTERVAL;
       }
 
-      if (data.messages && data.messages.length > 0) {
-        updateStudyTime(data.messages);
+      if (!data.messages || data.messages.length === 0) {
+        return parameter.API_POLLING_INTERVAL;
       }
+
+      updateStudyTime(data.messages);
 
       return parameter.API_POLLING_INTERVAL;
     } catch (error) {
