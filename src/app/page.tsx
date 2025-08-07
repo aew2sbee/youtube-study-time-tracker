@@ -7,11 +7,16 @@ import HowToUse from '@/components/HowToUse';
 import FocusTimeTracker from '@/components/FocusTimeTracker';
 import MyStudyProgress from '@/components/MyStudyProgress';
 import MonthlyChallenge from '@/components/MonthlyChallenge';
+import LoadingSpinner from '@/components/LoadingSpinner';
+import ErrorMessage from '@/components/ErrorMessage';
 import { useUsers } from '@/hooks/useUsers';
 
 
 export default function Home() {
   const { currentTime, users, totalStudyTime, isLoading, isError } = useUsers();
+
+  if (isLoading) return <LoadingSpinner />;
+  if (isError) return <ErrorMessage error={isError} />;
 
   const [currentPage, setCurrentPage] = useState<number>(0);
 

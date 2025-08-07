@@ -2,10 +2,9 @@ import Image from 'next/image';
 
 const FALLBACK_IMAGE_DATA_URL = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8Xw8AAnMB9QkQeQAAAABJRU5ErkJggg==";
 
-export default function FlowerImage({ key, src, alt }: { key: number; src: string; alt: string }) {
+export default function FlowerImage({ src, alt }: { src: string; alt: string }) {
   return (
     <Image
-      key={key}
       src={src}
       alt={alt}
       width={600}
