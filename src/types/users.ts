@@ -3,6 +3,6 @@ export interface User {
   name: string;
   studyTime: number; // in seconds
   profileImageUrl: string;
-  startTime?: Date;
+  startTime: Date | undefined;
   isStudying: boolean;
 }

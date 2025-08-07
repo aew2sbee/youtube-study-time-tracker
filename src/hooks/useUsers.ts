@@ -4,8 +4,9 @@ import { useState } from 'react';
 import { LiveChatResponse, YouTubeLiveChatMessage } from '@/types/youtube';
 import { isEndMessage, isStartMessage } from '@/utils/liveChatMessage';
 import { User } from '@/types/users';
-import { calcStudyTime } from '@/utils/time';
+import { calcTotalTime } from '@/utils/time';
 import { parameter } from '@/config/system';
+import { restartTime, startTime, stopTime, updateTime } from '@/lib/user';
 
 const YOUTUBE_API_URL = '/api/youtube';
 
@@ -66,59 +67,8 @@ export const useUsers = () => {
   return {
     currentTime: currentTime,
     users: user,
-    pollingIntervalMillis: data?.pollingIntervalMillis || parameter.API_POLLING_INTERVAL,
+    totalStudyTime: calcTotalTime(user),
     isLoading,
     isError: error,
   };
-};
-
-const startTime = (message: YouTubeLiveChatMessage): User => {
-  const startUser = {
-    channelId: message.channelId,
-    name: message.authorDisplayName,
-    studyTime: 0,
-    profileImageUrl: message.profileImageUrl,
-    startTime: new Date(message.publishedAt),
-    isStudying: true,
-  };
-  console.debug(`startUser: ${startUser.name}`);
-  return startUser;
-};
-
-const restartTime = (user: User, startTime: Date): User => {
-  const restartUser = {
-    ...user,
-    isStudying: true,
-    startTime: startTime,
-  };
-  console.debug(`restartUser: ${restartUser.name}`);
-  return restartUser;
-};
-
-const stopTime = (user: User, endTime: Date): User => {
-  if (user.startTime) {
-    const stopUser = {
-      ...user,
-      studyTime: calcStudyTime(user.startTime, endTime),
-      isStudying: false,
-      startTime: undefined,
-    };
-    console.debug(`stopUser: ${stopUser.name}`);
-    return stopUser;
-  }
-  console.warn(`No stopUser: ${user.name}`);
-  return user;
-};
-
-const updateTime = (user: User, currentTime: Date): User => {
-  if (user.startTime) {
-    const updatedUser = {
-      ...user,
-      studyTime: calcStudyTime(user.startTime, currentTime),
-    };
-    console.debug(`updatedUser: ${updatedUser.name}`);
-    return updatedUser;
-  }
-  console.warn(`No updateUser: ${user.name}`);
-  return user;
 };

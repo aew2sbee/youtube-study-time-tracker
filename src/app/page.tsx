@@ -5,18 +5,18 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { parameter } from '@/config/system';
 import HowToUse from '@/components/HowToUse';
 import FocusTimeTracker from '@/components/FocusTimeTracker';
-import { useStudyTime } from '@/hooks/useStudyTime';
 import MyStudyProgress from '@/components/MyStudyProgress';
 import MonthlyChallenge from '@/components/MonthlyChallenge';
+import { useUsers } from '@/hooks/useUsers';
 
 
 export default function Home() {
-  const { currentTime, displayedUsers, totalStudyTime } = useStudyTime();
+  const { currentTime, users, totalStudyTime, isLoading, isError } = useUsers();
 
   const [currentPage, setCurrentPage] = useState<number>(0);
 
   // 3人ずつでページ分割
-  const userArray = Array.from(displayedUsers.values());
+  const userArray = Array.from(users.values());
   const totalUserPages = Math.ceil(userArray.length / parameter.USERS_PER_PAGE);
 
   const userPages = Array.from({ length: totalUserPages }, (_, pageIndex) => {
