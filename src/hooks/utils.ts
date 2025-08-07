@@ -17,10 +17,6 @@ export const isStartStudyMessage = (messageText: string): boolean => messageText
 export const isEndStudyMessage = (messageText: string): boolean => messageText.toLowerCase().trim() === parameter.END_STUDY_KEYWORDS;
 
 
-export const buildApiUrl = (pageToken?: string): string => {
-  return `/api/youtube${pageToken ? `?pageToken=${pageToken}` : ''}`;
-};
-
 export const createNewUser = (message: YouTubeLiveChatMessage, messageText: string): StudyTimeUser => {
   const isStarting = isStartStudyMessage(messageText);
   const messageTime = new Date(message.publishedAt);
