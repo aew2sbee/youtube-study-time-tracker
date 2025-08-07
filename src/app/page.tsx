@@ -44,11 +44,13 @@ export default function Home() {
   ];
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentPage((prev) => (prev + 1) % pages.length);
-    }, parameter.PAGE_DISPLAY_INTERVAL); // 10秒間隔
+    if (pages.length > 0) {
+      const interval = setInterval(() => {
+        setCurrentPage((prev) => (prev + 1) % pages.length);
+      }, parameter.PAGE_DISPLAY_INTERVAL); // 10秒間隔
 
-    return () => clearInterval(interval);
+      return () => clearInterval(interval);
+    }
   }, [pages.length]);
 
   if (isLoading) return <LoadingSpinner />;
