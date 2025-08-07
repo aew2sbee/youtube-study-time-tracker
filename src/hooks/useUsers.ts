@@ -1,6 +1,6 @@
 import useSWR from 'swr';
 import { fetcher } from '@/utils/fetcher';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { LiveChatResponse, YouTubeLiveChatMessage } from '@/types/youtube';
 import { isEndMessage, isStartMessage } from '@/utils/liveChatMessage';
 import { User } from '@/types/users';
@@ -15,10 +15,14 @@ export const useUsers = () => {
   const [liveChatMessage, setLiveChatMessage] = useState<YouTubeLiveChatMessage[]>([]);
   const [user, setUser] = useState<User[]>([]);
 
-  const { data, error, isLoading } = useSWR<LiveChatResponse>(YOUTUBE_API_URL, fetcher);
+  const { data, error, isLoading } = useSWR<LiveChatResponse>(YOUTUBE_API_URL, fetcher, {
+    refreshInterval: (data: LiveChatResponse | undefined) => data?.pollingIntervalMillis || parameter.API_POLLING_INTERVAL,
+  });
 
   // 現在時刻を更新
-  setCurrentTime(new Date());
+  useEffect(() => {
+    setCurrentTime(new Date());
+  }, [data]);
 
   if (data?.messages.length === 0) {
     console.debug(`data.messages.length: ${data.messages.length}`);
@@ -68,6 +72,7 @@ export const useUsers = () => {
     currentTime: currentTime,
     users: user,
     totalStudyTime: calcTotalTime(user),
+    pollingIntervalMillis: data?.pollingIntervalMillis || parameter.API_POLLING_INTERVAL,
     isLoading,
     isError: error,
   };
