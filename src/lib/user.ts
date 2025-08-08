@@ -8,10 +8,10 @@ export const startTime = (message: YouTubeLiveChatMessage): User => {
     name: message.authorDisplayName,
     timeSec: 0,
     profileImageUrl: message.profileImageUrl,
-    startTime: new Date(message.publishedAt),
+    updateTime: new Date(message.publishedAt),
     isStudying: true,
   };
-  console.info(`startUser: ${startUser.name} ${startUser.timeSec}`);
+  console.info(`startUser: ${startUser.name} ${calcTime(startUser.timeSec)}`);
   return startUser;
 };
 
@@ -19,21 +19,21 @@ export const restartTime = (user: User, startTime: Date): User => {
   const restartUser = {
     ...user,
     isStudying: true,
-    startTime: startTime,
+    updateTime: startTime,
   };
-  console.info(`restartUser: ${restartUser.name} ${restartUser.timeSec}`);
+  console.info(`restartUser: ${restartUser.name} ${calcTime(user.timeSec)} => ${calcTime(restartUser.timeSec)}`);
   return restartUser;
 };
 
 export const stopTime = (user: User, endTime: Date): User => {
-  if (user.startTime) {
+  if (user.updateTime) {
     const stopUser = {
       ...user,
-      timeSec: user.timeSec + calcStudyTime(user.startTime, endTime),
+      timeSec: user.timeSec + calcStudyTime(user.updateTime, endTime),
       isStudying: false,
-      startTime: undefined,
+      updateTime: endTime,
     };
-    console.info(`stopUser: ${stopUser.name} ${stopUser.timeSec}`);
+    console.info(`stopUser: ${stopUser.name} ${calcTime(user.timeSec)} => ${calcTime(stopUser.timeSec)}`);
     return stopUser;
   }
   console.info(`No stopUser: ${user.name}`);
@@ -41,12 +41,13 @@ export const stopTime = (user: User, endTime: Date): User => {
 };
 
 export const updateTime = (user: User, currentTime: Date): User => {
-  if (user.startTime) {
+  if (user.updateTime) {
     const updatedUser = {
       ...user,
-      timeSec: calcStudyTime(user.startTime, currentTime),
+      timeSec: user.timeSec + calcStudyTime(user.updateTime, currentTime),
+      updateTime: currentTime,
     };
-    console.info(`updatedUser: ${updatedUser.name} ${calcTime(updatedUser.timeSec)}`);
+    console.info(`updatedUser: ${updatedUser.name} ${calcTime(user.timeSec)} => ${calcTime(updatedUser.timeSec)}`);
     return updatedUser;
   }
   console.info(`No updateUser: ${user.name}`);
