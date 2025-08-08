@@ -15,16 +15,14 @@ export const useUsers = () => {
   const [currentTime, setCurrentTime] = useState<Date>(new Date());
   const [liveChatMessage, setLiveChatMessage] = useState<YouTubeLiveChatMessage[]>([]);
 
-  const { data, error, isLoading } = useSWR<LiveChatResponse>(YOUTUBE_API_URL, fetcher, {
-    refreshInterval: (data) => Math.max(data?.pollingIntervalMillis ?? 0, parameter.API_POLLING_INTERVAL),
-  });
+  const { data, error, isLoading } = useSWR<LiveChatResponse>(YOUTUBE_API_URL, fetcher, {refreshInterval: parameter.API_POLLING_INTERVAL});
 
   // データの処理
   useEffect(() => {
+    setCurrentTime(new Date());
     if (!data) return;
 
     console.debug(`useUsers: data: ${JSON.stringify(data)}`);
-    setCurrentTime(new Date());
 
     if (data.messages.length === 0) {
       console.debug(`data.messages.length: ${data.messages.length}`);
@@ -84,13 +82,12 @@ export const useUsers = () => {
 
       return updatedUsers;
     });
-  }, [liveChatMessage, currentTime]); // userを依存配列から外す
+  }, [currentTime, liveChatMessage]); // userを依存配列から外す
 
   return {
     currentTime: currentTime,
     users: user,
     totalStudyTime: calcTotalTime(user),
-    pollingIntervalMillis: data?.pollingIntervalMillis || parameter.API_POLLING_INTERVAL,
     isLoading,
     isError: error,
   };
