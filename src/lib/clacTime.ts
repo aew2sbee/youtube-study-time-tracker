@@ -8,7 +8,6 @@ export const calcStudyTime = (start: Date, end: Date): number => {
 }
 export const calcTotalTime = (users: User[]): number => {
   const total = users.reduce((total, u) => total + u.timeSec, parameter.ADDITIONAL_STUDY_TIME)
-  console.debug(`total: ${total}`);
   return total;
 }
 
