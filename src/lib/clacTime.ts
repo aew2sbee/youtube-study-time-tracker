@@ -30,3 +30,11 @@ export const convertHHMM = (publishedAt:string) => new Date(publishedAt).toLocal
   hour12: false,
   timeZone: 'Asia/Tokyo',
 });
+
+export const convertHHMM2 = (publishedAt:Date) => publishedAt.toLocaleTimeString('ja-JP', {
+  hour: '2-digit',
+  minute: '2-digit',
+  hour12: false,
+  timeZone: 'Asia/Tokyo',
+});
+

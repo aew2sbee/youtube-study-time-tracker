@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { LiveChatResponse, YouTubeLiveChatMessage } from '@/types/youtube';
 import { isEndMessage, isStartMessage } from '@/lib/liveChatMessage';
 import { User } from '@/types/users';
-import { calcTotalTime } from '@/lib/clacTime';
+import { calcTime, calcTotalTime, convertHHMM2 } from '@/lib/clacTime';
 import { parameter } from '@/config/system';
 import { restartTime, startTime, stopTime, updateTime } from '@/lib/user';
 
@@ -56,34 +56,41 @@ export const useUsers = () => {
     if (messagesToProcess.length === 0) return;
 
     setUser((prevUsers) => {
-      let updatedUsers = [...prevUsers];
+      let newList = [...prevUsers];
 
       messagesToProcess.forEach((message) => {
         const messageText = message.displayMessage.toLowerCase().trim();
         const publishedAt = new Date(message.publishedAt);
-        const existingUser = updatedUsers.find((u) => u.channelId === message.channelId);
+        const existingUser = newList.find((u) => u.channelId === message.channelId);
 
         if (existingUser) {
           // 再開
-          if (isStartMessage(messageText) && !existingUser.isStudying) {
+          if (isStartMessage(messageText)) {
+            console.info(`restartUser1 ${existingUser?.name} ${calcTime(existingUser?.timeSec)} ${existingUser?.startTime}`);
             const restartUser = restartTime(existingUser, publishedAt);
-            updatedUsers = updatedUsers.filter((u) => u.channelId !== existingUser.channelId).concat(restartUser);
+            console.info(`restartUser2 ${restartUser?.name} ${calcTime(restartUser?.timeSec)} ${convertHHMM2(restartUser?.startTime)}`);
+            newList = newList.filter((u) => u.channelId !== existingUser.channelId).concat(restartUser);
+            console.info(`restartUser3 ${calcTime(newList.find((u) => u.channelId === message.channelId)?.timeSec)}`);
             // 停止
-          } else if (isEndMessage(messageText) && existingUser.isStudying) {
+          } else if (isEndMessage(messageText)) {
+            console.info(`stopUser1 ${existingUser?.name} ${calcTime(existingUser?.timeSec)} ${convertHHMM2(existingUser?.startTime)}`);
             const stopUser = stopTime(existingUser, publishedAt);
-            updatedUsers = updatedUsers.filter((u) => u.channelId !== existingUser.channelId).concat(stopUser);
+            console.info(`stopUser2 ${stopUser?.name} ${calcTime(stopUser?.timeSec)} ${stopUser?.startTime}`);
+            newList = newList.filter((u) => u.channelId !== existingUser.channelId).concat(stopUser);
+            console.info(`stopUser3 ${calcTime(newList.find((u) => u.channelId === message.channelId)?.timeSec)}`);
           }
-          // 学習時間の更新はここでは行わない（currentTime変更時に一括で行う）
         } else {
           // 新規ユーザーの開始
           if (isStartMessage(messageText)) {
             const startUser = startTime(message);
-            updatedUsers.push(startUser);
+            console.info(`startUser2 ${startUser?.name} ${calcTime(startUser?.timeSec)} ${convertHHMM2(startUser?.startTime)}`);
+            newList.push(startUser);
+            console.info(`startUser3 ${calcTime(newList.find((u) => u.channelId === message.channelId)?.timeSec)}`);
           }
         }
       });
 
-      return updatedUsers;
+      return newList;
     });
 
     lastProcessedIndexRef.current = liveChatMessage.length;
@@ -91,7 +98,7 @@ export const useUsers = () => {
 
   // currentTimeが変わるたびに、学習中ユーザーのstudyTimeを一括更新
   useEffect(() => {
-    setUser((prev) => prev.map((u) => (u.isStudying ? updateTime(u, currentTime) : u)));
+    setUser((prev) => prev.map((user) => (user.isStudying ? updateTime(user, currentTime) : user)));
   }, [currentTime]);
 
   return {

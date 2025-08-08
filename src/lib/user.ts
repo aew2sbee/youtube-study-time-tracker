@@ -1,6 +1,6 @@
 import { User } from '@/types/users';
 import { YouTubeLiveChatMessage } from '@/types/youtube';
-import { calcStudyTime } from '@/lib/clacTime';
+import { calcStudyTime, calcTime } from '@/lib/clacTime';
 
 export const startTime = (message: YouTubeLiveChatMessage): User => {
   const startUser = {
@@ -11,7 +11,7 @@ export const startTime = (message: YouTubeLiveChatMessage): User => {
     startTime: new Date(message.publishedAt),
     isStudying: true,
   };
-  console.debug(`startUser: ${startUser.name}`);
+  console.info(`startUser: ${startUser.name} ${startUser.timeSec}`);
   return startUser;
 };
 
@@ -21,7 +21,7 @@ export const restartTime = (user: User, startTime: Date): User => {
     isStudying: true,
     startTime: startTime,
   };
-  console.debug(`restartUser: ${restartUser.name}`);
+  console.info(`restartUser: ${restartUser.name} ${restartUser.timeSec}`);
   return restartUser;
 };
 
@@ -29,14 +29,14 @@ export const stopTime = (user: User, endTime: Date): User => {
   if (user.startTime) {
     const stopUser = {
       ...user,
-      timeSec: calcStudyTime(user.startTime, endTime),
+      timeSec: user.timeSec + calcStudyTime(user.startTime, endTime),
       isStudying: false,
       startTime: undefined,
     };
-    console.debug(`stopUser: ${stopUser.name}`);
+    console.info(`stopUser: ${stopUser.name} ${stopUser.timeSec}`);
     return stopUser;
   }
-  console.warn(`No stopUser: ${user.name}`);
+  console.info(`No stopUser: ${user.name}`);
   return user;
 };
 
@@ -46,9 +46,9 @@ export const updateTime = (user: User, currentTime: Date): User => {
       ...user,
       timeSec: calcStudyTime(user.startTime, currentTime),
     };
-    console.debug(`updatedUser: ${updatedUser.name}`);
+    console.info(`updatedUser: ${updatedUser.name} ${calcTime(updatedUser.timeSec)}`);
     return updatedUser;
   }
-  console.warn(`No updateUser: ${user.name}`);
+  console.info(`No updateUser: ${user.name}`);
   return user;
 };
