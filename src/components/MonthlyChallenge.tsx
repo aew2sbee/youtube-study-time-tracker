@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import FlowerImage from './ImageFlower';
 import AnimationStar from './AnimationStar';
 import ProgressBar from './ProgressBar';
@@ -20,9 +20,18 @@ export default function MonthlyChallenge({
 }) {
   const [animatedPercentage, setAnimatedPercentage] = useState<number>(0);
   const [animatedFlowerLevel, setAnimatedFlowerLevel] = useState<number>(1);
+  const lastTotalStudyTimeRef = useRef<number | null>(null);
+
+  const CURRENT_YEAR_MONTH = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}`;
+
+  const targetValues = useMemo(() => {
+    return calculateTargetValues(totalStudyTime);
+  }, [totalStudyTime]);
 
   useEffect(() => {
-    const { targetPercentage, targetFlowerLevel } = calculateTargetValues(totalStudyTime);
+    if (lastTotalStudyTimeRef.current === totalStudyTime) return
+
+    const { targetPercentage, targetFlowerLevel } = targetValues;
 
     setAnimatedPercentage(0);
     setAnimatedFlowerLevel(1);
@@ -35,7 +44,6 @@ export default function MonthlyChallenge({
     const interval = setInterval(() => {
       currentStep++;
 
-      // 線形進行：ステップ数に比例して値を増加
       const currentPercentage = Math.min(Math.round(percentageStep * currentStep), targetPercentage);
       const currentFlowerLevel = Math.min(Math.round(1 + flowerLevelStep * currentStep), targetFlowerLevel);
 
@@ -47,9 +55,10 @@ export default function MonthlyChallenge({
       }
     }, stepTime);
 
+    lastTotalStudyTimeRef.current = totalStudyTime;
+
     return () => clearInterval(interval);
-  }, [totalStudyTime]);
-  const CURRENT_YEAR_MONTH = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}`;
+  }, [totalStudyTime, targetValues]);
 
   return (
     <div className="flex-1 flex flex-row pt-4">
