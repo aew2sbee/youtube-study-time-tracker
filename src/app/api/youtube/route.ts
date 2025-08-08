@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { YouTubeLiveChatMessage, LiveChatResponse } from '@/types/youtube';
 import { google } from 'googleapis';
-import { isEndMessage, isStartMessage } from '@/utils/liveChatMessage';
+import { isEndMessage, isStartMessage } from '@/lib/liveChatMessage';
 import { parameter } from '@/config/system';
 
 // 公式ドキュメント：https://developers.google.com/youtube/v3/live/docs/liveChatMessages/list?hl=ja
@@ -20,19 +20,20 @@ export async function GET() {
       maxResults: 200,
     });
 
-    const messages: YouTubeLiveChatMessage[] = liveChatMessages.data.items
-      ?.filter((item) => {
-        const displayMessage = item.snippet?.displayMessage || '';
-        return isStartMessage(displayMessage) || isEndMessage(displayMessage);
-      })
-      .map((item) => ({
-        id: item.id || '',
-        channelId: item.authorDetails?.channelId || '',
-        authorDisplayName: item.authorDetails?.displayName || '',
-        displayMessage: item.snippet?.displayMessage || '',
-        publishedAt: item.snippet?.publishedAt || '',
-        profileImageUrl: item.authorDetails?.profileImageUrl || '',
-      })) || [];
+    const messages: YouTubeLiveChatMessage[] =
+      liveChatMessages.data.items
+        ?.filter((item) => {
+          const displayMessage = item.snippet?.displayMessage || '';
+          return isStartMessage(displayMessage) || isEndMessage(displayMessage);
+        })
+        .map((item) => ({
+          id: item.id || '',
+          channelId: item.authorDetails?.channelId || '',
+          authorDisplayName: item.authorDetails?.displayName || '',
+          displayMessage: item.snippet?.displayMessage || '',
+          publishedAt: item.snippet?.publishedAt || '',
+          profileImageUrl: item.authorDetails?.profileImageUrl || '',
+        })) || [];
 
     nextPageToken = liveChatMessages.data.nextPageToken || undefined;
 

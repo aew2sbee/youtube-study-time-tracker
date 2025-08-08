@@ -2,9 +2,9 @@ import useSWR from 'swr';
 import { fetcher } from '@/utils/fetcher';
 import { useState, useEffect } from 'react';
 import { LiveChatResponse, YouTubeLiveChatMessage } from '@/types/youtube';
-import { isEndMessage, isStartMessage } from '@/utils/liveChatMessage';
+import { isEndMessage, isStartMessage } from '@/lib/liveChatMessage';
 import { User } from '@/types/users';
-import { calcTotalTime } from '@/utils/time';
+import { calcTotalTime } from '@/lib/clacTime';
 import { parameter } from '@/config/system';
 import { restartTime, startTime, stopTime, updateTime } from '@/lib/user';
 
