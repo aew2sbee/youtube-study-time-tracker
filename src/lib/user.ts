@@ -6,7 +6,7 @@ export const startTime = (message: YouTubeLiveChatMessage): User => {
   const startUser = {
     channelId: message.channelId,
     name: message.authorDisplayName,
-    studyTime: 0,
+    timeSec: 0,
     profileImageUrl: message.profileImageUrl,
     startTime: new Date(message.publishedAt),
     isStudying: true,
@@ -29,7 +29,7 @@ export const stopTime = (user: User, endTime: Date): User => {
   if (user.startTime) {
     const stopUser = {
       ...user,
-      studyTime: calcStudyTime(user.startTime, endTime),
+      timeSec: calcStudyTime(user.startTime, endTime),
       isStudying: false,
       startTime: undefined,
     };
@@ -44,7 +44,7 @@ export const updateTime = (user: User, currentTime: Date): User => {
   if (user.startTime) {
     const updatedUser = {
       ...user,
-      studyTime: calcStudyTime(user.startTime, currentTime),
+      timeSec: calcStudyTime(user.startTime, currentTime),
     };
     console.debug(`updatedUser: ${updatedUser.name}`);
     return updatedUser;

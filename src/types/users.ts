@@ -1,7 +1,7 @@
 export interface User {
   channelId: string;
   name: string;
-  studyTime: number; // in seconds
+  timeSec: number;
   profileImageUrl: string;
   startTime: Date | undefined;
   isStudying: boolean;
