@@ -16,7 +16,7 @@ export const useUsers = () => {
   const [liveChatMessage, setLiveChatMessage] = useState<YouTubeLiveChatMessage[]>([]);
 
   const { data, error, isLoading } = useSWR<LiveChatResponse>(YOUTUBE_API_URL, fetcher, {
-    refreshInterval: (data) => Math.max(data?.pollingIntervalMillis ?? 0, parameter.API_POLLING_INTERVAL),
+    refreshInterval: (data) => Math.min(data?.pollingIntervalMillis ?? parameter.API_POLLING_INTERVAL),
   });
 
   // データの処理
