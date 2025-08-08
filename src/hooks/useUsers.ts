@@ -18,18 +18,23 @@ export const useUsers = () => {
 
   const { data, error, isLoading } = useSWR<LiveChatResponse>(YOUTUBE_API_URL, fetcher, {
     refreshInterval: (data) => {
-      const interval = Math.max(data?.pollingIntervalMillis ?? 0, parameter.API_POLLING_INTERVAL);
+      const interval = data?.pollingIntervalMillis ?? parameter.API_POLLING_INTERVAL;
       console.info(`SWR polling interval: ${interval}ms, pollingIntervalMillis: ${data?.pollingIntervalMillis}`);
       return interval;
     },
     onError: (error) => {
       console.error('SWR fetch error:', error);
     },
+    onSuccess: (data) => {
+      console.info('SWR fetch success - received data', data);
+    },
   });
+
 
   // データの処理（新規メッセージの追加）
   useEffect(() => {
     setCurrentTime(new Date());
+    console.info(`SWR status - isLoading: ${isLoading}, error: ${!!error}, data: ${!!data}`);
 
     if (!data || data.messages.length === 0) return;
 
@@ -44,6 +49,7 @@ export const useUsers = () => {
       setLiveChatMessage((prev) => [...prev, ...newMessages]);
       console.info(`add ${newMessages.length} new messages`);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
 
   // メッセージ処理（新規分のみ、開始/終了の状態遷移のみ反映）
@@ -105,6 +111,7 @@ export const useUsers = () => {
   }, [liveChatMessage]);
 
   useEffect(() => {
+    console.info(`SWR`);
     setUser((prev) => prev.map((user) => (user.isStudying ? updateTime(user, currentTime) : user)));
   }, [currentTime]);
 
