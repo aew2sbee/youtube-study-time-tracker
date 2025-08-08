@@ -46,8 +46,6 @@ export async function GET() {
       pollingIntervalMillis: liveChatMessages.data.pollingIntervalMillis || parameter.API_POLLING_INTERVAL,
     };
 
-    console.debug(`nextPageToken: ${nextPageToken}`);
-    console.debug(`result: ${result.messages.length}`);
     return NextResponse.json(result);
   } catch (error) {
     console.error('Error fetching live chat messages', error);
