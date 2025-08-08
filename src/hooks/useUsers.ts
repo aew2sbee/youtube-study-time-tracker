@@ -17,22 +17,22 @@ export const useUsers = () => {
   const lastProcessedIndexRef = useRef(0); // 追加: 再処理防止用のインデックス
 
   const { data, error, isLoading } = useSWR<LiveChatResponse>(YOUTUBE_API_URL, fetcher, {
-    refreshInterval: (data) => Math.max(data?.pollingIntervalMillis ?? 0, parameter.API_POLLING_INTERVAL),
+    refreshInterval: (data) => {
+      const interval = Math.max(data?.pollingIntervalMillis ?? 0, parameter.API_POLLING_INTERVAL);
+      console.info(`SWR polling interval: ${interval}ms, pollingIntervalMillis: ${data?.pollingIntervalMillis}`);
+      return interval;
+    },
+    onError: (error) => {
+      console.error('SWR fetch error:', error);
+    },
   });
 
-  // データの処理（currentTime更新＋新規メッセージの追加）
+  // データの処理（新規メッセージの追加）
   useEffect(() => {
-    if (!data) return;
-
-    console.debug(`useUsers: data: ${JSON.stringify(data)}`);
     setCurrentTime(new Date());
 
-    if (data.messages.length === 0) {
-      console.debug(`data.messages.length: ${data.messages.length}`);
-      return;
-    }
+    if (!data || data.messages.length === 0) return;
 
-    // 新しいメッセージのみを処理
     const newMessages = data.messages.filter(
       (message) =>
         !liveChatMessage.some(
@@ -42,9 +42,8 @@ export const useUsers = () => {
 
     if (newMessages.length > 0) {
       setLiveChatMessage((prev) => [...prev, ...newMessages]);
-      console.debug(`add ${newMessages.length} new messages`);
+      console.info(`add ${newMessages.length} new messages`);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
 
   // メッセージ処理（新規分のみ、開始/終了の状態遷移のみ反映）
@@ -65,27 +64,36 @@ export const useUsers = () => {
 
         if (existingUser) {
           // 再開
-          if (isStartMessage(messageText)) {
-            console.info(`restartUser1 ${existingUser?.name} ${calcTime(existingUser?.timeSec)} ${existingUser?.startTime}`);
+          if (isStartMessage(messageText) && !existingUser.isStudying) {
+            console.info(
+              `restartUser1 ${existingUser?.name} ${calcTime(existingUser?.timeSec)} ${existingUser?.updateTime}`,
+            );
             const restartUser = restartTime(existingUser, publishedAt);
-            console.info(`restartUser2 ${restartUser?.name} ${calcTime(restartUser?.timeSec)} ${convertHHMM2(restartUser?.startTime)}`);
+            console.info(
+              `restartUser2 ${restartUser?.name} ${calcTime(restartUser?.timeSec)} ${convertHHMM2(
+                restartUser?.updateTime,
+              )}`,
+            );
             newList = newList.filter((u) => u.channelId !== existingUser.channelId).concat(restartUser);
-            console.info(`restartUser3 ${calcTime(newList.find((u) => u.channelId === message.channelId)?.timeSec)}`);
             // 停止
-          } else if (isEndMessage(messageText)) {
-            console.info(`stopUser1 ${existingUser?.name} ${calcTime(existingUser?.timeSec)} ${convertHHMM2(existingUser?.startTime)}`);
+          } else if (isEndMessage(messageText) && existingUser.isStudying) {
+            console.info(
+              `stopUser1 ${existingUser?.name} ${calcTime(existingUser?.timeSec)} ${convertHHMM2(
+                existingUser?.updateTime,
+              )}`,
+            );
             const stopUser = stopTime(existingUser, publishedAt);
-            console.info(`stopUser2 ${stopUser?.name} ${calcTime(stopUser?.timeSec)} ${stopUser?.startTime}`);
+            console.info(`stopUser2 ${stopUser?.name} ${calcTime(stopUser?.timeSec)} ${stopUser?.updateTime}`);
             newList = newList.filter((u) => u.channelId !== existingUser.channelId).concat(stopUser);
-            console.info(`stopUser3 ${calcTime(newList.find((u) => u.channelId === message.channelId)?.timeSec)}`);
           }
         } else {
           // 新規ユーザーの開始
           if (isStartMessage(messageText)) {
             const startUser = startTime(message);
-            console.info(`startUser2 ${startUser?.name} ${calcTime(startUser?.timeSec)} ${convertHHMM2(startUser?.startTime)}`);
+            console.info(
+              `startUser2 ${startUser?.name} ${calcTime(startUser?.timeSec)} ${convertHHMM2(startUser?.updateTime)}`,
+            );
             newList.push(startUser);
-            console.info(`startUser3 ${calcTime(newList.find((u) => u.channelId === message.channelId)?.timeSec)}`);
           }
         }
       });
@@ -96,7 +104,6 @@ export const useUsers = () => {
     lastProcessedIndexRef.current = liveChatMessage.length;
   }, [liveChatMessage]);
 
-  // currentTimeが変わるたびに、学習中ユーザーのstudyTimeを一括更新
   useEffect(() => {
     setUser((prev) => prev.map((user) => (user.isStudying ? updateTime(user, currentTime) : user)));
   }, [currentTime]);
