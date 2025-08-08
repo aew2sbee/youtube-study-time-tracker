@@ -24,3 +24,10 @@ export const calculateTargetValues = (totalTime: number) => {
   const targetFlowerLevel = Math.min(Math.floor(targetPercentage / 10), 10);
   return { targetPercentage, targetFlowerLevel };
 };
+
+export const convertHHMM = (publishedAt:string) => new Date(publishedAt).toLocaleTimeString('ja-JP', {
+  hour: '2-digit',
+  minute: '2-digit',
+  hour12: false,
+  timeZone: 'Asia/Tokyo',
+});
