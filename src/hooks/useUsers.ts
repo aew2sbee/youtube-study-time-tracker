@@ -1,6 +1,6 @@
 import useSWR from 'swr';
 import { fetcher } from '@/utils/fetcher';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { LiveChatResponse, YouTubeLiveChatMessage } from '@/types/youtube';
 import { isEndMessage, isStartMessage } from '@/lib/liveChatMessage';
 import { User } from '@/types/users';
@@ -14,18 +14,18 @@ export const useUsers = () => {
   const [user, setUser] = useState<User[]>([]);
   const [currentTime, setCurrentTime] = useState<Date>(new Date());
   const [liveChatMessage, setLiveChatMessage] = useState<YouTubeLiveChatMessage[]>([]);
+  const lastProcessedIndexRef = useRef(0); // 追加: 再処理防止用のインデックス
 
   const { data, error, isLoading } = useSWR<LiveChatResponse>(YOUTUBE_API_URL, fetcher, {
-    refreshInterval: (data) => Math.min(data?.pollingIntervalMillis ?? parameter.API_POLLING_INTERVAL),
+    refreshInterval: (data) => Math.max(data?.pollingIntervalMillis ?? 0, parameter.API_POLLING_INTERVAL),
   });
 
-  // データの処理
-  useEffect(() => {
-    setCurrentTime(new Date());
-  }, []); // liveChatMessageを依存配列から外す
-
+  // データの処理（currentTime更新＋新規メッセージの追加）
   useEffect(() => {
     if (!data) return;
+
+    console.debug(`useUsers: data: ${JSON.stringify(data)}`);
+    setCurrentTime(new Date());
 
     if (data.messages.length === 0) {
       console.debug(`data.messages.length: ${data.messages.length}`);
@@ -45,37 +45,37 @@ export const useUsers = () => {
       console.debug(`add ${newMessages.length} new messages`);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentTime, data]); // liveChatMessageを依存配列から外す
+  }, [data]);
 
-  // メッセージ処理
+  // メッセージ処理（新規分のみ、開始/終了の状態遷移のみ反映）
   useEffect(() => {
     if (liveChatMessage.length === 0) return;
+
+    const startIndex = lastProcessedIndexRef.current;
+    const messagesToProcess = liveChatMessage.slice(startIndex);
+    if (messagesToProcess.length === 0) return;
 
     setUser((prevUsers) => {
       let updatedUsers = [...prevUsers];
 
-      liveChatMessage.forEach((message) => {
+      messagesToProcess.forEach((message) => {
         const messageText = message.displayMessage.toLowerCase().trim();
         const publishedAt = new Date(message.publishedAt);
-        const existingUser = updatedUsers.find((user) => user.channelId === message.channelId);
+        const existingUser = updatedUsers.find((u) => u.channelId === message.channelId);
 
-        // 既存ユーザー
         if (existingUser) {
-          // 時間の再開
+          // 再開
           if (isStartMessage(messageText) && !existingUser.isStudying) {
             const restartUser = restartTime(existingUser, publishedAt);
             updatedUsers = updatedUsers.filter((u) => u.channelId !== existingUser.channelId).concat(restartUser);
-            // 時間の停止
+            // 停止
           } else if (isEndMessage(messageText) && existingUser.isStudying) {
             const stopUser = stopTime(existingUser, publishedAt);
             updatedUsers = updatedUsers.filter((u) => u.channelId !== existingUser.channelId).concat(stopUser);
-            // 時間の更新
-          } else if (existingUser.isStudying) {
-            const updatedUser = updateTime(existingUser, currentTime);
-            updatedUsers = updatedUsers.filter((u) => u.channelId !== existingUser.channelId).concat(updatedUser);
           }
-          // 新規ユーザー
+          // 学習時間の更新はここでは行わない（currentTime変更時に一括で行う）
         } else {
+          // 新規ユーザーの開始
           if (isStartMessage(messageText)) {
             const startUser = startTime(message);
             updatedUsers.push(startUser);
@@ -85,7 +85,14 @@ export const useUsers = () => {
 
       return updatedUsers;
     });
-  }, [currentTime, liveChatMessage]); // userを依存配列から外す
+
+    lastProcessedIndexRef.current = liveChatMessage.length;
+  }, [liveChatMessage]);
+
+  // currentTimeが変わるたびに、学習中ユーザーのstudyTimeを一括更新
+  useEffect(() => {
+    setUser((prev) => prev.map((u) => (u.isStudying ? updateTime(u, currentTime) : u)));
+  }, [currentTime]);
 
   return {
     currentTime: currentTime,
