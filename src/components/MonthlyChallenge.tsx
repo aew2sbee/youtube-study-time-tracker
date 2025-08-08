@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
-import { calcTime, calculateTargetValues } from '@/utils/calc';
 import FlowerImage from './ImageFlower';
 import AnimationStar from './AnimationStar';
 import ProgressBar from './ProgressBar';
 import { parameter } from '@/config/system';
+import { calcTime, calculateTargetValues } from '@/lib/clacTime';
 
 // アニメーション設定
 const ANIMATION_CONFIG = {
