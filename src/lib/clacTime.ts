@@ -12,7 +12,7 @@ export const calcTotalTime = (users: User[]): number => {
 }
 
 export const calcTime = (seconds: number): string => {
-  if (seconds === 0) return '0h 0min';
+  if (seconds === 0) return '0h 00min';
   const hours = Math.floor(seconds / 3600);
   const minutes = Math.floor((seconds % 3600) / 60);
   return `${hours.toString()}h ${minutes.toString().padStart(2, '0')}min`;
