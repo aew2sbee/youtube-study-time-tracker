@@ -9,4 +9,5 @@ export interface YouTubeLiveChatMessage {
 
 export interface LiveChatResponse {
   messages: YouTubeLiveChatMessage[];
+  pollingIntervalMillis: number; // ポーリング間隔ミリ秒
 }

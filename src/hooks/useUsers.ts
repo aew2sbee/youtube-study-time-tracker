@@ -15,14 +15,17 @@ export const useUsers = () => {
   const [currentTime, setCurrentTime] = useState<Date>(new Date());
   const [liveChatMessage, setLiveChatMessage] = useState<YouTubeLiveChatMessage[]>([]);
 
-  const { data, error, isLoading } = useSWR<LiveChatResponse>(YOUTUBE_API_URL, fetcher, {refreshInterval: parameter.API_POLLING_INTERVAL});
+  const { data, error, isLoading } = useSWR<LiveChatResponse>(YOUTUBE_API_URL, fetcher, {
+    refreshInterval: (data) => Math.max(data?.pollingIntervalMillis ?? 0, parameter.API_POLLING_INTERVAL),
+  });
 
   // データの処理
   useEffect(() => {
     setCurrentTime(new Date());
-    if (!data) return;
+  }, []); // liveChatMessageを依存配列から外す
 
-    console.debug(`useUsers: data: ${JSON.stringify(data)}`);
+  useEffect(() => {
+    if (!data) return;
 
     if (data.messages.length === 0) {
       console.debug(`data.messages.length: ${data.messages.length}`);
@@ -42,7 +45,7 @@ export const useUsers = () => {
       console.debug(`add ${newMessages.length} new messages`);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data]); // liveChatMessageを依存配列から外す
+  }, [currentTime, data]); // liveChatMessageを依存配列から外す
 
   // メッセージ処理
   useEffect(() => {

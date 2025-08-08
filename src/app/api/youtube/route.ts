@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { YouTubeLiveChatMessage, LiveChatResponse } from '@/types/youtube';
 import { google } from 'googleapis';
 import { isEndMessage, isStartMessage } from '@/utils/liveChatMessage';
+import { parameter } from '@/config/system';
 
 // 公式ドキュメント：https://developers.google.com/youtube/v3/live/docs/liveChatMessages/list?hl=ja
 let nextPageToken: string | undefined;
@@ -39,8 +40,10 @@ export async function GET() {
       console.info(message.publishedAt, message.authorDisplayName, message.displayMessage);
     });
 
-    // pollingIntervalMillis(liveChatMessages.data.pollingIntervalMillis)は本アプリには過剰なポーリング処理になるため房用
-    const result: LiveChatResponse = { messages };
+    const result: LiveChatResponse = {
+      messages,
+      pollingIntervalMillis: liveChatMessages.data.pollingIntervalMillis || parameter.API_POLLING_INTERVAL,
+    };
 
     console.debug(`nextPageToken: ${nextPageToken}`);
     console.debug(`result: ${result.messages.length}`);
