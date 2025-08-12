@@ -1,6 +1,6 @@
 import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
-import { fetcher, postLowdb } from '@/utils/useSWR';
+import { fetcher, postLowdb, postYouTubeComment } from '@/utils/useSWR';
 import { useState, useEffect, useRef } from 'react';
 import { LiveChatResponse, YouTubeLiveChatMessage } from '@/types/youtube';
 import { isEndMessage, isStartMessage } from '@/lib/liveChatMessage';
@@ -23,6 +23,7 @@ export const useUsers = () => {
   });
 
   const { trigger: saveUser } = useSWRMutation(USERS_API_URL, postLowdb);
+  const { trigger: postComment } = useSWRMutation(YOUTUBE_API_URL, postYouTubeComment);
 
   // データの処理（新規メッセージの追加）
   useEffect(() => {
@@ -97,6 +98,7 @@ export const useUsers = () => {
     totalStudyTime: calcTotalTime(user),
     isLoading,
     isError: error,
+    postComment: postComment,
   };
 };
 
