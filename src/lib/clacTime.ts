@@ -24,7 +24,7 @@ export const calculateTargetValues = (totalTime: number) => {
   return { targetPercentage, targetFlowerLevel };
 };
 
-export const convertHHMM = (publishedAt: string) =>
+export const convertHHMMSS = (publishedAt: string) =>
   new Date(publishedAt).toLocaleTimeString('ja-JP', {
     hour12: false,
     timeZone: 'Asia/Tokyo',
