@@ -33,7 +33,10 @@ export const convertHHMMSS = (publishedAt: string) =>
 export const calcCurrentWeekTotalTime = (users: User[], today:Date): number => {
   const monday = getMonday(today)
   const sunday = getSunday(today);
-  const currentWeek = users.filter(date => date.updateTime >= monday && date.updateTime <= sunday);
+  const currentWeek = users.filter(user => {
+    const userDate = new Date(user.updateTime);
+    return userDate >= monday && userDate <= sunday;
+  });
   const currentWeekTimeSec = currentWeek.reduce((total, user) => total + user.timeSec, 0);
   return currentWeekTimeSec;
 };

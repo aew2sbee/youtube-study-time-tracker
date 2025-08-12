@@ -68,7 +68,7 @@ export async function POST(request: NextRequest) {
   try {
     const user: User = await request.json();
     const userLog = await getUserData(user);
-    const currentWeekTotalTime = calcCurrentWeekTotalTime(userLog, user.updateTime);
+    const currentWeekTotalTime = calcCurrentWeekTotalTime(userLog, new Date(user.updateTime));
     const message = `[自動送信] @${user.name} 今週は${calcTime(currentWeekTotalTime)}を集中しました!!`;
 
     if (!message) {
