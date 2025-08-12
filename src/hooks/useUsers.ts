@@ -10,7 +10,7 @@ import { parameter } from '@/config/system';
 import { restartTime, startTime, stopTime, updateTime } from '@/lib/user';
 
 const YOUTUBE_API_URL = '/api/youtube';
-const USERS_API_URL = '/api/lowdb';
+const USERS_API_URL = '/api/users';
 
 export const useUsers = () => {
   const [user, setUser] = useState<User[]>([]);
