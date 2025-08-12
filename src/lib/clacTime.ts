@@ -1,15 +1,15 @@
-import { parameter } from "@/config/system";
-import { User } from "@/types/users";
+import { parameter } from '@/config/system';
+import { User } from '@/types/users';
 
 export const calcStudyTime = (start: Date, end: Date): number => {
   const diffMs = end.getTime() - start.getTime();
   const safeDiffMs = Math.max(diffMs, 0); // マイナスにならないように
   return Math.floor(safeDiffMs / 1000);
-}
+};
 export const calcTotalTime = (users: User[]): number => {
-  const total = users.reduce((total, u) => total + u.timeSec, parameter.ADDITIONAL_STUDY_TIME)
+  const total = users.reduce((total, u) => total + u.timeSec, parameter.ADDITIONAL_STUDY_TIME);
   return total;
-}
+};
 
 export const calcTime = (seconds: number): string => {
   if (seconds === 0) return '0h 00min';
@@ -24,17 +24,8 @@ export const calculateTargetValues = (totalTime: number) => {
   return { targetPercentage, targetFlowerLevel };
 };
 
-export const convertHHMM = (publishedAt:string) => new Date(publishedAt).toLocaleTimeString('ja-JP', {
-  hour: '2-digit',
-  minute: '2-digit',
-  hour12: false,
-  timeZone: 'Asia/Tokyo',
-});
-
-export const convertHHMM2 = (publishedAt:Date) => publishedAt.toLocaleTimeString('ja-JP', {
-  hour: '2-digit',
-  minute: '2-digit',
-  hour12: false,
-  timeZone: 'Asia/Tokyo',
-});
-
+export const convertHHMM = (publishedAt: string) =>
+  new Date(publishedAt).toLocaleTimeString('ja-JP', {
+    hour12: false,
+    timeZone: 'Asia/Tokyo',
+  });
