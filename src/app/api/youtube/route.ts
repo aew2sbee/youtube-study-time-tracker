@@ -4,6 +4,7 @@ import { google } from 'googleapis';
 import { isEndMessage, isStartMessage } from '@/lib/liveChatMessage';
 import { parameter } from '@/config/system';
 import { convertHHMM } from '@/lib/clacTime';
+import { logger } from '@/utils/logger';
 
 // 公式ドキュメント：https://developers.google.com/youtube/v3/live/docs/liveChatMessages/list?hl=ja
 let nextPageToken: string | undefined;
@@ -11,6 +12,8 @@ let nextPageToken: string | undefined;
 export async function GET() {
   try {
     const { youtube, liveChatId } = await getYoutubeClientAndLiveChatId();
+    logger.info(`liveChatId: ${liveChatId}`);
+    logger.info(`nextPageToken: ${nextPageToken}`);
 
     if (!liveChatId) return NextResponse.json({ error: 'No live chat found' }, { status: 404 });
 
@@ -39,7 +42,7 @@ export async function GET() {
     nextPageToken = liveChatMessages.data.nextPageToken || undefined;
 
     messages.forEach((message) => {
-      console.info(convertHHMM(message.publishedAt), message.authorDisplayName, message.displayMessage);
+      logger.info(`message received: ${convertHHMM(message.publishedAt)} ${message.authorDisplayName} ${message.displayMessage}`);
     });
 
     const result: LiveChatResponse = {
@@ -49,7 +52,7 @@ export async function GET() {
 
     return NextResponse.json(result);
   } catch (error) {
-    console.error('Error fetching live chat messages', error);
+    logger.error(`Error fetching live chat messages: ${error}`);
     return NextResponse.json({ error: 'Failed to fetch live chat messages' }, { status: 500 });
   }
 }
