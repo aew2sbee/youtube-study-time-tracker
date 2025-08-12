@@ -3,13 +3,14 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { parameter } from '@/config/system';
-// import HowToUse from '@/components/HowToUse';
 import FocusTimeTracker from '@/components/FocusTimeTracker';
-// import MyStudyProgress from '@/components/MyStudyProgress';
+import MyStudyProgress from '@/components/MyStudyProgress';
 import MonthlyChallenge from '@/components/MonthlyChallenge';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import ErrorMessage from '@/components/ErrorMessage';
 import { useUsers } from '@/hooks/useUsers';
+import StreamingPolicy from '@/components/StreamingPolicy';
+import HowToJoin from '@/components/HowToJoin';
 
 
 export default function Home() {
@@ -37,10 +38,11 @@ export default function Home() {
   });
 
   const pages = [
-    // { key: 'How to use', title: 'How to use', component: <HowToUse /> },
+    { key: 'Streaming Policy', title: 'Streaming Policy', component: <StreamingPolicy /> },
+    { key: 'How to join', title: 'How to join', component: <HowToJoin /> },
     ...userPages,
     { key: 'Monthly Challenge', title: 'Monthly Challenge', component: <MonthlyChallenge now={currentTime} totalStudyTime={totalStudyTime} /> },
-    // { key: 'My study progress', title: 'My Study Progress', component: <MyStudyProgress /> },
+    { key: 'My study progress', title: 'My Study Progress', component: <MyStudyProgress /> },
   ];
 
   useEffect(() => {
