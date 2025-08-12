@@ -11,6 +11,7 @@
   "dependencies": {
     "framer-motion": "^12.23.12",
     "googleapis": "^134.0.0",
+    "lowdb": "^7.0.1",
     "next": "15.3.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -18,6 +19,7 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
+    "@types/lowdb": "^1.0.15",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",

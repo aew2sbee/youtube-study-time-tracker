@@ -84,6 +84,7 @@ export const useUsers = () => {
     });
 
     lastProcessedIndexRef.current = liveChatMessage.length;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [liveChatMessage]);
 
   useEffect(() => {
