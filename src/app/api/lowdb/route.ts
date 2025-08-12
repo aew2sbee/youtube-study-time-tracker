@@ -16,10 +16,7 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const user: User = await request.json();
-    logger.info(`API received user data - ${user.name} ${user.timeSec} seconds`);
-
     await saveJson(user);
-    logger.info(`API successfully saved user data - ${user.name}`);
     return NextResponse.json({ success: true, user });
   } catch (error) {
     logger.error(`Error saving user data - ${error}`);

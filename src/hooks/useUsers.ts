@@ -69,8 +69,7 @@ export const useUsers = () => {
             const stopUser = stopTime(existingUser, publishedAt);
             newList = newList.filter((u) => u.channelId !== existingUser.channelId).concat(stopUser);
             // useSWRMutation経由でデータ保存
-            console.log('Attempting to save user:', stopUser);
-            saveUser(stopUser).catch(error => console.error('Failed to save user:', error));
+            (async () => await saveUser(stopUser))();
           }
         } else {
           // 新規ユーザーの開始
