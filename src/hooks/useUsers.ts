@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { LiveChatResponse, YouTubeLiveChatMessage } from '@/types/youtube';
 import { isEndMessage, isStartMessage } from '@/lib/liveChatMessage';
 import { User } from '@/types/users';
-import { calcTime, calcTotalTime, convertHHMM2 } from '@/lib/clacTime';
+import { calcTotalTime } from '@/lib/clacTime';
 import { parameter } from '@/config/system';
 import { restartTime, startTime, stopTime, updateTime } from '@/lib/user';
 
@@ -16,25 +16,12 @@ export const useUsers = () => {
   const [liveChatMessage, setLiveChatMessage] = useState<YouTubeLiveChatMessage[]>([]);
   const lastProcessedIndexRef = useRef(0); // 追加: 再処理防止用のインデックス
 
-  const { data, error, isLoading } = useSWR<LiveChatResponse>(YOUTUBE_API_URL, fetcher, {
-    refreshInterval: (data) => {
-      const interval = data?.pollingIntervalMillis ?? parameter.API_POLLING_INTERVAL;
-      console.info(`SWR polling interval: ${interval}ms, pollingIntervalMillis: ${data?.pollingIntervalMillis}`);
-      return interval;
-    },
-    onError: (error) => {
-      console.error('SWR fetch error:', error);
-    },
-    onSuccess: (data) => {
-      console.info('SWR fetch success - received data', data);
-    },
-  });
+  const { data, error, isLoading } = useSWR<LiveChatResponse>(YOUTUBE_API_URL, fetcher, { refreshInterval: parameter.API_POLLING_INTERVAL });
 
 
   // データの処理（新規メッセージの追加）
   useEffect(() => {
     setCurrentTime(new Date());
-    console.info(`SWR status - isLoading: ${isLoading}, error: ${!!error}, data: ${!!data}`);
 
     if (!data || data.messages.length === 0) return;
 
@@ -47,7 +34,6 @@ export const useUsers = () => {
 
     if (newMessages.length > 0) {
       setLiveChatMessage((prev) => [...prev, ...newMessages]);
-      console.info(`add ${newMessages.length} new messages`);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
@@ -71,34 +57,17 @@ export const useUsers = () => {
         if (existingUser) {
           // 再開
           if (isStartMessage(messageText) && !existingUser.isStudying) {
-            console.info(
-              `restartUser1 ${existingUser?.name} ${calcTime(existingUser?.timeSec)} ${existingUser?.updateTime}`,
-            );
             const restartUser = restartTime(existingUser, publishedAt);
-            console.info(
-              `restartUser2 ${restartUser?.name} ${calcTime(restartUser?.timeSec)} ${convertHHMM2(
-                restartUser?.updateTime,
-              )}`,
-            );
             newList = newList.filter((u) => u.channelId !== existingUser.channelId).concat(restartUser);
             // 停止
           } else if (isEndMessage(messageText) && existingUser.isStudying) {
-            console.info(
-              `stopUser1 ${existingUser?.name} ${calcTime(existingUser?.timeSec)} ${convertHHMM2(
-                existingUser?.updateTime,
-              )}`,
-            );
             const stopUser = stopTime(existingUser, publishedAt);
-            console.info(`stopUser2 ${stopUser?.name} ${calcTime(stopUser?.timeSec)} ${stopUser?.updateTime}`);
             newList = newList.filter((u) => u.channelId !== existingUser.channelId).concat(stopUser);
           }
         } else {
           // 新規ユーザーの開始
           if (isStartMessage(messageText)) {
             const startUser = startTime(message);
-            console.info(
-              `startUser2 ${startUser?.name} ${calcTime(startUser?.timeSec)} ${convertHHMM2(startUser?.updateTime)}`,
-            );
             newList.push(startUser);
           }
         }
@@ -111,7 +80,6 @@ export const useUsers = () => {
   }, [liveChatMessage]);
 
   useEffect(() => {
-    console.info(`SWR`);
     setUser((prev) => prev.map((user) => (user.isStudying ? updateTime(user, currentTime) : user)));
   }, [currentTime]);
 
