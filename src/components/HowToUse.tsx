@@ -5,8 +5,8 @@ export default function HowToUse() {
       <p>※見てるだけでも、挨拶だけでも大歓迎です!</p>
       <p className="pt-3">📌 参加方法</p>
       <ul className="space-y-2">
-        <li>コメント欄に<strong>「start」</strong>と入力 → 計測開始</li>
-        <li>コメント欄に<strong>「end」 </strong>と入力 → 計測終了</li>
+        <li>チャット欄に<strong>「start」</strong>と入力 → 計測開始</li>
+        <li>チャット欄に<strong>「end」 </strong>と入力 → 計測終了</li>
         <li>何回でも参加OK。時間は自動で累積されます</li>
       </ul>
     </div>
