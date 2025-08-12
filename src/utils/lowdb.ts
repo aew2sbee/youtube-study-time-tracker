@@ -21,10 +21,30 @@ export const saveJson = async (user: User) => {
   // dateKeyが存在しない場合は初期化
   if (!db.data.user) db.data.user = [];
 
-  db.data.user.push(user);
+  logger.info(`Before save - total users: ${db.data.user.length}`);
+
+  // 重複チェック: 同じchannelIdとupdateTimeの組み合わせが既に存在するかチェック
+  const existingUserIndex = db.data.user.findIndex(
+    (existingUser) =>
+      existingUser.channelId === user.channelId &&
+      existingUser.updateTime === user.updateTime
+  );
+
+  if (existingUserIndex >= 0) {
+    // 既存のユーザーデータを更新
+    db.data.user[existingUserIndex] = user;
+    logger.info(`Updated existing user data - ${user.name} ${user.timeSec} seconds`);
+  } else {
+    // 新しいユーザーデータとして追加
+    db.data.user.push(user);
+    logger.info(`Added new user data - ${user.name} ${user.timeSec} seconds`);
+  }
+
+  logger.info(`After operation - total users: ${db.data.user.length}`);
+
   // ファイルに書き込み
   await db.write();
-  logger.info(`Saved user data - ${user.name} ${user.timeSec} seconds`);
+  logger.info(`Saved user data - ${user.name} ${user.timeSec} seconds, total count: ${db.data.user.length}`);
 }
 
 

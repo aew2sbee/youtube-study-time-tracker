@@ -10,7 +10,7 @@ import { parameter } from '@/config/system';
 import { restartTime, startTime, stopTime, updateTime } from '@/lib/user';
 
 const YOUTUBE_API_URL = '/api/youtube';
-const USERS_API_URL = '/api/users';
+const USERS_API_URL = '/api/lowdb';
 
 export const useUsers = () => {
   const [user, setUser] = useState<User[]>([]);
@@ -69,7 +69,8 @@ export const useUsers = () => {
             const stopUser = stopTime(existingUser, publishedAt);
             newList = newList.filter((u) => u.channelId !== existingUser.channelId).concat(stopUser);
             // useSWRMutation経由でデータ保存
-            saveUser(stopUser);
+            console.log('Attempting to save user:', stopUser);
+            saveUser(stopUser).catch(error => console.error('Failed to save user:', error));
           }
         } else {
           // 新規ユーザーの開始

@@ -1,3 +1,60 @@
 {
- "user":[]
+  "user": [
+    {
+      "channelId": "UCZL5e7-gezu3nGm0oheTudw",
+      "name": "Moy",
+      "timeSec": 8377,
+      "profileImageUrl": "https://yt3.ggpht.com/L8kSZu3RRzPLXpsPCC3DneewhrVOWXG4n5S2wT59VsnQdG81KK0cfOx4b-ey1z254F7_lSRSLg=s88-c-k-c0x00ffffff-no-rj",
+      "updateTime": "2025-08-12T04:11:17.776Z",
+      "isStudying": false
+    },
+    {
+      "channelId": "UCsys2iqH6uQatXuYH3-4mhw",
+      "name": "れんぞく",
+      "timeSec": 18516,
+      "profileImageUrl": "https://yt3.ggpht.com/glG2MmeKWT9WDb9TQh8LgCnO8fPFXKvu6x8ALWaE--LbMUXELB0jij6KCR8PLyeB_fJqiyEP=s88-c-k-c0x00ffffff-no-rj",
+      "updateTime": "2025-08-12T06:17:06.632Z",
+      "isStudying": false
+    },
+    {
+      "channelId": "UCEMSNOYTYJ5iSwwSU7oP9ug",
+      "name": "ar",
+      "timeSec": 9590,
+      "profileImageUrl": "https://yt3.ggpht.com/ytc/AIdro_kVssoNZkZkFVFx_MpTAQUE8Hq7qsda-vMaR9m-16c=s88-c-k-c0x00ffffff-no-rj",
+      "updateTime": "2025-08-12T03:21:52.011Z",
+      "isStudying": false
+    },
+    {
+      "channelId": "UCSlZsSpj5aajhnXwTu26fjA",
+      "name": "りんごおいしい",
+      "timeSec": 1498,
+      "profileImageUrl": "https://yt3.ggpht.com/vkJHABqOm9YiVQngVtTIrhk-opNnok5n6LcoRt8WccmsVXgb_qV00JDzih-edUFJDAlewT0Vmw=s88-c-k-c0x00ffffff-no-rj",
+      "updateTime": "2025-08-12T02:09:25.589Z",
+      "isStudying": false
+    },
+    {
+      "channelId": "UCDV95uUZlqOmxJ0hONnoALw",
+      "name": "小倉あん",
+      "timeSec": 10698,
+      "profileImageUrl": "https://yt3.ggpht.com/ToBVHdJPmTSckqWsesfbs8OxH6kBd-V-81pP8BLysaXnLwVfOjFF9pA05HGdiuTRJjYwuVZ_yA=s88-c-k-c0x00ffffff-no-rj",
+      "updateTime": "2025-08-12T02:58:23.919Z",
+      "isStudying": false
+    },
+    {
+      "channelId": "UCJeqXqAFicpGzWZbG0nVU6A",
+      "name": "いかす",
+      "timeSec": 9607,
+      "profileImageUrl": "https://yt3.ggpht.com/ytc/AIdro_lG7txRkImoPd0o2R8NsOnHcVqsBn8XnHkDyzu3Vlk=s88-c-k-c0x00ffffff-no-rj",
+      "updateTime": "2025-08-12T04:14:04.508Z",
+      "isStudying": false
+    },
+    {
+      "channelId": "UCSlZsSpj5aajhnXwTu26fjA",
+      "name": "りんごおいしい",
+      "timeSec": 5845,
+      "profileImageUrl": "https://yt3.ggpht.com/vkJHABqOm9YiVQngVtTIrhk-opNnok5n6LcoRt8WccmsVXgb_qV00JDzih-edUFJDAlewT0Vmw=s88-c-k-c0x00ffffff-no-rj",
+      "updateTime": "2025-08-12T05:56:45.123Z",
+      "isStudying": false
+    }
+  ]
 }
