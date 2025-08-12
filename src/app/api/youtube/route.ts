@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { YouTubeLiveChatMessage, LiveChatResponse } from '@/types/youtube';
 import { google } from 'googleapis';
 import { isEndMessage, isStartMessage } from '@/lib/liveChatMessage';
@@ -59,5 +59,45 @@ export async function GET() {
   } catch (error) {
     logger.error(`Error fetching live chat messages - ${error}`);
     return NextResponse.json({ error: 'Failed to fetch live chat messages' }, { status: 500 });
+  }
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    const { message } = await request.json();
+
+    if (!message) {
+      return NextResponse.json({ error: 'Message is required' }, { status: 400 });
+    }
+
+    if (!LIVE_CHAT_ID) {
+      return NextResponse.json({ error: 'No live chat found' }, { status: 404 });
+    }
+
+    logger.info(`Attempting to post comment: ${message}`);
+
+    const result = await YOUTUBE.liveChatMessages.insert({
+      part: ['snippet'],
+      requestBody: {
+        snippet: {
+          liveChatId: LIVE_CHAT_ID,
+          type: 'textMessageEvent',
+          textMessageDetails: {
+            messageText: message,
+          },
+        },
+      },
+    });
+
+    logger.info(`Comment posted successfully: ${message}`);
+
+    return NextResponse.json({
+      success: true,
+      messageId: result.data.id,
+      message: message
+    });
+  } catch (error) {
+    logger.error(`Error posting comment - ${error}`);
+    return NextResponse.json({ error: 'Failed to post comment' }, { status: 500 });
   }
 }
