@@ -3,7 +3,7 @@ import { YouTubeLiveChatMessage, LiveChatResponse } from '@/types/youtube';
 import { google } from 'googleapis';
 import { isEndMessage, isStartMessage } from '@/lib/liveChatMessage';
 import { parameter } from '@/config/system';
-import { convertHHMM } from '@/lib/clacTime';
+import { convertHHMMSS } from '@/lib/clacTime';
 import { logger } from '@/utils/logger';
 
 // 公式ドキュメント：https://developers.google.com/youtube/v3/live/docs/liveChatMessages/list?hl=ja
@@ -42,7 +42,11 @@ export async function GET() {
     nextPageToken = liveChatMessages.data.nextPageToken || undefined;
 
     messages.forEach((message) => {
-      logger.info(`message received - ${convertHHMM(message.publishedAt)} ${message.authorDisplayName} ${message.displayMessage}`);
+      logger.info(
+        `message received - ${convertHHMMSS(message.publishedAt)} ${message.authorDisplayName} ${
+          message.displayMessage
+        }`,
+      );
     });
 
     const result: LiveChatResponse = {
