@@ -1,5 +1,6 @@
 import useSWR from 'swr';
-import { fetcher } from '@/utils/fetcher';
+import useSWRMutation from 'swr/mutation';
+import { fetcher, postLowdb } from '@/utils/useSWR';
 import { useState, useEffect, useRef } from 'react';
 import { LiveChatResponse, YouTubeLiveChatMessage } from '@/types/youtube';
 import { isEndMessage, isStartMessage } from '@/lib/liveChatMessage';
@@ -9,6 +10,7 @@ import { parameter } from '@/config/system';
 import { restartTime, startTime, stopTime, updateTime } from '@/lib/user';
 
 const YOUTUBE_API_URL = '/api/youtube';
+const USERS_API_URL = '/api/lowdb';
 
 export const useUsers = () => {
   const [user, setUser] = useState<User[]>([]);
@@ -19,6 +21,8 @@ export const useUsers = () => {
   const { data, error, isLoading } = useSWR<LiveChatResponse>(YOUTUBE_API_URL, fetcher, {
     refreshInterval: parameter.API_POLLING_INTERVAL,
   });
+
+  const { trigger: saveUser } = useSWRMutation(USERS_API_URL, postLowdb);
 
   // データの処理（新規メッセージの追加）
   useEffect(() => {
@@ -64,6 +68,8 @@ export const useUsers = () => {
           } else if (isEndMessage(messageText) && existingUser.isStudying) {
             const stopUser = stopTime(existingUser, publishedAt);
             newList = newList.filter((u) => u.channelId !== existingUser.channelId).concat(stopUser);
+            // useSWRMutation経由でデータ保存
+            saveUser(stopUser);
           }
         } else {
           // 新規ユーザーの開始
@@ -92,3 +98,4 @@ export const useUsers = () => {
     isError: error,
   };
 };
+
