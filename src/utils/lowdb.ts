@@ -1,7 +1,6 @@
 import { User } from '@/types/users';
-import { Low } from 'lowdb';
-import { JSONFile } from 'lowdb/node';
 import { logger } from './logger';
+import { JSONFilePreset } from 'lowdb/node';
 
 // データベース全体の型
 interface DatabaseData {
@@ -14,8 +13,7 @@ const defaultData: DatabaseData = {
 };
 
 // データベースを初期化
-const adapter = new JSONFile<DatabaseData>('database/db.json');
-const db = new Low<DatabaseData>(adapter, defaultData);
+const db = await JSONFilePreset<DatabaseData>('database/db.json', defaultData);
 
 // データを保存する関数
 export const saveJson = async (user: User) => {
