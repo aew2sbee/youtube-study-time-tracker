@@ -1,6 +1,6 @@
 import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
-import { fetcher, postLowdb, postYouTubeComment } from '@/utils/useSWR';
+import { fetcher, postUser } from '@/utils/useSWR';
 import { useState, useEffect, useRef } from 'react';
 import { LiveChatResponse, YouTubeLiveChatMessage } from '@/types/youtube';
 import { isEndMessage, isStartMessage } from '@/lib/liveChatMessage';
@@ -10,7 +10,7 @@ import { parameter } from '@/config/system';
 import { restartTime, startTime, stopTime, updateTime } from '@/lib/user';
 
 const YOUTUBE_API_URL = '/api/youtube';
-const USERS_API_URL = '/api/lowdb';
+const LOWDB_API_URL = '/api/lowdb';
 
 export const useUsers = () => {
   const [user, setUser] = useState<User[]>([]);
@@ -22,8 +22,8 @@ export const useUsers = () => {
     refreshInterval: parameter.API_POLLING_INTERVAL,
   });
 
-  const { trigger: saveUser } = useSWRMutation(USERS_API_URL, postLowdb);
-  const { trigger: postComment } = useSWRMutation(YOUTUBE_API_URL, postYouTubeComment);
+  const { trigger: saveUser } = useSWRMutation(LOWDB_API_URL, postUser);
+  const { trigger: postComment } = useSWRMutation(YOUTUBE_API_URL, postUser);
 
   // データの処理（新規メッセージの追加）
   useEffect(() => {
@@ -71,6 +71,7 @@ export const useUsers = () => {
             newList = newList.filter((u) => u.channelId !== existingUser.channelId).concat(stopUser);
             // useSWRMutation経由でデータ保存
             (async () => await saveUser(stopUser))();
+            (async () => await postComment(stopUser))();
           }
         } else {
           // 新規ユーザーの開始
@@ -98,7 +99,6 @@ export const useUsers = () => {
     totalStudyTime: calcTotalTime(user),
     isLoading,
     isError: error,
-    postComment: postComment,
   };
 };
 
