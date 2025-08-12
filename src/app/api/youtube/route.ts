@@ -69,7 +69,7 @@ export async function POST(request: NextRequest) {
     const user: User = await request.json();
     const userLog = await getUserData(user);
     const currentWeekTotalTime = calcCurrentWeekTotalTime(userLog, new Date(user.updateTime));
-    const message = `[自動送信] @${user.name} 今週は${calcTime(currentWeekTotalTime)}を集中しました!!`;
+    const message = `[自動送信] @${user.name} 今週は${calcTime(currentWeekTotalTime)}集中しました!!`;
 
     if (!message) {
       return NextResponse.json({ error: 'Message is required' }, { status: 400 });
