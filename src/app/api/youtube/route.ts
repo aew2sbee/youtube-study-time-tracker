@@ -2,7 +2,6 @@ import { NextResponse } from 'next/server';
 import { YouTubeLiveChatMessage, LiveChatResponse } from '@/types/youtube';
 import { google } from 'googleapis';
 import { isEndMessage, isStartMessage } from '@/lib/liveChatMessage';
-import { parameter } from '@/config/system';
 import { convertHHMMSS } from '@/lib/clacTime';
 import { logger } from '@/utils/logger';
 
@@ -54,10 +53,7 @@ export async function GET() {
       );
     });
 
-    const result: LiveChatResponse = {
-      messages,
-      pollingIntervalMillis: liveChatMessages.data.pollingIntervalMillis || parameter.API_POLLING_INTERVAL,
-    };
+    const result: LiveChatResponse = { messages };
 
     return NextResponse.json(result);
   } catch (error) {
