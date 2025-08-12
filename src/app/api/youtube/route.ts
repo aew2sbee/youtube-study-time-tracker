@@ -12,8 +12,8 @@ let nextPageToken: string | undefined;
 export async function GET() {
   try {
     const { youtube, liveChatId } = await getYoutubeClientAndLiveChatId();
-    logger.info(`liveChatId: ${liveChatId}`);
-    logger.info(`nextPageToken: ${nextPageToken}`);
+    logger.info(`liveChatId - ${liveChatId}`);
+    logger.info(`nextPageToken - ${nextPageToken}`);
 
     if (!liveChatId) return NextResponse.json({ error: 'No live chat found' }, { status: 404 });
 
@@ -42,7 +42,7 @@ export async function GET() {
     nextPageToken = liveChatMessages.data.nextPageToken || undefined;
 
     messages.forEach((message) => {
-      logger.info(`message received: ${convertHHMM(message.publishedAt)} ${message.authorDisplayName} ${message.displayMessage}`);
+      logger.info(`message received - ${convertHHMM(message.publishedAt)} ${message.authorDisplayName} ${message.displayMessage}`);
     });
 
     const result: LiveChatResponse = {
@@ -52,7 +52,7 @@ export async function GET() {
 
     return NextResponse.json(result);
   } catch (error) {
-    logger.error(`Error fetching live chat messages: ${error}`);
+    logger.error(`Error fetching live chat messages - ${error}`);
     return NextResponse.json({ error: 'Failed to fetch live chat messages' }, { status: 500 });
   }
 }
