@@ -25,7 +25,7 @@ export const saveJson = async (user: User) => {
 
   // 重複チェック: 同じchannelIdとupdateTimeの組み合わせが既に存在するかチェック
   const existingUserIndex = db.data.user.findIndex(
-    (existingUser) =>
+    (existingUser: User) =>
       existingUser.channelId === user.channelId &&
       existingUser.updateTime === user.updateTime
   );
@@ -56,7 +56,7 @@ export const getUserData = async (user: User): Promise<User[]> => {
     return [];
   }
   logger.info(`User data - ${user.name} ${user.channelId}`);
-  const users = db.data.user.filter((u) => u.channelId === user.channelId);
+  const users = db.data.user.filter((u: User) => u.channelId === user.channelId);
   if (users.length === 0) {
     logger.warn(`No user data found for channelId: ${user.channelId}`);
   }

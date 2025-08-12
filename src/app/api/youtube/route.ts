@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { YouTubeLiveChatMessage, LiveChatResponse } from '@/types/youtube';
+import { User } from '@/types/users';
 import { google } from 'googleapis';
 import { isEndMessage, isStartMessage } from '@/lib/liveChatMessage';
-import { convertHHMMSS } from '@/lib/calcTime';
+import { calcCurrentWeekTotalTime, calcTime, convertHHMMSS } from '@/lib/calcTime';
 import { logger } from '@/utils/logger';
+import { getUserData } from '@/utils/lowdb';
 
 // 公式ドキュメント：https://developers.google.com/youtube/v3/live/docs/liveChatMessages/list?hl=ja
 
@@ -64,7 +66,10 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
-    const { message } = await request.json();
+    const user: User = await request.json();
+    const userLog = await getUserData(user);
+    const currentWeekTotalTime = calcCurrentWeekTotalTime(userLog, user.updateTime);
+    const message = `[自動送信] @${user.name} 今週は${calcTime(currentWeekTotalTime)}を集中しました!!`;
 
     if (!message) {
       return NextResponse.json({ error: 'Message is required' }, { status: 400 });
