@@ -2,7 +2,7 @@ import { parameter } from '@/config/system';
 import ImageCrown from './ImageCrown';
 import ImageProfile from './ImageProfile';
 import { User } from '@/types/users';
-import { calcTime } from '@/lib/clacTime';
+import { calcTime } from '@/lib/calcTime';
 
 export default function FocusTimeTracker({ user }: { user: User[] }) {
   if (!user || user.length === 0) {

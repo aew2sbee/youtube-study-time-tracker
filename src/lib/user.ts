@@ -1,6 +1,6 @@
 import { User } from '@/types/users';
 import { YouTubeLiveChatMessage } from '@/types/youtube';
-import { calcStudyTime, calcTime } from '@/lib/clacTime';
+import { calcStudyTime, calcTime } from '@/lib/calcTime';
 import { logger } from '@/utils/logger';
 
 export const startTime = (message: YouTubeLiveChatMessage): User => {

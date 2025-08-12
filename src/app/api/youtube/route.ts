@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { YouTubeLiveChatMessage, LiveChatResponse } from '@/types/youtube';
 import { google } from 'googleapis';
 import { isEndMessage, isStartMessage } from '@/lib/liveChatMessage';
-import { convertHHMMSS } from '@/lib/clacTime';
+import { convertHHMMSS } from '@/lib/calcTime';
 import { logger } from '@/utils/logger';
 
 // 公式ドキュメント：https://developers.google.com/youtube/v3/live/docs/liveChatMessages/list?hl=ja

@@ -3,7 +3,7 @@ import FlowerImage from './ImageFlower';
 import AnimationStar from './AnimationStar';
 import ProgressBar from './ProgressBar';
 import { parameter } from '@/config/system';
-import { calcTime, calculateTargetValues } from '@/lib/clacTime';
+import { calcTime, calculateTargetValues } from '@/lib/calcTime';
 
 // アニメーション設定
 const ANIMATION_CONFIG = {
@@ -11,13 +11,7 @@ const ANIMATION_CONFIG = {
   steps: 180,
 };
 
-export default function MonthlyChallenge({
-  now,
-  totalStudyTime,
-}: {
-  now: Date;
-  totalStudyTime: number;
-}) {
+export default function MonthlyChallenge({ now, totalStudyTime }: { now: Date; totalStudyTime: number }) {
   const [animatedPercentage, setAnimatedPercentage] = useState<number>(0);
   const [animatedFlowerLevel, setAnimatedFlowerLevel] = useState<number>(1);
   const lastTotalStudyTimeRef = useRef<number | null>(null);
@@ -29,7 +23,7 @@ export default function MonthlyChallenge({
   }, [totalStudyTime]);
 
   useEffect(() => {
-    if (lastTotalStudyTimeRef.current === totalStudyTime) return
+    if (lastTotalStudyTimeRef.current === totalStudyTime) return;
 
     const { targetPercentage, targetFlowerLevel } = targetValues;
 
@@ -66,7 +60,8 @@ export default function MonthlyChallenge({
         <div className="text-white text-center">
           <div className="text-3xl mb-2">Current Progress</div>
           <div className="text-4xl font-bold">
-            {parseInt(calcTime(totalStudyTime).slice(0, -3))} / {parseInt(calcTime(parameter.TARGET_STUDY_TIME).slice(0, -3))} h
+            {parseInt(calcTime(totalStudyTime).slice(0, -3))} /{' '}
+            {parseInt(calcTime(parameter.TARGET_STUDY_TIME).slice(0, -3))} h
           </div>
         </div>
         <div className="text-white text-center">
