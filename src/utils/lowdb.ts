@@ -48,13 +48,17 @@ export const saveJson = async (user: User) => {
 }
 
 
-export const getUserData = async (): Promise<User[]> => {
+export const getUserData = async (user: User): Promise<User[]> => {
   await db.read();
   // dateKeyが存在しない場合は空のオブジェクトを返す
   if (!db.data.user) {
-    logger.info(`No user data`);
+    logger.error(`No data`);
     return [];
   }
-  logger.info(`User data - ${db.data.user.length}`);
-  return db.data.user;
+  logger.info(`User data - ${user.name} ${user.channelId}`);
+  const users = db.data.user.filter((u) => u.channelId === user.channelId);
+  if (users.length === 0) {
+    logger.warn(`No user data found for channelId: ${user.channelId}`);
+  }
+  return users;
 }
