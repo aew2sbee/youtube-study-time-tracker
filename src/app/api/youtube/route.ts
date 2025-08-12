@@ -7,18 +7,23 @@ import { convertHHMMSS } from '@/lib/clacTime';
 import { logger } from '@/utils/logger';
 
 // 公式ドキュメント：https://developers.google.com/youtube/v3/live/docs/liveChatMessages/list?hl=ja
+
+const YOUTUBE = await google.youtube({ version: 'v3', auth: process.env.YOUTUBE_API_KEY });
+const response = await YOUTUBE.videos.list({ part: ['liveStreamingDetails'], id: [process.env.VIDEO_ID!] });
+const video = response.data.items?.[0];
+const LIVE_CHAT_ID = video?.liveStreamingDetails?.activeLiveChatId;
+logger.info(`liveChatId - ${LIVE_CHAT_ID}`);
+
 let nextPageToken: string | undefined;
 
 export async function GET() {
   try {
-    const { youtube, liveChatId } = await getYoutubeClientAndLiveChatId();
-    logger.info(`liveChatId - ${liveChatId}`);
     logger.info(`nextPageToken - ${nextPageToken}`);
 
-    if (!liveChatId) return NextResponse.json({ error: 'No live chat found' }, { status: 404 });
+    if (!LIVE_CHAT_ID) return NextResponse.json({ error: 'No live chat found' }, { status: 404 });
 
-    const liveChatMessages = await youtube.liveChatMessages.list({
-      liveChatId,
+    const liveChatMessages = await YOUTUBE.liveChatMessages.list({
+      liveChatId: LIVE_CHAT_ID,
       part: ['snippet', 'authorDetails'],
       pageToken: nextPageToken || undefined,
       maxResults: 200,
@@ -60,17 +65,3 @@ export async function GET() {
     return NextResponse.json({ error: 'Failed to fetch live chat messages' }, { status: 500 });
   }
 }
-
-const getYoutubeClientAndLiveChatId = async () => {
-  const youtube = await google.youtube({
-    version: 'v3',
-    auth: process.env.YOUTUBE_API_KEY,
-  });
-  const response = await youtube.videos.list({
-    part: ['liveStreamingDetails'],
-    id: [process.env.VIDEO_ID!],
-  });
-  const video = response.data.items?.[0];
-  const liveChatId = video?.liveStreamingDetails?.activeLiveChatId;
-  return { youtube, liveChatId };
-};
