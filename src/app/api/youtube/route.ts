@@ -3,7 +3,7 @@ import { YouTubeLiveChatMessage, LiveChatResponse } from '@/types/youtube';
 import { User } from '@/types/users';
 import { google } from 'googleapis';
 import { CHAT_MESSAGE, isEndMessage, isStartMessage } from '@/lib/liveChatMessage';
-import { calcCurrentWeekTotalTime, calcTimeJP, convertHHMMSS } from '@/lib/calcTime';
+import { calcUserTotalTime, calcTimeJP, convertHHMMSS } from '@/lib/calcTime';
 import { logger } from '@/utils/logger';
 import { getUserData } from '@/utils/lowdb';
 import { getOAuth2Client } from '@/utils/googleClient';
@@ -74,8 +74,8 @@ export async function POST(request: NextRequest) {
     const youtube = google.youtube({ version: 'v3', auth: oauth2Client });
     const user: User = await request.json();
     const userLog = await getUserData(user);
-    const currentWeekTotalTime = calcCurrentWeekTotalTime(userLog, new Date(user.updateTime));
-    const message = `@${user.name} これまでの累計は${calcTimeJP(currentWeekTotalTime)}でした👏 ` + CHAT_MESSAGE[Math.floor(Math.random() * CHAT_MESSAGE.length)];
+    const userTotalTime = calcUserTotalTime(userLog);
+    const message = `@${user.name} これまでの累計は${calcTimeJP(userTotalTime)}でした👏 ` + CHAT_MESSAGE[Math.floor(Math.random() * CHAT_MESSAGE.length)];
 
     if (!message) {
       return NextResponse.json({ error: 'Message is required' }, { status: 400 });
