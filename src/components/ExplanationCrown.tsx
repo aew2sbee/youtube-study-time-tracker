@@ -12,7 +12,6 @@ export default function ExplanationCrown() {
           <Image src="/crown/silver.png" alt="Silver Crown" width={40} height={40} className="w-[40px] h-[40px]" />
           <span className="text-white text-2xl">30min +</span>
         </div>
-        <p>時間に応じて👑プレゼント!!</p>
       </div>
     </div>
   );
