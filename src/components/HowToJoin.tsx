@@ -1,5 +1,3 @@
-import ExplanationCrown from "./ExplanationCrown";
-
 export default function HowToJoin() {
   return (
     <div className="text-white text-3xl items-start justify-start pt-2">
@@ -10,7 +8,7 @@ export default function HowToJoin() {
         <li>チャット欄に<strong>「end」 </strong>のみを入力 → 計測終了</li>
         <li>何回でも参加OK。時間は自動で累積されます</li>
       </ul>
-      <ExplanationCrown />
+      <p>計測終了にモデレーターから<strong>累計時間</strong>を通知</p>
     </div>
   );
 }
