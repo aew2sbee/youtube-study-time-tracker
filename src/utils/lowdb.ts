@@ -60,5 +60,6 @@ export const getUserData = async (user: User): Promise<User[]> => {
   if (users.length === 0) {
     logger.warn(`No user data found for channelId: ${user.channelId}`);
   }
+  logger.info(`User data length - ${users.length}`);
   return users;
 }

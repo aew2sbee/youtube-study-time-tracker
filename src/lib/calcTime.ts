@@ -33,10 +33,13 @@ export const convertHHMMSS = (publishedAt: string) =>
 export const calcCurrentWeekTotalTime = (users: User[], today:Date): number => {
   const monday = getMonday(today)
   const sunday = getSunday(today);
+  console.log(`monday: ${monday}`);
+  console.log(`sunday: ${sunday}`);
   const currentWeek = users.filter(user => {
     const userDate = new Date(user.updateTime);
     return userDate >= monday && userDate <= sunday;
   });
+  console.log(`currentWeek: ${currentWeek.length}`);
   const currentWeekTimeSec = currentWeek.reduce((total, user) => total + user.timeSec, 0);
   return currentWeekTimeSec;
 };
@@ -52,8 +55,9 @@ const getMonday = (today: Date): Date => {
 
 const getSunday = (today: Date): Date => {
   const dayOfWeek = today.getDay(); // 0:日曜, 1:月曜, ..., 6:土曜
-  const diff = 0 - dayOfWeek; // 日曜日との差（日曜日は0）
+  const diff = (7 - dayOfWeek) % 7; // 次の日曜日との差（今日が日曜なら0）
   const sunday = new Date(today);
   sunday.setDate(today.getDate() + diff);
+  sunday.setHours(23, 59, 59, 999); // 時刻は23時59分59秒にセット
   return sunday;
 }

@@ -40,6 +40,9 @@ YouTube Liveのチャットコメントを監視して、視聴者の勉強時�
 ```env
 YOUTUBE_API_KEY=your_youtube_api_key_here
 VIDEO_ID=your_live_video_id_here
+GOOGLE_CLIENT_ID=your_google_client_id
+GOOGLE_CLIENT_SECRET=your_google_client_secret
+GOOGLE_REFRESH_TOKEN=your_google_refresh_token
 ```
 
 #### YouTube API キーの取得方法
@@ -47,6 +50,44 @@ VIDEO_ID=your_live_video_id_here
 2. 新しいプロジェクトを作成または既存のプロジェクトを選択
 3. YouTube Data API v3を有効化
 4. 認証情報からAPIキーを作成
+
+#### OAuth 2.0認証情報の設定
+YouTube Live Chat APIでコメントを投稿するにはOAuth 2.0認証が必要です：
+
+1. **OAuth同意画面の設定**（最初に必須）：
+   - Google Cloud Console → 「OAuth同意画面」
+   - User Type: **External** を選択
+   - アプリ情報を入力：
+     - アプリ名: `YouTube Study Time Tracker`
+     - ユーザーサポートメール: あなたのメールアドレス
+     - デベロッパーの連絡先情報: あなたのメールアドレス
+   - スコープ: 今は設定不要
+   - **テストユーザー**に必ずあなたのGoogleアカウントのメールアドレスを追加
+   - 公開ステータス: **テスト中**のまま
+
+2. **OAuth 2.0 クライアントIDの作成**：
+   - 「認証情報」→「認証情報を作成」→「OAuth 2.0 クライアントID」を選択
+   - アプリケーションの種類：「ウェブアプリケーション」
+   - 名前: `YouTube Study Time Client`
+   - 承認済みのリダイレクトURI：`http://localhost:3000/api/oauth/callback`
+   - クライアントIDとクライアントシークレットを取得
+
+**よくあるエラーと対処法**：
+- ❌ **「アクセスをブロック: このアプリのリクエストは無効です」**
+  → OAuth同意画面が未設定、またはテストユーザーに追加されていない
+- ❌ **「アクセスをブロック: youtube-study-time-tracker は Google の審査プロセスを完了していません」**
+  → 「OAuth同意画面」→「テストユーザー」に使用するGoogleアカウントを追加
+- ❌ **「このアプリは確認されていません」**
+  → 「詳細」をクリックして「安全でないページに移動」を選択（開発用途のため安全）
+
+2. **リフレッシュトークンの取得**：
+   ```bash
+   npm run get-refresh-token
+   ```
+   - 表示されたURLをブラウザで開く
+   - Googleアカウントで認証
+   - 認証コードを入力
+   - 表示されたリフレッシュトークンを`.env.local`に追加
 
 #### VIDEO IDの取得方法
 YouTube Liveの配信URLから取得：
