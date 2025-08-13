@@ -6,6 +6,7 @@ import { isEndMessage, isStartMessage } from '@/lib/liveChatMessage';
 import { calcCurrentWeekTotalTime, calcTime, convertHHMMSS } from '@/lib/calcTime';
 import { logger } from '@/utils/logger';
 import { getUserData } from '@/utils/lowdb';
+import { getOAuth2Client } from '@/utils/googleClient';
 
 // 公式ドキュメント：https://developers.google.com/youtube/v3/live/docs/liveChatMessages/list?hl=ja
 
@@ -66,10 +67,15 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
+    const oauth2Client = getOAuth2Client();
+    // refresh_token から access_token を自動生成
+    const tokens = await oauth2Client.getAccessToken();
+    console.log("Generated access token:", tokens.token);
+    const youtube = google.youtube({ version: 'v3', auth: oauth2Client });
     const user: User = await request.json();
     const userLog = await getUserData(user);
     const currentWeekTotalTime = calcCurrentWeekTotalTime(userLog, new Date(user.updateTime));
-    const message = `[自動送信] @${user.name} 今週は${calcTime(currentWeekTotalTime)}集中しました!!`;
+    const message = `[自動送信] @${user.name} 今週は${calcTime(currentWeekTotalTime)}集中しました!!  すごいです👏`;
 
     if (!message) {
       return NextResponse.json({ error: 'Message is required' }, { status: 400 });
@@ -81,7 +87,7 @@ export async function POST(request: NextRequest) {
 
     logger.info(`Attempting to post comment: ${message}`);
 
-    const result = await YOUTUBE.liveChatMessages.insert({
+    const result = await youtube.liveChatMessages.insert({
       part: ['snippet'],
       requestBody: {
         snippet: {
