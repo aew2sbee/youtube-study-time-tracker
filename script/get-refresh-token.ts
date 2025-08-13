@@ -54,19 +54,19 @@ const rl = readline.createInterface({
 rl.question('🔑 認証コードを入力してください: ', async (code) => {
   try {
     console.log('\n⏳ トークンを取得中...');
-    
+
     const { tokens } = await oauth2Client.getToken(code.trim());
-    
+
     console.log('\n✅ 成功! トークンを取得しました:');
     console.log('=====================================');
     console.log(`Access Token: ${tokens.access_token?.substring(0, 20)}...`);
     console.log(`Refresh Token: ${tokens.refresh_token}`);
     console.log(`Expires: ${new Date(tokens.expiry_date || 0).toLocaleString()}`);
-    
+
     console.log('\n📝 .env.localファイルに以下を追加してください:');
     console.log('================================================');
     console.log(`GOOGLE_REFRESH_TOKEN=${tokens.refresh_token}`);
-    
+
     if (!tokens.refresh_token) {
       console.log('\n⚠️  警告: refresh_tokenが取得できませんでした。');
       console.log('以下を確認してください:');
@@ -74,7 +74,7 @@ rl.question('🔑 認証コードを入力してください: ', async (code) =>
       console.log('- 以前に同じアカウントで認証していないか');
       console.log('- prompt: "consent" が設定されているか');
     }
-    
+
   } catch (err: any) {
     console.error('\n❌ エラーが発生しました:');
     if (err.code === 'invalid_grant') {
@@ -83,6 +83,6 @@ rl.question('🔑 認証コードを入力してください: ', async (code) =>
       console.error(err.message || err);
     }
   }
-  
+
   rl.close();
 });
