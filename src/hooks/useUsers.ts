@@ -23,10 +23,23 @@ export const useUsers = () => {
   const { trigger: saveUser } = useSWRMutation(LOWDB_API_URL, postUser);
   const { trigger: postComment } = useSWRMutation(YOUTUBE_API_URL, postUser);
 
+  // currentTimeを定期的に更新（dataに関係なく）
+  useEffect(() => {
+    const updateCurrentTime = () => {
+      const now = new Date();
+      setCurrentTime(now);
+      setUser((prev) => prev.map((user) => (user.isStudying ? updateTime(user, now) : user)));
+    };
+
+    updateCurrentTime(); // 初回実行
+
+    const interval = setInterval(updateCurrentTime, parameter.API_POLLING_INTERVAL);
+
+    return () => clearInterval(interval);
+  }, []);
+
   // データの処理（新規メッセージの追加）
   useEffect(() => {
-    setCurrentTime(new Date());
-
     if (!data || data.messages.length === 0) return;
 
     const newMessages = data.messages.filter(
@@ -89,9 +102,6 @@ export const useUsers = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [liveChatMessage]);
 
-  useEffect(() => {
-    setUser((prev) => prev.map((user) => (user.isStudying ? updateTime(user, currentTime) : user)));
-  }, [currentTime]);
 
   return {
     currentTime: currentTime,
