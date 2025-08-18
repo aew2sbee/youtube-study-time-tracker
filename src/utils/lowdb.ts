@@ -25,11 +25,13 @@ export const saveJson = async (user: LogUser) => {
   // dateKeyが存在しない場合は初期化
   if (!db.data.user) db.data.user = [];
 
-  logger.info(`Before save - total users: ${db.data.user.length}`);
+  logger.info(`user - ${user.name} ${user.timeSec} ${user.updateTime}`);
 
   const existingUserIndex = db.data.user.findIndex(
     (existingUser: LogUser) => existingUser.channelId === user.channelId,
   );
+
+  logger.info(`existingUserIndex - ${existingUserIndex}`);
 
   if (existingUserIndex >= 0) {
     // 既存のユーザーデータを更新
@@ -38,14 +40,12 @@ export const saveJson = async (user: LogUser) => {
       timeSec: db.data.user[existingUserIndex].timeSec + user.timeSec, // 既存の時間に追加
       updateTime: user.updateTime,
     };
-    logger.info(`Updated existing user data - ${user.name} ${user.timeSec} seconds`);
+    logger.info(`Updated user data - ${user.name} ${user.updateTime} ${db.data.user[existingUserIndex].timeSec} => ${db.data.user[existingUserIndex].timeSec + user.timeSec}`);
   } else {
     // 新しいユーザーデータとして追加
     db.data.user.push(user);
-    logger.info(`Added new user data - ${user.name} ${user.timeSec} seconds`);
+    logger.info(`Added user data - ${user.name} ${user.updateTime} 0 => ${user.timeSec}`);
   }
-
-  logger.info(`After operation - total users: ${db.data.user.length}`);
 
   // ファイルに書き込み
   await db.write();
