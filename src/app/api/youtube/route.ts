@@ -3,7 +3,7 @@ import { YouTubeLiveChatMessage, LiveChatResponse } from '@/types/youtube';
 import { User } from '@/types/users';
 import { google } from 'googleapis';
 import { CHAT_MESSAGE, isEndMessage, isStartMessage } from '@/lib/liveChatMessage';
-import { calcUserTotalTime, calcTimeJP, convertHHMMSS } from '@/lib/calcTime';
+import { calcTimeJP, convertHHMMSS } from '@/lib/calcTime';
 import { logger } from '@/utils/logger';
 import { getUserData } from '@/utils/lowdb';
 import { getOAuth2Client } from '@/utils/googleClient';
@@ -73,9 +73,14 @@ export async function POST(request: NextRequest) {
     console.log("Generated access token:", tokens.token);
     const youtube = google.youtube({ version: 'v3', auth: oauth2Client });
     const user: User = await request.json();
-    const userLog = await getUserData(user);
-    const userTotalTime = calcUserTotalTime(userLog);
-    const message = `@${user.name} これまでの累計は${calcTimeJP(userTotalTime)}でした👏 ` + CHAT_MESSAGE[Math.floor(Math.random() * CHAT_MESSAGE.length)];
+    const userLog = await getUserData({
+      channelId: user.channelId,
+      name: user.name,
+      timeSec: user.timeSec,
+      updateTime: user.updateTime,
+    });
+    const totalTimeSec = userLog ? userLog.timeSec : 0;
+    const message = `@${user.name} これまでの累計は${calcTimeJP(totalTimeSec)}でした👏 ` + CHAT_MESSAGE[Math.floor(Math.random() * CHAT_MESSAGE.length)];
 
     if (!message) {
       return NextResponse.json({ error: 'Message is required' }, { status: 400 });

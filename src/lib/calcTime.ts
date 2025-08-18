@@ -36,8 +36,3 @@ export const convertHHMMSS = (publishedAt: string) =>
     hour12: false,
     timeZone: 'Asia/Tokyo',
   });
-
-export const calcUserTotalTime = (users: User[]): number => {
-  const totalTimeSec = users.reduce((total, user) => total + user.timeSec, 0);
-  return totalTimeSec;
-};

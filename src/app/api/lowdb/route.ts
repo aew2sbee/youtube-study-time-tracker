@@ -6,7 +6,12 @@ import { logger } from '@/utils/logger';
 export async function POST(request: NextRequest) {
   try {
     const user: User = await request.json();
-    await saveJson(user);
+    await saveJson({
+      channelId: user.channelId,
+      name: user.name,
+      timeSec: user.timeSec,
+      updateTime: user.updateTime,
+    });
     logger.info(`User data saved - ${user.name} ${user.timeSec} seconds`);
     return NextResponse.json({ success: true, user });
   } catch (error) {
