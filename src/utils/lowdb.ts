@@ -61,7 +61,7 @@ export const getUserData = async (user: LogUser): Promise<LogUser | undefined> =
   logger.info(`User data - ${user.name} ${user.channelId}`);
   const existingUser = db.data.user.find((u: LogUser) => u.channelId === user.channelId);
   if (existingUser) {
-    logger.info(`User data length - ${existingUser.name}`);
+    logger.info(`User name - ${existingUser.name}`);
     return existingUser;
   }
   logger.warn(`No user data found for channelId: ${user.channelId}`);
