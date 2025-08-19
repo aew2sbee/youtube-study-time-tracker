@@ -36,3 +36,26 @@ export const convertHHMMSS = (publishedAt: string) =>
     hour12: false,
     timeZone: 'Asia/Tokyo',
   });
+
+export const convertYYYYMMDD = (updateTime: Date | string): string => {
+  if (typeof updateTime === 'string') {
+    return new Date(updateTime).toLocaleDateString('ja-JP', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      timeZone: 'Asia/Tokyo',
+    });
+  } else {
+    return updateTime.toLocaleDateString('ja-JP', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      timeZone: 'Asia/Tokyo',
+    });
+  }
+};
+
+export const calcUserTotalTime = (users: User[]): number => {
+  const totalTimeSec = users.reduce((total, user) => total + user.timeSec, 0);
+  return totalTimeSec;
+};

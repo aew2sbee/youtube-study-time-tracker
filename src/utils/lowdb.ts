@@ -1,14 +1,11 @@
+import { convertYYYYMMDD } from '@/lib/calcTime';
 import { logger } from './logger';
 import { JSONFilePreset } from 'lowdb/node';
-interface LogUser {
-  channelId: string;
-  name: string;
-  timeSec: number;
-  updateTime: Date;
-}
+import { User } from '@/types/users';
+
 // データベース全体の型
 interface DatabaseData {
-  user: LogUser[];
+  user: User[];
 }
 
 // デフォルトデータ
@@ -20,7 +17,7 @@ const defaultData: DatabaseData = {
 const db = await JSONFilePreset<DatabaseData>('database/db.json', defaultData);
 
 // データを保存する関数
-export const saveJson = async (user: LogUser) => {
+export const saveJson = async (user: User) => {
   await db.read();
   // dateKeyが存在しない場合は初期化
   if (!db.data.user) db.data.user = [];
@@ -28,7 +25,9 @@ export const saveJson = async (user: LogUser) => {
   logger.info(`user - ${user.name} ${user.timeSec} ${user.updateTime}`);
 
   const existingUserIndex = db.data.user.findIndex(
-    (existingUser: LogUser) => existingUser.channelId === user.channelId,
+    (existingUser: User) =>
+      existingUser.channelId === user.channelId &&
+      convertYYYYMMDD(existingUser.updateTime) === convertYYYYMMDD(user.updateTime),
   );
 
   logger.info(`existingUserIndex - ${existingUserIndex}`);
@@ -37,7 +36,7 @@ export const saveJson = async (user: LogUser) => {
     // 既存のユーザーデータを更新
     db.data.user[existingUserIndex] = {
       ...db.data.user[existingUserIndex],
-      timeSec: db.data.user[existingUserIndex].timeSec + user.timeSec, // 既存の時間に追加
+      timeSec: user.timeSec,
       updateTime: user.updateTime,
     };
     logger.info(`Updated user data - ${user.name} ${user.updateTime} ${db.data.user[existingUserIndex].timeSec} => ${db.data.user[existingUserIndex].timeSec + user.timeSec}`);
@@ -52,17 +51,17 @@ export const saveJson = async (user: LogUser) => {
   logger.info(`Saved user data - ${user.name} ${user.timeSec} seconds, total count: ${db.data.user.length}`);
 };
 
-export const getUserData = async (user: LogUser): Promise<LogUser | undefined> => {
+export const getUserData = async (user: User): Promise<User[]> => {
   await db.read();
   // dateKeyが存在しない場合は空のオブジェクトを返す
   if (!db.data.user) {
     logger.error(`No data`);
   }
   logger.info(`User data - ${user.name} ${user.channelId}`);
-  const existingUser = db.data.user.find((u: LogUser) => u.channelId === user.channelId);
+  const existingUser = db.data.user.filter((u: User) => u.channelId === user.channelId);
   if (existingUser) {
-    logger.info(`User name - ${existingUser.name}`);
-    return existingUser;
+    logger.info(`User name - ${existingUser[0].name}`);
   }
   logger.warn(`No user data found for channelId: ${user.channelId}`);
+  return existingUser;
 };
