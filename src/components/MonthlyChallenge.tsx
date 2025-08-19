@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react';
-import { calcTime, calculateTargetValues } from '@/utils/calc';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import FlowerImage from './ImageFlower';
 import AnimationStar from './AnimationStar';
 import ProgressBar from './ProgressBar';
 import { parameter } from '@/config/system';
+import { calcTime, calculateTargetValues } from '@/lib/calcTime';
 
 // アニメーション設定
 const ANIMATION_CONFIG = {
@@ -11,18 +11,21 @@ const ANIMATION_CONFIG = {
   steps: 180,
 };
 
-export default function MonthlyChallenge({
-  now,
-  totalStudyTime,
-}: {
-  now: Date;
-  totalStudyTime: number;
-}) {
+export default function MonthlyChallenge({ now, totalStudyTime }: { now: Date; totalStudyTime: number }) {
   const [animatedPercentage, setAnimatedPercentage] = useState<number>(0);
   const [animatedFlowerLevel, setAnimatedFlowerLevel] = useState<number>(1);
+  const lastTotalStudyTimeRef = useRef<number | null>(null);
+
+  const CURRENT_YEAR_MONTH = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}`;
+
+  const targetValues = useMemo(() => {
+    return calculateTargetValues(totalStudyTime);
+  }, [totalStudyTime]);
 
   useEffect(() => {
-    const { targetPercentage, targetFlowerLevel } = calculateTargetValues(totalStudyTime);
+    if (lastTotalStudyTimeRef.current === totalStudyTime) return;
+
+    const { targetPercentage, targetFlowerLevel } = targetValues;
 
     setAnimatedPercentage(0);
     setAnimatedFlowerLevel(1);
@@ -35,7 +38,6 @@ export default function MonthlyChallenge({
     const interval = setInterval(() => {
       currentStep++;
 
-      // 線形進行：ステップ数に比例して値を増加
       const currentPercentage = Math.min(Math.round(percentageStep * currentStep), targetPercentage);
       const currentFlowerLevel = Math.min(Math.round(1 + flowerLevelStep * currentStep), targetFlowerLevel);
 
@@ -47,9 +49,10 @@ export default function MonthlyChallenge({
       }
     }, stepTime);
 
+    lastTotalStudyTimeRef.current = totalStudyTime;
+
     return () => clearInterval(interval);
-  }, [totalStudyTime]);
-  const CURRENT_YEAR_MONTH = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}`;
+  }, [totalStudyTime, targetValues]);
 
   return (
     <div className="flex-1 flex flex-row pt-4">
@@ -57,7 +60,8 @@ export default function MonthlyChallenge({
         <div className="text-white text-center">
           <div className="text-3xl mb-2">Current Progress</div>
           <div className="text-4xl font-bold">
-            {parseInt(calcTime(totalStudyTime).slice(0, -3))} / {parseInt(calcTime(parameter.TARGET_STUDY_TIME).slice(0, -3))} h
+            {parseInt(calcTime(totalStudyTime).slice(0, -3))} /{' '}
+            {parseInt(calcTime(parameter.TARGET_STUDY_TIME).slice(0, -3))} h
           </div>
         </div>
         <div className="text-white text-center">

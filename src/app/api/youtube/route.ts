@@ -1,41 +1,38 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { YouTubeLiveChatMessage, LiveChatResponse } from '@/types/youtube';
 import { google } from 'googleapis';
-import { parameter } from '@/config/system';
-import { isEndStudyMessage, isStartStudyMessage } from '@/hooks/utils';
+import { isEndMessage, isStartMessage } from '@/lib/liveChatMessage';
+import { convertHHMMSS } from '@/lib/calcTime';
+import { logger } from '@/utils/logger';
 
 // 公式ドキュメント：https://developers.google.com/youtube/v3/live/docs/liveChatMessages/list?hl=ja
 
-export async function GET(request: NextRequest) {
-  const { searchParams } = new URL(request.url);
-  const pageToken = searchParams.get('pageToken');
+const YOUTUBE = await google.youtube({ version: 'v3', auth: process.env.YOUTUBE_API_KEY });
+const response = await YOUTUBE.videos.list({ part: ['liveStreamingDetails'], id: [process.env.VIDEO_ID!] });
+const video = response.data.items?.[0];
+const LIVE_CHAT_ID = video?.liveStreamingDetails?.activeLiveChatId;
+logger.info(`liveChatId - ${LIVE_CHAT_ID}`);
 
+let nextPageToken: string | undefined;
+
+export async function GET() {
   try {
-    const youtube = await google.youtube({
-      version: 'v3',
-      auth: process.env.YOUTUBE_API_KEY,
-    });
-    const response = await youtube.videos.list({
-      part: ['liveStreamingDetails'],
-      id: [process.env.VIDEO_ID!],
-    });
-    const video = response.data.items?.[0];
-    const liveChatId = video?.liveStreamingDetails?.activeLiveChatId;
-    if (!liveChatId) {
-      return NextResponse.json({ error: 'No live chat found' }, { status: 404 });
-    }
+    logger.info(`nextPageToken - ${nextPageToken}`);
 
-    const liveChatMessages = await youtube.liveChatMessages.list({
-      liveChatId,
+    if (!LIVE_CHAT_ID) return NextResponse.json({ error: 'No live chat found' }, { status: 404 });
+
+    const liveChatMessages = await YOUTUBE.liveChatMessages.list({
+      liveChatId: LIVE_CHAT_ID,
       part: ['snippet', 'authorDetails'],
-      pageToken: pageToken || undefined,
+      pageToken: nextPageToken || undefined,
+      maxResults: 200,
     });
 
     const messages: YouTubeLiveChatMessage[] =
       liveChatMessages.data.items
         ?.filter((item) => {
           const displayMessage = item.snippet?.displayMessage || '';
-          return isStartStudyMessage(displayMessage) || isEndStudyMessage(displayMessage);
+          return isStartMessage(displayMessage) || isEndMessage(displayMessage);
         })
         .map((item) => ({
           id: item.id || '',
@@ -46,18 +43,21 @@ export async function GET(request: NextRequest) {
           profileImageUrl: item.authorDetails?.profileImageUrl || '',
         })) || [];
 
+    nextPageToken = liveChatMessages.data.nextPageToken || undefined;
+
     messages.forEach((message) => {
-      console.log(message.publishedAt, message.authorDisplayName, message.displayMessage);
+      logger.info(
+        `message received - ${convertHHMMSS(message.publishedAt)} ${message.authorDisplayName} ${
+          message.displayMessage
+        }`,
+      );
     });
-    const result: LiveChatResponse = {
-      messages,
-      nextPageToken: liveChatMessages.data.nextPageToken || undefined,
-      pollingIntervalMillis: liveChatMessages.data.pollingIntervalMillis || parameter.API_POLLING_INTERVAL,
-    };
+
+    const result: LiveChatResponse = { messages };
 
     return NextResponse.json(result);
   } catch (error) {
-    console.error('Error fetching live chat messages:', error);
+    logger.error(`Error fetching live chat messages - ${error}`);
     return NextResponse.json({ error: 'Failed to fetch live chat messages' }, { status: 500 });
   }
 }
