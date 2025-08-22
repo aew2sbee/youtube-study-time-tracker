@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { User } from '@/types/users';
-import { saveJson } from '@/utils/lowdb';
+import { saveUser } from '@/utils/database';
 import { logger } from '@/utils/logger';
 
 export async function POST(request: NextRequest) {
   try {
     const user: User = await request.json();
-    await saveJson(user);
+    await saveUser(user);
     logger.info(`User data saved - ${user.name} ${user.timeSec} seconds`);
     return NextResponse.json({ success: true, user });
   } catch (error) {
