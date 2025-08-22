@@ -1,5 +1,6 @@
 import useSWR from 'swr';
-import { fetcher } from '@/utils/fetcher';
+import useSWRMutation from 'swr/mutation';
+import { fetcher, postUser } from '@/utils/useSWR';
 import { useState, useEffect, useRef } from 'react';
 import { LiveChatResponse, YouTubeLiveChatMessage } from '@/types/youtube';
 import { isEndMessage, isStartMessage } from '@/lib/liveChatMessage';
@@ -9,6 +10,7 @@ import { parameter } from '@/config/system';
 import { restartTime, startTime, stopTime, updateTime } from '@/lib/user';
 
 const YOUTUBE_API_URL = '/api/youtube';
+const LOWDB_API_URL = '/api/lowdb';
 
 export const useUsers = () => {
   const [user, setUser] = useState<User[]>([]);
@@ -16,14 +18,28 @@ export const useUsers = () => {
   const [liveChatMessage, setLiveChatMessage] = useState<YouTubeLiveChatMessage[]>([]);
   const lastProcessedIndexRef = useRef(0); // 追加: 再処理防止用のインデックス
 
-  const { data, error, isLoading } = useSWR<LiveChatResponse>(YOUTUBE_API_URL, fetcher, {
-    refreshInterval: parameter.API_POLLING_INTERVAL,
-  });
+  const { data, error, isLoading } = useSWR<LiveChatResponse>(YOUTUBE_API_URL, fetcher, { refreshInterval: parameter.API_POLLING_INTERVAL });
+
+  const { trigger: saveUser } = useSWRMutation(LOWDB_API_URL, postUser);
+  // const { trigger: postComment } = useSWRMutation(YOUTUBE_API_URL, postUser);
+
+  // currentTimeを定期的に更新（dataに関係なく）
+  useEffect(() => {
+    const updateCurrentTime = () => {
+      const now = new Date();
+      setCurrentTime(now);
+      setUser((prev) => prev.map((user) => (user.isStudying ? updateTime(user, now) : user)));
+    };
+
+    updateCurrentTime(); // 初回実行
+
+    const interval = setInterval(updateCurrentTime, parameter.API_POLLING_INTERVAL);
+
+    return () => clearInterval(interval);
+  }, []);
 
   // データの処理（新規メッセージの追加）
   useEffect(() => {
-    setCurrentTime(new Date());
-
     if (!data || data.messages.length === 0) return;
 
     const newMessages = data.messages.filter(
@@ -64,6 +80,11 @@ export const useUsers = () => {
           } else if (isEndMessage(messageText) && existingUser.isStudying) {
             const stopUser = stopTime(existingUser, publishedAt);
             newList = newList.filter((u) => u.channelId !== existingUser.channelId).concat(stopUser);
+            // useSWRMutation経由でデータ保存
+            (async () => {
+              await saveUser(stopUser);
+              // await postComment(stopUser);
+            })();
           }
         } else {
           // 新規ユーザーの開始
@@ -78,11 +99,9 @@ export const useUsers = () => {
     });
 
     lastProcessedIndexRef.current = liveChatMessage.length;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [liveChatMessage]);
 
-  useEffect(() => {
-    setUser((prev) => prev.map((user) => (user.isStudying ? updateTime(user, currentTime) : user)));
-  }, [currentTime]);
 
   return {
     currentTime: currentTime,
@@ -92,3 +111,4 @@ export const useUsers = () => {
     isError: error,
   };
 };
+

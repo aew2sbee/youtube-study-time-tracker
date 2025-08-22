@@ -1,0 +1,67 @@
+import { convertYYYYMMDD } from '@/lib/calcTime';
+import { logger } from './logger';
+import { JSONFilePreset } from 'lowdb/node';
+import { User } from '@/types/users';
+
+// データベース全体の型
+interface DatabaseData {
+  user: User[];
+}
+
+// デフォルトデータ
+const defaultData: DatabaseData = {
+  user: [],
+};
+
+// データベースを初期化
+const db = await JSONFilePreset<DatabaseData>('database/db.json', defaultData);
+
+// データを保存する関数
+export const saveJson = async (user: User) => {
+  await db.read();
+  // dateKeyが存在しない場合は初期化
+  if (!db.data.user) db.data.user = [];
+
+  logger.info(`user - ${user.name} ${user.timeSec} ${user.updateTime}`);
+
+  const existingUserIndex = db.data.user.findIndex(
+    (existingUser: User) =>
+      existingUser.channelId === user.channelId &&
+      convertYYYYMMDD(existingUser.updateTime) === convertYYYYMMDD(user.updateTime),
+  );
+
+  logger.info(`existingUserIndex - ${existingUserIndex}`);
+
+  if (existingUserIndex >= 0) {
+    // 既存のユーザーデータを更新
+    db.data.user[existingUserIndex] = {
+      ...db.data.user[existingUserIndex],
+      timeSec: user.timeSec,
+      updateTime: user.updateTime,
+    };
+    logger.info(`Updated user data - ${user.name} ${user.updateTime} ${db.data.user[existingUserIndex].timeSec} => ${db.data.user[existingUserIndex].timeSec + user.timeSec}`);
+  } else {
+    // 新しいユーザーデータとして追加
+    db.data.user.push(user);
+    logger.info(`Added user data - ${user.name} ${user.updateTime} 0 => ${user.timeSec}`);
+  }
+
+  // ファイルに書き込み
+  await db.write();
+  logger.info(`Saved user data - ${user.name} ${user.timeSec} seconds, total count: ${db.data.user.length}`);
+};
+
+export const getUserData = async (user: User): Promise<User[]> => {
+  await db.read();
+  // dateKeyが存在しない場合は空のオブジェクトを返す
+  if (!db.data.user) {
+    logger.error(`No data`);
+  }
+  logger.info(`User data - ${user.name} ${user.channelId}`);
+  const existingUser = db.data.user.filter((u: User) => u.channelId === user.channelId);
+  if (existingUser) {
+    logger.info(`User name - ${existingUser[0].name}`);
+  }
+  logger.warn(`No user data found for channelId: ${user.channelId}`);
+  return existingUser;
+};
