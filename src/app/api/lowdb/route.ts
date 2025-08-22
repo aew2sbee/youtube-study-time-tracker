@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { User } from '@/types/users';
-import { saveUser } from '@/utils/database';
+import { saveUser } from '@/db/user';
 import { logger } from '@/utils/logger';
 
 export async function POST(request: NextRequest) {
