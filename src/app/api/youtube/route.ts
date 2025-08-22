@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { YouTubeLiveChatMessage, LiveChatResponse } from '@/types/youtube';
 import { User } from '@/types/users';
 import { google } from 'googleapis';
@@ -10,8 +10,11 @@ import { getOAuth2Client } from '@/utils/googleClient';
 
 // 公式ドキュメント：https://developers.google.com/youtube/v3/live/docs/liveChatMessages/list?hl=ja
 
+// npm run buildの時に一度だけ実施し、videoId、liveChatId
 const YOUTUBE = await google.youtube({ version: 'v3', auth: process.env.YOUTUBE_API_KEY });
-const response = await YOUTUBE.videos.list({ part: ['liveStreamingDetails'], id: [process.env.VIDEO_ID!] });
+const channel = await YOUTUBE.search.list({part: ["id"], channelId: process.env.CHANNEL_ID, eventType: "live", type: ["video"], maxResults: 1});
+logger.info(`videoId - ${channel.data.items![0].id!.videoId}`);
+const response = await YOUTUBE.videos.list({ part: ['liveStreamingDetails'], id: [channel.data.items![0].id!.videoId as string] });
 const video = response.data.items?.[0];
 const LIVE_CHAT_ID = video?.liveStreamingDetails?.activeLiveChatId;
 logger.info(`liveChatId - ${LIVE_CHAT_ID}`);
