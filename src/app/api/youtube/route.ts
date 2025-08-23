@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { YouTubeLiveChatMessage, LiveChatResponse } from '@/types/youtube';
-// import { User } from '@/types/users';
+import { User } from '@/types/users';
 import { google } from 'googleapis';
-import { isEndMessage, isStartMessage } from '@/lib/liveChatMessage';
-import { convertHHMMSS } from '@/lib/calcTime';
+import { CHAT_MESSAGE, isEndMessage, isStartMessage } from '@/lib/liveChatMessage';
+import { calcTimeJP, convertHHMMSS } from '@/lib/calcTime';
 import { logger } from '@/utils/logger';
-// import { getUserData } from '@/utils/database';
-// import { getOAuth2Client } from '@/utils/googleClient';
+import { getTotalTimeSec } from '@/db/user';
+import { getOAuth2Client } from '@/utils/googleClient';
 
 // 公式ドキュメント：https://developers.google.com/youtube/v3/live/docs/liveChatMessages/list?hl=ja
 
@@ -15,6 +15,10 @@ const response = await YOUTUBE.videos.list({ part: ['liveStreamingDetails'], id:
 const video = response.data.items?.[0];
 const LIVE_CHAT_ID = video?.liveStreamingDetails?.activeLiveChatId;
 logger.info(`liveChatId - ${LIVE_CHAT_ID}`);
+
+// OAuth2クライアントの設定（初期化時は削除）
+const oauth2Client = await getOAuth2Client();
+const youtubeWithOAuth = google.youtube({ version: 'v3', auth: oauth2Client });
 
 let nextPageToken: string | undefined;
 
@@ -65,50 +69,44 @@ export async function GET() {
   }
 }
 
-// export async function POST(request: NextRequest) {
-//   try {
-//     const oauth2Client = getOAuth2Client();
-//     // refresh_token から access_token を自動生成
-//     const tokens = await oauth2Client.getAccessToken();
-//     console.log("Generated access token:", tokens.token);
-//     const youtube = google.youtube({ version: 'v3', auth: oauth2Client });
-//     const user: User = await request.json();
-//     const userLog = await getUserData(user);
-//     const totalTimeSec = calcUserTotalTime(userLog);
-//     const message = `@${user.name} これまでの累計は${calcTimeJP(totalTimeSec)}でした👏 ` + CHAT_MESSAGE[Math.floor(Math.random() * CHAT_MESSAGE.length)];
+export async function POST(request: NextRequest) {
+  try {
+    const user: User = await request.json();
+    const totalTimeSec = await getTotalTimeSec(user.channelId);
+    const message = `@${user.name}: 累計は${calcTimeJP(totalTimeSec)}でした👏 ` + CHAT_MESSAGE[Math.floor(Math.random() * CHAT_MESSAGE.length)];
 
-//     if (!message) {
-//       return NextResponse.json({ error: 'Message is required' }, { status: 400 });
-//     }
+    if (!message) {
+      return NextResponse.json({ error: 'Message is required' }, { status: 400 });
+    }
 
-//     if (!LIVE_CHAT_ID) {
-//       return NextResponse.json({ error: 'No live chat found' }, { status: 404 });
-//     }
+    if (!LIVE_CHAT_ID) {
+      return NextResponse.json({ error: 'No live chat found' }, { status: 404 });
+    }
 
-//     logger.info(`Attempting to post comment: ${message}`);
+    logger.info(`Attempting to post comment: ${message}`);
 
-//     const result = await youtube.liveChatMessages.insert({
-//       part: ['snippet'],
-//       requestBody: {
-//         snippet: {
-//           liveChatId: LIVE_CHAT_ID,
-//           type: 'textMessageEvent',
-//           textMessageDetails: {
-//             messageText: message,
-//           },
-//         },
-//       },
-//     });
+    const result = await youtubeWithOAuth.liveChatMessages.insert({
+      part: ['snippet'],
+      requestBody: {
+        snippet: {
+          liveChatId: LIVE_CHAT_ID,
+          type: 'textMessageEvent',
+          textMessageDetails: {
+            messageText: message,
+          },
+        },
+      },
+    });
 
-//     logger.info(`Comment posted successfully: ${message}`);
+    logger.info(`Comment posted successfully: ${message}`);
 
-//     return NextResponse.json({
-//       success: true,
-//       messageId: result.data.id,
-//       message: message
-//     });
-//   } catch (error) {
-//     logger.error(`Error posting comment - ${error}`);
-//     return NextResponse.json({ error: 'Failed to post comment' }, { status: 500 });
-//   }
-// }
+    return NextResponse.json({
+      success: true,
+      messageId: result.data.id,
+      message: message
+    });
+  } catch (error) {
+    logger.error(`Error posting comment - ${error}`);
+    return NextResponse.json({ error: 'Failed to post comment' }, { status: 500 });
+  }
+}
