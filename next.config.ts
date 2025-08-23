@@ -16,6 +16,12 @@ const nextConfig: NextConfig = {
         os: false,
       };
     }
+
+    // better-sqlite3を外部パッケージとして扱う（サーバーサイドでのみ）
+    if (isServer) {
+      config.externals = [...(config.externals || []), 'better-sqlite3'];
+    }
+
     return config;
   },
   images: {

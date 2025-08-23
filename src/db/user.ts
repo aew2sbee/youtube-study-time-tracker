@@ -1,0 +1,73 @@
+import { logger } from '@/utils/logger';
+import { db } from '@/db';
+import { users } from '@/db/schema';
+import { User } from '@/types/users';
+import { eq, and, gte, lte } from 'drizzle-orm';
+
+// データを保存する関数
+export const saveUser = async (user: User) => {
+  logger.info(`saveUser - ${user.name} ${user.timeSec}`);
+  let res;
+  const existingUser = await hasUser(user);
+  if (existingUser.length > 0) {
+    // 既存のユーザーデータを更新
+    res = await updateTimeSec(user, existingUser[0].id);
+  } else {
+    // 新しいユーザーデータとして追加
+    res = await insertUser(user);
+  }
+  logger.info(`savedUser - ${res[0].name} ${res[0].timeSec}`);
+  return res;
+};
+
+export const updateTimeSec = async (user: User, userId: number) => {
+  logger.info(`updateTimeSec - ${user.name} ${user.timeSec}`);
+  const userDate = new Date(user.updateTime);
+  const res = await db
+    .update(users)
+    .set({
+      timeSec: user.timeSec,
+      updateTime: userDate,
+    })
+    .where(eq(users.id, userId))
+    .returning();
+  logger.info(`updatedTimeSec - ${user.name} ${user.timeSec} => ${res[0].timeSec}`);
+  return res;
+};
+
+export const insertUser = async (user: User) => {
+  logger.info(`insertUser - ${user.name} ${user.timeSec}`);
+  const userDate = new Date(user.updateTime);
+  const res = await db
+    .insert(users)
+    .values({
+      channelId: user.channelId,
+      name: user.name,
+      timeSec: user.timeSec,
+      updateTime: userDate,
+    })
+    .returning();
+  logger.info(`insertedUser - ${user.name} ${user.timeSec}`);
+  return res;
+};
+
+export const hasUser = async (user: User) => {
+  logger.info(`hasUser - ${user.name} ${user.timeSec}`);
+  const userDate = new Date(user.updateTime);
+  const startOfDay = new Date(userDate);
+  startOfDay.setHours(0, 0, 0, 0);
+  const endOfDay = new Date(userDate);
+  endOfDay.setHours(23, 59, 59, 999);
+
+  const res = await db
+    .select({ id: users.id })
+    .from(users)
+    .where(and(eq(users.channelId, user.channelId), gte(users.updateTime, startOfDay), lte(users.updateTime, endOfDay)))
+    .limit(1);
+  if (res.length > 0) {
+    logger.info(`existingUser - ${user.name} ${res[0].id}`);
+  } else {
+    logger.info(`existingUser - ${user.name} not found`);
+  }
+  return res;
+};
