@@ -6,8 +6,7 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "get-refresh-token": "node script/get-refresh-token.js"
+    "lint": "next lint"
   },
   "dependencies": {
     "dotenv": "^17.2.1",
