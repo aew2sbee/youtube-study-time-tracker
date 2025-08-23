@@ -64,6 +64,10 @@ export const hasUser = async (user: User) => {
     .from(users)
     .where(and(eq(users.channelId, user.channelId), gte(users.updateTime, startOfDay), lte(users.updateTime, endOfDay)))
     .limit(1);
-  logger.info(`existingUser - ${user.name} ${res[0].id}`);
+  if (res.length > 0) {
+    logger.info(`existingUser - ${user.name} ${res[0].id}`);
+  } else {
+    logger.info(`existingUser - ${user.name} not found`);
+  }
   return res;
 };
