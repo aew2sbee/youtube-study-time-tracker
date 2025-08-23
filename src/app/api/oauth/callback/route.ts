@@ -113,7 +113,7 @@ export async function GET(request: NextRequest) {
         setTimeout(() => {
           window.close();
         }, 3000);
-        
+
         // ページロード時にメッセージを表示
         window.onload = function() {
           setTimeout(() => {
