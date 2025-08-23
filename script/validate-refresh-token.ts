@@ -8,7 +8,7 @@ dotenv.config({ path: '.env.local' });
 async function testRefreshToken() {
   console.log('🧪 Refresh Token自動検証・更新のテスト開始');
   console.log('==========================================');
-  
+
   // 現在のrefresh tokenの状況を表示
   console.log('📋 現在の状況:');
   console.log(`GOOGLE_CLIENT_ID: ${process.env.GOOGLE_CLIENT_ID ? '設定済み' : '未設定'}`);
@@ -54,7 +54,7 @@ async function testRefreshToken() {
     console.log('🔄 Step 3: 認証済みクライアントを取得してAccess tokenを更新中...');
     const client = await getAuthenticatedClient();
     console.log('✅ 成功! 認証済みクライアントを取得し、Access tokenを更新しました');
-    
+
     const credentials = client.credentials;
     console.log('📊 認証情報:');
     console.log(`- Access Token: ${credentials.access_token?.substring(0, 20)}...`);
