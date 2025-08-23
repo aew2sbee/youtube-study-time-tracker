@@ -31,7 +31,7 @@ export const updateTimeSec = async (user: User, userId: number) => {
     })
     .where(eq(users.id, userId))
     .returning();
-  logger.info(`updateedTimeSec - ${user.name} ${user.timeSec} => ${res[0].timeSec}`);
+  logger.info(`updatedTimeSec - ${user.name} ${user.timeSec} => ${res[0].timeSec}`);
   return res;
 };
 
