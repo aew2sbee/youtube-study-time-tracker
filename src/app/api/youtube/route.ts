@@ -10,8 +10,11 @@ import { logger } from '@/utils/logger';
 
 // 公式ドキュメント：https://developers.google.com/youtube/v3/live/docs/liveChatMessages/list?hl=ja
 
+// このコードブロックはビルド時（npm run build）に一度だけ実行され、指定されたチャンネルの現在のライブ配信のvideoIdとliveChatIdを取得します。
 const YOUTUBE = await google.youtube({ version: 'v3', auth: process.env.YOUTUBE_API_KEY });
-const response = await YOUTUBE.videos.list({ part: ['liveStreamingDetails'], id: [process.env.VIDEO_ID!] });
+const channel = await YOUTUBE.search.list({part: ["id"], channelId: process.env.CHANNEL_ID, eventType: "live", type: ["video"], maxResults: 1});
+logger.info(`videoId - ${channel.data.items![0].id!.videoId}`);
+const response = await YOUTUBE.videos.list({ part: ['liveStreamingDetails'], id: [channel.data.items![0].id!.videoId as string] });
 const video = response.data.items?.[0];
 const LIVE_CHAT_ID = video?.liveStreamingDetails?.activeLiveChatId;
 logger.info(`liveChatId - ${LIVE_CHAT_ID}`);
