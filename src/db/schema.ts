@@ -5,5 +5,5 @@ export const users = sqliteTable('users', {
   channelId: text('channel_id').notNull(),
   name: text('name').notNull(),
   timeSec: integer('time_sec').notNull().default(0),
-  updateTime: integer('update_time', { mode: 'timestamp' }).notNull(), // Date型
+  videoId: text('video_id').notNull(), // YouTube動画ID
 });

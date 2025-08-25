@@ -2,7 +2,7 @@ import { logger } from '@/utils/logger';
 import { db } from '@/db';
 import { users } from '@/db/schema';
 import { User } from '@/types/users';
-import { eq, and, gte, lte } from 'drizzle-orm';
+import { eq, and } from 'drizzle-orm';
 
 // データを保存する関数
 export const saveUser = async (user: User) => {
@@ -22,29 +22,20 @@ export const saveUser = async (user: User) => {
 
 export const updateTimeSec = async (user: User, userId: number) => {
   logger.info(`updateTimeSec - ${user.name} ${user.timeSec}`);
-  const userDate = new Date(user.updateTime);
-  const res = await db
-    .update(users)
-    .set({
-      timeSec: user.timeSec,
-      updateTime: userDate,
-    })
-    .where(eq(users.id, userId))
-    .returning();
+  const res = await db.update(users).set({ timeSec: user.timeSec }).where(eq(users.id, userId)).returning();
   logger.info(`updatedTimeSec - ${user.name} ${user.timeSec} => ${res[0].timeSec}`);
   return res;
 };
 
 export const insertUser = async (user: User) => {
   logger.info(`insertUser - ${user.name} ${user.timeSec}`);
-  const userDate = new Date(user.updateTime);
   const res = await db
     .insert(users)
     .values({
       channelId: user.channelId,
       name: user.name,
       timeSec: user.timeSec,
-      updateTime: userDate,
+      videoId: process.env.VIDEO_ID!,
     })
     .returning();
   logger.info(`insertedUser - ${user.name} ${user.timeSec}`);
@@ -53,16 +44,10 @@ export const insertUser = async (user: User) => {
 
 export const hasUser = async (user: User) => {
   logger.info(`hasUser - ${user.name} ${user.timeSec}`);
-  const userDate = new Date(user.updateTime);
-  const startOfDay = new Date(userDate);
-  startOfDay.setHours(0, 0, 0, 0);
-  const endOfDay = new Date(userDate);
-  endOfDay.setHours(23, 59, 59, 999);
-
   const res = await db
     .select({ id: users.id })
     .from(users)
-    .where(and(eq(users.channelId, user.channelId), gte(users.updateTime, startOfDay), lte(users.updateTime, endOfDay)))
+    .where(and(eq(users.channelId, user.channelId), eq(users.videoId, process.env.VIDEO_ID!)))
     .limit(1);
   if (res.length > 0) {
     logger.info(`existingUser - ${user.name} ${res[0].id}`);
@@ -74,11 +59,8 @@ export const hasUser = async (user: User) => {
 
 export const getTotalTimeSec = async (channelId: string) => {
   logger.info(`getTotalTimeSec - ${channelId}`);
-  const res = await db
-    .select({ timeSec: users.timeSec })
-    .from(users)
-    .where(eq(users.channelId, channelId));
+  const res = await db.select({ timeSec: users.timeSec }).from(users).where(eq(users.channelId, channelId));
   const totalTimeSec = res.reduce((acc, curr) => acc + curr.timeSec, 0);
   logger.info(`totalTimeSec - ${channelId} ${totalTimeSec}`);
   return totalTimeSec;
-}
+};
