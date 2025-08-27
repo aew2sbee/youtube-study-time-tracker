@@ -1,7 +1,7 @@
 const studyProgressItems = [
-  { key: 'Update Time', text: '2025/08/26' },
+  { key: 'Update Time', text: '2025/08/27' },
   { key: 'Current Study', text: '基本情報技術者試験 (FE)' },
-  { key: 'Total Study Time', text: '44 / 150h' },
+  { key: 'Total Study Time', text: '45 / 150h' },
   { key: 'Exam Date', text: 'Not scheduled yet' },
 ];
 
