@@ -1,0 +1,29 @@
+name: CI - Jest Tests # Jest による単体テスト用のCI
+
+on:
+  push:
+    branches: [main, develop, feature/**] # これらのブランチに push されたら実行
+  pull_request:
+    branches: [main, develop, feature/**] # これらのブランチへの PR でも実行
+
+jobs:
+  test:
+    runs-on: ubuntu-latest # 最新のUbuntuランナーで動かす
+    steps:
+      - name: Checkout # リポジトリのコードを取得
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js # Node.js をセットアップ（npm キャッシュ有効化）
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.x' # プロジェクトに合わせて変更可
+          cache: 'npm'         # node_modules を npm のロックファイルでキャッシュ
+
+      - name: Install dependencies # 依存関係のクリーンインストール
+        run: npm ci
+
+      - name: Lint # ESLint（存在する場合のみ実行）
+        run: npm run lint --if-present
+
+      - name: Run Jest # Jest をCIモードで実行（カラー出力付き）
+        run: npm test -- --ci --color
