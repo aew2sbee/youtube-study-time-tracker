@@ -2,7 +2,7 @@ name: CI - Jest Tests # Jest による単体テスト用のCI
 
 on:
   push:
-    branches: [feature/**] # これらのブランチに push されたら実行
+    branches: [feature/*] # これらのブランチに push されたら実行
   pull_request:
     branches: [main, develop] # これらのブランチへの PR でも実行
 
@@ -18,6 +18,16 @@ jobs:
         with:
           node-version: '22.x' # プロジェクトに合わせて変更可
           cache: 'npm' # node_modules を npm のロックファイルでキャッシュ
+
+      - name: Cache Jest/ts-jest
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/jest
+            ~/.cache/ts-jest
+          key: jest-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            jest-${{ runner.os }}-
 
       - name: Install dependencies # 依存関係のクリーンインストール（ロック不整合時はフォールバック）
         run: |
