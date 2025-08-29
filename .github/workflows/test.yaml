@@ -17,7 +17,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22.x' # プロジェクトに合わせて変更可
-          cache: 'npm'         # node_modules を npm のロックファイルでキャッシュ
+          cache: 'npm' # node_modules を npm のロックファイルでキャッシュ
 
       - name: Install dependencies # 依存関係のクリーンインストール
         run: npm ci
