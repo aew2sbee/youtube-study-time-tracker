@@ -1,10 +1,8 @@
 name: CI - Jest Tests # Jest による単体テスト用のCI
 
 on:
-  push:
-    branches: [feature/*] # これらのブランチに push されたら実行
   pull_request:
-    branches: [main, develop] # これらのブランチへの PR でも実行
+    branches: [main, develop] # これらのブランチへの PR で実行
 
 jobs:
   test:
