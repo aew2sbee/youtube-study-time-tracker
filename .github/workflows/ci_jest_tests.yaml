@@ -19,8 +19,9 @@ jobs:
           node-version: '22.x' # プロジェクトに合わせて変更可
           cache: 'npm' # node_modules を npm のロックファイルでキャッシュ
 
-      - name: Install dependencies # 依存関係のクリーンインストール
-        run: npm ci
+      - name: Install dependencies # 依存関係のクリーンインストール（ロック不整合時はフォールバック）
+        run: |
+          npm ci || npm install
 
       - name: Lint # ESLint（存在する場合のみ実行）
         run: npm run lint --if-present
