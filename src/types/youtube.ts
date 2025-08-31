@@ -7,17 +7,6 @@ export interface YouTubeLiveChatMessage {
   profileImageUrl: string;
 }
 
-export interface StudyTimeUser {
-  channelId: string;
-  name: string;
-  studyTime: number; // in seconds
-  profileImageUrl: string;
-  startTime?: Date;
-  isStudying: boolean;
-}
-
 export interface LiveChatResponse {
   messages: YouTubeLiveChatMessage[];
-  nextPageToken?: string;
-  pollingIntervalMillis: number;
 }

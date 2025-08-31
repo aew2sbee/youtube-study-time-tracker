@@ -3,52 +3,58 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { parameter } from '@/config/system';
-import HowToUse from '@/components/HowToUse';
 import FocusTimeTracker from '@/components/FocusTimeTracker';
-import { useStudyTime } from '@/hooks/useStudyTime';
 import MyStudyProgress from '@/components/MyStudyProgress';
 import MonthlyChallenge from '@/components/MonthlyChallenge';
+import LoadingSpinner from '@/components/LoadingSpinner';
+import ErrorMessage from '@/components/ErrorMessage';
+import { useUsers } from '@/hooks/useUsers';
+import HowToJoin from '@/components/HowToJoin';
 
 
 export default function Home() {
-  const { currentTime, displayedUsers, totalStudyTime } = useStudyTime();
-
   const [currentPage, setCurrentPage] = useState<number>(0);
 
+  const { currentTime, users, totalStudyTime, isLoading, isError } = useUsers();
+
   // 3人ずつでページ分割
-  const userArray = Array.from(displayedUsers.values());
-  const totalUserPages = Math.ceil(userArray.length / parameter.USERS_PER_PAGE);
+  const totalUserPages = Math.ceil(users.length / parameter.USERS_PER_PAGE);
 
   const userPages = Array.from({ length: totalUserPages }, (_, pageIndex) => {
     const startIndex = pageIndex * parameter.USERS_PER_PAGE;
     const endIndex = startIndex + parameter.USERS_PER_PAGE;
-    const pageUsers = userArray.slice(startIndex, endIndex);
+    const pageUsers = users.slice(startIndex, endIndex);
 
     return {
       key: `users-${pageIndex}`,
       title: totalUserPages > 1 ? `Focus Tracker (${pageIndex + 1}/${totalUserPages})` : 'Focus Tracker',
       component: (
         <FocusTimeTracker
-          displayedUsers={pageUsers}
+          user={pageUsers}
         />
       ),
     };
   });
 
   const pages = [
-    { key: 'How to use', title: 'How to use', component: <HowToUse /> },
+    { key: 'How to join', title: 'How to join', component: <HowToJoin /> },
     ...userPages,
     { key: 'Monthly Challenge', title: 'Monthly Challenge', component: <MonthlyChallenge now={currentTime} totalStudyTime={totalStudyTime} /> },
     { key: 'My study progress', title: 'My Study Progress', component: <MyStudyProgress /> },
   ];
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentPage((prev) => (prev + 1) % pages.length);
-    }, parameter.PAGE_DISPLAY_INTERVAL); // 10秒間隔
+    if (pages.length > 0) {
+      const interval = setInterval(() => {
+        setCurrentPage((prev) => (prev + 1) % pages.length);
+      }, parameter.PAGE_DISPLAY_INTERVAL); // 10秒間隔
 
-    return () => clearInterval(interval);
+      return () => clearInterval(interval);
+    }
   }, [pages.length]);
+
+  if (isLoading) return <LoadingSpinner />;
+  if (isError) return <ErrorMessage error={isError} />;
 
   const currentPageData = pages[currentPage];
 

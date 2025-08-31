@@ -1,41 +1,45 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { YouTubeLiveChatMessage, LiveChatResponse } from '@/types/youtube';
+import { User } from '@/types/users';
 import { google } from 'googleapis';
-import { parameter } from '@/config/system';
-import { isEndStudyMessage, isStartStudyMessage } from '@/hooks/utils';
+import { CHAT_MESSAGE, isEndMessage, isStartMessage } from '@/lib/liveChatMessage';
+import { calcTimeJP, convertHHMMSS } from '@/lib/calcTime';
+import { logger } from '@/utils/logger';
+import { getTotalTimeSec } from '@/db/user';
+import { getOAuth2Client } from '@/utils/googleClient';
 
 // 公式ドキュメント：https://developers.google.com/youtube/v3/live/docs/liveChatMessages/list?hl=ja
 
-export async function GET(request: NextRequest) {
-  const { searchParams } = new URL(request.url);
-  const pageToken = searchParams.get('pageToken');
+const YOUTUBE = await google.youtube({ version: 'v3', auth: process.env.YOUTUBE_API_KEY });
+const response = await YOUTUBE.videos.list({ part: ['liveStreamingDetails'], id: [process.env.VIDEO_ID!] });
+const video = response.data.items?.[0];
+const LIVE_CHAT_ID = video?.liveStreamingDetails?.activeLiveChatId;
+logger.info(`liveChatId - ${LIVE_CHAT_ID}`);
 
+// OAuth2クライアントの設定（初期化時は削除）
+const oauth2Client = await getOAuth2Client();
+const youtubeWithOAuth = google.youtube({ version: 'v3', auth: oauth2Client });
+
+let nextPageToken: string | undefined;
+
+export async function GET() {
   try {
-    const youtube = await google.youtube({
-      version: 'v3',
-      auth: process.env.YOUTUBE_API_KEY,
-    });
-    const response = await youtube.videos.list({
-      part: ['liveStreamingDetails'],
-      id: [process.env.VIDEO_ID!],
-    });
-    const video = response.data.items?.[0];
-    const liveChatId = video?.liveStreamingDetails?.activeLiveChatId;
-    if (!liveChatId) {
-      return NextResponse.json({ error: 'No live chat found' }, { status: 404 });
-    }
+    logger.info(`nextPageToken - ${nextPageToken}`);
 
-    const liveChatMessages = await youtube.liveChatMessages.list({
-      liveChatId,
+    if (!LIVE_CHAT_ID) return NextResponse.json({ error: 'No live chat found' }, { status: 404 });
+
+    const liveChatMessages = await YOUTUBE.liveChatMessages.list({
+      liveChatId: LIVE_CHAT_ID,
       part: ['snippet', 'authorDetails'],
-      pageToken: pageToken || undefined,
+      pageToken: nextPageToken || undefined,
+      maxResults: 200,
     });
 
     const messages: YouTubeLiveChatMessage[] =
       liveChatMessages.data.items
         ?.filter((item) => {
           const displayMessage = item.snippet?.displayMessage || '';
-          return isStartStudyMessage(displayMessage) || isEndStudyMessage(displayMessage);
+          return isStartMessage(displayMessage) || isEndMessage(displayMessage);
         })
         .map((item) => ({
           id: item.id || '',
@@ -46,18 +50,63 @@ export async function GET(request: NextRequest) {
           profileImageUrl: item.authorDetails?.profileImageUrl || '',
         })) || [];
 
+    nextPageToken = liveChatMessages.data.nextPageToken || undefined;
+
     messages.forEach((message) => {
-      console.log(message.publishedAt, message.authorDisplayName, message.displayMessage);
+      logger.info(
+        `message received - ${convertHHMMSS(message.publishedAt)} ${message.authorDisplayName} ${
+          message.displayMessage
+        }`,
+      );
     });
-    const result: LiveChatResponse = {
-      messages,
-      nextPageToken: liveChatMessages.data.nextPageToken || undefined,
-      pollingIntervalMillis: liveChatMessages.data.pollingIntervalMillis || parameter.API_POLLING_INTERVAL,
-    };
+
+    const result: LiveChatResponse = { messages };
 
     return NextResponse.json(result);
   } catch (error) {
-    console.error('Error fetching live chat messages:', error);
+    logger.error(`Error fetching live chat messages - ${error}`);
     return NextResponse.json({ error: 'Failed to fetch live chat messages' }, { status: 500 });
+  }
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    const user: User = await request.json();
+    const totalTimeSec = await getTotalTimeSec(user.channelId);
+    const message = `@${user.name}: 累計は${calcTimeJP(totalTimeSec)}👏 ` + CHAT_MESSAGE[Math.floor(Math.random() * CHAT_MESSAGE.length)];
+
+    if (!message) {
+      return NextResponse.json({ error: 'Message is required' }, { status: 400 });
+    }
+
+    if (!LIVE_CHAT_ID) {
+      return NextResponse.json({ error: 'No live chat found' }, { status: 404 });
+    }
+
+    logger.info(`Attempting to post comment: ${message}`);
+
+    const result = await youtubeWithOAuth.liveChatMessages.insert({
+      part: ['snippet'],
+      requestBody: {
+        snippet: {
+          liveChatId: LIVE_CHAT_ID,
+          type: 'textMessageEvent',
+          textMessageDetails: {
+            messageText: message,
+          },
+        },
+      },
+    });
+
+    logger.info(`Comment posted successfully: ${message}`);
+
+    return NextResponse.json({
+      success: true,
+      messageId: result.data.id,
+      message: message
+    });
+  } catch (error) {
+    logger.error(`Error posting comment - ${error}`);
+    return NextResponse.json({ error: 'Failed to post comment' }, { status: 500 });
   }
 }
