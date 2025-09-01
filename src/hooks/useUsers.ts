@@ -21,7 +21,7 @@ export const useUsers = () => {
   const { data, error, isLoading } = useSWR<LiveChatResponse>(YOUTUBE_API_URL, fetcher, { refreshInterval: parameter.API_POLLING_INTERVAL });
 
   const { trigger: saveUser } = useSWRMutation(LOWDB_API_URL, postUser);
-  // const { trigger: postComment } = useSWRMutation(YOUTUBE_API_URL, postUser);
+  const { trigger: postComment } = useSWRMutation(YOUTUBE_API_URL, postUser);
 
   // currentTimeを定期的に更新（dataに関係なく）
   useEffect(() => {
@@ -83,7 +83,7 @@ export const useUsers = () => {
             // useSWRMutation経由でデータ保存
             (async () => {
               await saveUser(stopUser);
-              // await postComment(stopUser);
+              await postComment(stopUser);
             })();
           }
         } else {

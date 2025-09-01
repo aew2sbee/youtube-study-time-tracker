@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { saveRefreshToken } from '@/utils/googleClient';
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
@@ -22,6 +23,14 @@ export async function GET(request: NextRequest) {
       { error: '認証コードが見つかりません' },
       { status: 400 }
     );
+  }
+
+  // Refresh tokenを自動保存
+  try {
+    await saveRefreshToken(code);
+    console.log('✅ Refresh tokenを自動保存しました');
+  } catch (error) {
+    console.error('❌ Refresh token保存エラー:', error);
   }
 
   // 成功時のレスポンス（認証コードを表示）
@@ -85,51 +94,31 @@ export async function GET(request: NextRequest) {
         <div class="success">✅ OAuth認証が完了しました!</div>
 
         <div class="instructions">
-          <strong>📋 次の手順:</strong><br>
-          1. 下記の認証コードをコピーしてください<br>
-          2. ターミナルに戻って認証コードを貼り付けてください
+          <strong>🎉 自動設定完了:</strong><br>
+          Refresh tokenが自動的に.env.localファイルに保存されました。<br>
+          この画面を閉じてアプリケーションをお使いください。
         </div>
 
         <div>
           <strong>🔑 認証コード:</strong>
           <div class="code-container" id="authCode">${code}</div>
+          <small style="color: #666;">※ 参考情報として表示しています</small>
         </div>
 
-        <button onclick="copyCode()">📋 コードをコピー</button>
-        <button onclick="window.close()">❌ ウィンドウを閉じる</button>
+        <button onclick="window.close()">✅ 完了 - ウィンドウを閉じる</button>
       </div>
 
       <script>
-        function copyCode() {
-          const codeElement = document.getElementById('authCode');
-          const textArea = document.createElement('textarea');
-          textArea.value = codeElement.textContent;
-          document.body.appendChild(textArea);
-          textArea.select();
-          document.execCommand('copy');
-          document.body.removeChild(textArea);
+        // 3秒後に自動でページを閉じる
+        setTimeout(() => {
+          window.close();
+        }, 3000);
 
-          const button = event.target;
-          const originalText = button.textContent;
-          button.textContent = '✅ コピーしました！';
-          button.style.background = '#22c55e';
-
-          setTimeout(() => {
-            button.textContent = originalText;
-            button.style.background = '#2196f3';
-          }, 2000);
-        }
-
-        // ページロード時に自動でコードを選択
+        // ページロード時にメッセージを表示
         window.onload = function() {
-          const codeElement = document.getElementById('authCode');
-          if (window.getSelection) {
-            const selection = window.getSelection();
-            const range = document.createRange();
-            range.selectNodeContents(codeElement);
-            selection.removeAllRanges();
-            selection.addRange(range);
-          }
+          setTimeout(() => {
+            alert('設定が完了しました！このウィンドウは自動で閉じます。');
+          }, 1000);
         };
       </script>
     </body>

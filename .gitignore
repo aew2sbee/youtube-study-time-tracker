@@ -42,4 +42,6 @@ next-env.d.ts
 
 # claude code
 .claude/*
-database/db.json
+
+# database
+database/*

@@ -3,9 +3,9 @@ import { YouTubeLiveChatMessage, LiveChatResponse } from '@/types/youtube';
 import { User } from '@/types/users';
 import { google } from 'googleapis';
 import { CHAT_MESSAGE, isEndMessage, isStartMessage } from '@/lib/liveChatMessage';
-import { calcTimeJP, calcUserTotalTime, convertHHMMSS } from '@/lib/calcTime';
+import { calcTimeJP, convertHHMMSS } from '@/lib/calcTime';
 import { logger } from '@/utils/logger';
-import { getUserData } from '@/utils/lowdb';
+import { getTotalTimeSec } from '@/db/user';
 import { getOAuth2Client } from '@/utils/googleClient';
 
 // 公式ドキュメント：https://developers.google.com/youtube/v3/live/docs/liveChatMessages/list?hl=ja
@@ -28,6 +28,10 @@ const video = response.data.items?.[0];
 const LIVE_CHAT_ID = video?.liveStreamingDetails?.activeLiveChatId;
 if (!LIVE_CHAT_ID)  logger.error('LIVE_CHAT_IDが取得できませんでした。環境変数 VIDEO_ID の設定や配信中かを確認してください。');
 logger.info(`liveChatId - ${LIVE_CHAT_ID}`);
+
+// OAuth2クライアントの設定（初期化時は削除）
+const oauth2Client = await getOAuth2Client();
+const youtubeWithOAuth = google.youtube({ version: 'v3', auth: oauth2Client });
 
 let nextPageToken: string | undefined;
 
@@ -80,15 +84,9 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
-    const oauth2Client = getOAuth2Client();
-    // refresh_token から access_token を自動生成
-    const tokens = await oauth2Client.getAccessToken();
-    console.log('Generated access token:', tokens.token);
-    const youtube = google.youtube({ version: 'v3', auth: oauth2Client });
     const user: User = await request.json();
-    const userLog = await getUserData(user);
-    const totalTimeSec = calcUserTotalTime(userLog);
-    const message = `@${user.name} これまでの累計は${calcTimeJP(totalTimeSec)}👏 ` +CHAT_MESSAGE[Math.floor(Math.random() * CHAT_MESSAGE.length)];
+    const totalTimeSec = await getTotalTimeSec(user.channelId);
+    const message = `@${user.name}: 累計は${calcTimeJP(totalTimeSec)}👏 ` + CHAT_MESSAGE[Math.floor(Math.random() * CHAT_MESSAGE.length)];
 
     if (!message) {
       return NextResponse.json({ error: 'Message is required' }, { status: 400 });
@@ -100,7 +98,7 @@ export async function POST(request: NextRequest) {
 
     logger.info(`Attempting to post comment: ${message}`);
 
-    const result = await youtube.liveChatMessages.insert({
+    const result = await youtubeWithOAuth.liveChatMessages.insert({
       part: ['snippet'],
       requestBody: {
         snippet: {
