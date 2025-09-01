@@ -76,7 +76,7 @@ describe('src/lib/user.ts のユーティリティ関数', () => {
       // 準備(Arrange)
       const restartTime = new Date('2025-01-01T01:23:45.000Z');
       const beforeUser = { ...SAMPLE_USER, isStudying: false, timeSec: 100 }; // 停止中、100 秒経過
-      const expectedValue = { SAMPLE_USER, isStudying: true, timeSec: 100, updateTime: restartTime };
+      const expectedValue = { ...SAMPLE_USER, isStudying: true, timeSec: 100, updateTime: restartTime };
 
       // 実行(Act)
       const result = sut.restartTime(beforeUser, restartTime);
