@@ -67,7 +67,7 @@ describe('src/lib/user.ts のユーティリティ関数', () => {
       // 確認(Assert)
       expect(result.isStudying).toBe(expectedValue.isStudying);
       expect(result.updateTime.getTime()).toBe(expectedValue.updateTime.getTime());
-      expect(result.timeSec).toBe(expectedValue.timeSec); // 90 秒加算
+      expect(result.timeSec).toBe(expectedValue.timeSec); // 100 秒加算
     });
   });
 
