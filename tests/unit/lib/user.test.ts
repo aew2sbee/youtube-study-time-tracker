@@ -59,7 +59,7 @@ describe('src/lib/user.ts のユーティリティ関数', () => {
       // 準備(Arrange)
       const beforeUser = SAMPLE_USER;
       const endTime = new Date(SAMPLE_USER.updateTime.getTime() + 100 * 1000); // 100 秒後
-      const expectedValue = { SAMPLE_USER, isStudying: false, timeSec: 100, updateTime: endTime };
+      const expectedValue = { ...SAMPLE_USER, isStudying: false, timeSec: 100, updateTime: endTime };
 
       // 実行(Act)
       const result = sut.stopTime(beforeUser, endTime);
