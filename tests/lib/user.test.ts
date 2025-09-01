@@ -25,7 +25,7 @@ describe('src/lib/user.ts のユーティリティ関数', () => {
         authorDisplayName: 'testUser',
         displayMessage: 'start',
         publishedAt: testPublishedAt,
-        profileImageUrl: 'http://example.com/a.png',
+        profileImageUrl: 'http://example.com/sampleProfileImageUrl.png',
       } as const;
 
       // 実行(Act)
