@@ -26,6 +26,7 @@ logger.info(`tagetVideoId - ${tagetVideoId}`);
 const response = await YOUTUBE.videos.list({ part: ['liveStreamingDetails'], id: [tagetVideoId] });
 const video = response.data.items?.[0];
 const LIVE_CHAT_ID = video?.liveStreamingDetails?.activeLiveChatId;
+if (!LIVE_CHAT_ID)  logger.error('LIVE_CHAT_IDが取得できませんでした。環境変数 VIDEO_ID の設定や配信中かを確認してください。');
 logger.info(`liveChatId - ${LIVE_CHAT_ID}`);
 
 let nextPageToken: string | undefined;
