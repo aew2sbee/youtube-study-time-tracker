@@ -88,9 +88,7 @@ export async function POST(request: NextRequest) {
     const user: User = await request.json();
     const userLog = await getUserData(user);
     const totalTimeSec = calcUserTotalTime(userLog);
-    const message =
-      `@${user.name} これまでの累計は${calcTimeJP(totalTimeSec)}でした👏 ` +
-      CHAT_MESSAGE[Math.floor(Math.random() * CHAT_MESSAGE.length)];
+    const message = `@${user.name} これまでの累計は${calcTimeJP(totalTimeSec)}👏 ` +CHAT_MESSAGE[Math.floor(Math.random() * CHAT_MESSAGE.length)];
 
     if (!message) {
       return NextResponse.json({ error: 'Message is required' }, { status: 400 });
