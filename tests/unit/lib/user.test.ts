@@ -92,7 +92,7 @@ describe('src/lib/user.ts のユーティリティ関数', () => {
       // 準備(Arrange)
       const currentTime = new Date('2025-01-01T00:01:00.000Z');
       const beforeUser = { ...SAMPLE_USER, isStudying: true, timeSec: 100 };
-      const expectedValue = { SAMPLE_USER, isStudying: true, timeSec: 160, updateTime: currentTime };
+      const expectedValue = { ...SAMPLE_USER, isStudying: true, timeSec: 160, updateTime: currentTime };
 
       // 実行(Act)
       const result = sut.updateTime(beforeUser, currentTime);
