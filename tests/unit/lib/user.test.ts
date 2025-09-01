@@ -1,24 +1,6 @@
 import * as sut from '@/lib/user';
-import type { YouTubeLiveChatMessage } from '@/types/youtube';
-import type { User } from '@/types/users';
-
-const SAMPLE_USER: User = {
-  channelId: 'testChannelId',
-  name: 'testUser',
-  timeSec: 0,
-  profileImageUrl: 'http://example.com/sampleProfileImageUrl.png',
-  updateTime: new Date('2025-01-01T00:00:00.000Z'),
-  isStudying: false,
-} as const;
-
-const SAMPLE_MESSAGE: YouTubeLiveChatMessage = {
-  channelId: 'testChannelId',
-  authorDisplayName: 'testUser',
-  displayMessage: 'sample message',
-  id: 'testMessageId',
-  publishedAt: '2025-01-01T00:00:00.000Z',
-  profileImageUrl: 'http://example.com/sampleProfileImageUrl.png',
-} as const;
+import { SAMPLE_USER } from '../../mock/user';
+import { SAMPLE_MESSAGE } from '../../mock/liveChatMessage';
 
 // logger の副作用を抑止（呼び出し有無だけ確認できるように）
 jest.mock('@/utils/logger', () => ({
