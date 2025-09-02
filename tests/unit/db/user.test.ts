@@ -135,7 +135,7 @@ describe('db/user', () => {
 
       // drizzle チェーンのモック構造
       // db.select(...) -> { from(fn) } -> { where(fn) } -> { limit(fn) }
-      const limit = jest.fn<Promise<Array<Pick<UserRow, 'id'>>>, [number]>().mockResolvedValue(expected);
+      const limit = jest.fn().mockResolvedValue(expected);
       const where = jest.fn().mockReturnValue({ limit });
       const from = jest.fn().mockReturnValue({ where });
       (mockedDb.select as jest.Mock).mockReturnValue({ from });
