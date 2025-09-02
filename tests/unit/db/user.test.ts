@@ -1,6 +1,4 @@
-// schema は実物そのまま（型を得るために使用）。実 DB 操作は行わない
 import { users } from '@/db/schema';
-// ユーザモック（tests/mock/user.ts）をそのまま利用してテストデータを一元化
 import { SAMPLE_USER } from '@/../tests/mock/user';
 type UserRow = typeof users.$inferSelect;
 
