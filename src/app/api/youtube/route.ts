@@ -13,23 +13,30 @@ import { getOAuth2Client } from '@/utils/googleClient';
 // このコードブロックはビルド時（npm run build）に一度だけ実行され、指定されたチャンネルの現在のライブ配信のvideoIdとliveChatIdを取得します。
 const YOUTUBE = await google.youtube({ version: 'v3', auth: process.env.YOUTUBE_API_KEY });
 // 環境変数 VIDEO_ID があればそれを使用。なければ従来どおりチャンネルのライブ検索結果から取得
-let targetVideoId = undefined;
+let tagetVideoId = undefined;
 if (process.env.VIDEO_ID) {
-  targetVideoId = process.env.VIDEO_ID.trim();
+  tagetVideoId = process.env.VIDEO_ID.trim();
   logger.info('.envファイルのVIDEO_IDを使用します');
 } else {
-  const channel = await YOUTUBE.search.list({ part: ['id'], channelId: process.env.CHANNEL_ID, eventType: 'live', type: ['video'], maxResults: 1});
-  targetVideoId = channel.data.items![0].id!.videoId as string;
+  const channel = await YOUTUBE.search.list({
+    part: ['id'],
+    channelId: process.env.CHANNEL_ID,
+    eventType: 'live',
+    type: ['video'],
+    maxResults: 1,
+  });
+  tagetVideoId = channel.data.items![0].id!.videoId as string;
   logger.info('配信中のvideoIdを使用します');
 }
-logger.info(`targetVideoId - ${targetVideoId}`);
+logger.info(`tagetVideoId - ${tagetVideoId}`);
 
 // src/db/user.ts でも使用するのでエクスポート
-export const VIDEO_ID = targetVideoId;
-const response = await YOUTUBE.videos.list({ part: ['liveStreamingDetails'], id: [targetVideoId] });
+export const VIDEO_ID = tagetVideoId;
+const response = await YOUTUBE.videos.list({ part: ['liveStreamingDetails'], id: [tagetVideoId] });
 const video = response.data.items?.[0];
 const LIVE_CHAT_ID = video?.liveStreamingDetails?.activeLiveChatId;
-if (!LIVE_CHAT_ID)  logger.error('LIVE_CHAT_IDが取得できませんでした。環境変数 VIDEO_ID の設定や配信中かを確認してください。');
+if (!LIVE_CHAT_ID)
+  logger.error('LIVE_CHAT_IDが取得できませんでした。環境変数 VIDEO_ID の設定や配信中かを確認してください。');
 logger.info(`liveChatId - ${LIVE_CHAT_ID}`);
 
 // OAuth2クライアントの設定（初期化時は削除）
@@ -102,7 +109,9 @@ export async function POST(request: NextRequest) {
   try {
     const user: User = await request.json();
     const totalTimeSec = await getTotalTimeSec(user.channelId);
-    const message = `@${user.name}: 累計は${calcTimeJP(totalTimeSec)}👏 ` + CHAT_MESSAGE[Math.floor(Math.random() * CHAT_MESSAGE.length)];
+    const message =
+      `@${user.name}: 累計は${calcTimeJP(totalTimeSec)}👏 ` +
+      CHAT_MESSAGE[Math.floor(Math.random() * CHAT_MESSAGE.length)];
 
     if (!message) {
       return NextResponse.json({ error: 'Message is required' }, { status: 400 });
