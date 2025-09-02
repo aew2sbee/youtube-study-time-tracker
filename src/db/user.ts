@@ -3,6 +3,7 @@ import { db } from '@/db';
 import { users } from '@/db/schema';
 import { User } from '@/types/users';
 import { eq, and } from 'drizzle-orm';
+import { VIDEO_ID } from '@/app/api/youtube/route';
 
 // データを保存する関数
 export const saveUser = async (user: User) => {
@@ -35,7 +36,7 @@ export const insertUser = async (user: User) => {
       channelId: user.channelId,
       name: user.name,
       timeSec: user.timeSec,
-      videoId: process.env.VIDEO_ID!,
+      videoId: VIDEO_ID,
     })
     .returning();
   logger.info(`insertedUser - ${user.name} ${user.timeSec}`);
@@ -47,7 +48,7 @@ export const hasUser = async (user: User) => {
   const res = await db
     .select({ id: users.id })
     .from(users)
-    .where(and(eq(users.channelId, user.channelId), eq(users.videoId, process.env.VIDEO_ID!)))
+    .where(and(eq(users.channelId, user.channelId), eq(users.videoId, VIDEO_ID)))
     .limit(1);
   if (res.length > 0) {
     logger.info(`existingUser - ${user.name} ${res[0].id}`);
