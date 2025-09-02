@@ -21,12 +21,21 @@ const oauth2Client = await getOAuth2Client();
 const youtubeWithOAuth = google.youtube({ version: 'v3', auth: oauth2Client });
 
 let nextPageToken: string | undefined;
+// レート制御用：次回フェッチ可能な時刻（ms）
+let nextFetchAvailableAt = 0;
 
 export async function GET() {
   try {
     logger.info(`nextPageToken - ${nextPageToken}`);
 
     if (!LIVE_CHAT_ID) return NextResponse.json({ error: 'No live chat found' }, { status: 404 });
+
+    // レート制御：YouTubeの推奨間隔より早い呼び出しはキャッシュを返す
+    const now = Date.now();
+    if (0 < nextFetchAvailableAt && now < nextFetchAvailableAt) {
+      logger.warn(`YouTube APIで指定された秒数(ms)よりも短い間隔で呼び出されました - ${nextFetchAvailableAt - now} ms`);
+      return NextResponse.json({ messages: [] } as LiveChatResponse);
+    }
 
     const liveChatMessages = await YOUTUBE.liveChatMessages.list({
       liveChatId: LIVE_CHAT_ID,
@@ -51,6 +60,10 @@ export async function GET() {
         })) || [];
 
     nextPageToken = liveChatMessages.data.nextPageToken || undefined;
+
+    // 次回フェッチ可能時刻を設定（YouTubeの推奨間隔）
+    const pollingInterval = liveChatMessages.data.pollingIntervalMillis ?? 5000; // デフォルトは5秒
+    nextFetchAvailableAt = Date.now() + pollingInterval;
 
     messages.forEach((message) => {
       logger.info(
