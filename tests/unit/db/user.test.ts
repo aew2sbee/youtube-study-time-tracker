@@ -111,10 +111,25 @@ describe('db/user', () => {
       expect(returningFn).toHaveBeenCalledTimes(1); // returning() が 1 回呼ばれたこと
       expect(res).toEqual(returning); // updateTimeSec の戻り値が returning() の返却配列と一致すること
     });
+
+    it('id が一致しない場合は空配列を返す', async () => {
+      // returning() が空配列を返す（更新対象行が存在しない想定）
+      const returningFn = jest.fn<Promise<UserRow[]>, []>().mockResolvedValue([]);
+      const where = jest.fn().mockReturnValue({ returning: returningFn });
+      const set = jest.fn().mockReturnValue({ where });
+      (mockedDb.update as jest.Mock).mockReturnValue({ set });
+
+      const res = await userDb.updateTimeSec({ ...SAMPLE_USER, timeSec: 999 }, /* not matching id */ 99999);
+
+      expect(set).toHaveBeenCalledWith({ timeSec: 999 }); // 指定の timeSec で更新しようとしていること
+      expect(where).toHaveBeenCalledTimes(1); // where で id 条件を付与していること
+      expect(returningFn).toHaveBeenCalledTimes(1); // returning() が実行されていること
+      expect(res).toEqual([]); // 更新対象がなく、空配列が返ること
+    });
   });
 
   describe('hasUser', () => {
-    it('limit(1) の結果を返す', async () => {
+    it('データが1件だけ結果を返す', async () => {
       // hasUser は select({id}).from(users).where(...).limit(1) の結果を返す
       const expected: Array<Pick<UserRow, 'id'>> = [{ id: 77 }];
 
@@ -131,6 +146,68 @@ describe('db/user', () => {
       expect(where).toHaveBeenCalledTimes(1); // where(...) が 1 回呼ばれたこと（条件で絞っていること）
       expect(limit).toHaveBeenCalledWith(1); // limit(1) が指定されていること
       expect(res).toEqual(expected); // hasUser の戻り値が期待の {id} 配列であること
+    });
+
+    it('channelId は一致するが videoId が一致しない場合は空配列を返す', async () => {
+      // モジュールキャッシュをリセットし、VIDEO_ID を異なる値に差し替えた環境で実装を読み込む
+      jest.resetModules();
+      jest.doMock('@/app/api/youtube/route', () => ({ VIDEO_ID: 'differentVideoId' }), { virtual: true });
+
+      // drizzle の db モックを取得して、空配列を返すチェーンを準備
+      const dbModuleLocal = await import('@/db');
+      const mockedDbLocal = dbModuleLocal.db as unknown as MockDb;
+      const limit = jest.fn<Promise<Array<Pick<UserRow, 'id'>>>, [number]>().mockResolvedValue([]);
+      const where = jest.fn().mockReturnValue({ limit });
+      const from = jest.fn().mockReturnValue({ where });
+      (mockedDbLocal.select as jest.Mock).mockReturnValue({ from });
+
+      // VIDEO_ID が異なる状態で実装を読み込み直す
+      const userDbLocal = await import('@/db/user');
+      const res = await userDbLocal.hasUser({ ...SAMPLE_USER });
+
+      expect(from).toHaveBeenCalledTimes(1); // from が呼ばれていること
+      expect(where).toHaveBeenCalledTimes(1); // where が呼ばれていること
+      expect(limit).toHaveBeenCalledWith(1); // limit(1) が指定されていること
+      expect(res).toEqual([]); // videoId 不一致のため該当なし（空配列）
+    });
+
+    it('channelId は一致しないが videoId は一致する場合は空配列を返す', async () => {
+      // VIDEO_ID はグローバルモックのまま一致させ、channelId のみ異なるユーザーを検索する
+      const userWithDifferentChannel = { ...SAMPLE_USER, channelId: 'anotherChannel' };
+
+      // drizzle チェーンをモックして空配列を返す
+      const limit = jest.fn<Promise<Array<Pick<UserRow, 'id'>>>, [number]>().mockResolvedValue([]);
+      const where = jest.fn().mockReturnValue({ limit });
+      const from = jest.fn().mockReturnValue({ where });
+      (mockedDb.select as jest.Mock).mockReturnValue({ from });
+
+      const res = await userDb.hasUser(userWithDifferentChannel);
+
+      expect(from).toHaveBeenCalledTimes(1); // from が呼ばれていること
+      expect(where).toHaveBeenCalledTimes(1); // where が呼ばれていること
+      expect(limit).toHaveBeenCalledWith(1); // limit(1) が指定されていること
+      expect(res).toEqual([]); // channelId 不一致のため該当なし（空配列）
+    });
+
+    it('channelId も videoId も一致しない場合は空配列を返す', async () => {
+      // VIDEO_ID を別値に差し替え、かつ channelId も異なるユーザーで検索する
+      jest.resetModules();
+      jest.doMock('@/app/api/youtube/route', () => ({ VIDEO_ID: 'yetAnotherVideoId' }), { virtual: true });
+
+      const dbModuleLocal = await import('@/db');
+      const mockedDbLocal = dbModuleLocal.db as unknown as MockDb;
+      const limit = jest.fn<Promise<Array<Pick<UserRow, 'id'>>>, [number]>().mockResolvedValue([]);
+      const where = jest.fn().mockReturnValue({ limit });
+      const from = jest.fn().mockReturnValue({ where });
+      (mockedDbLocal.select as jest.Mock).mockReturnValue({ from });
+
+      const userDbLocal = await import('@/db/user');
+      const res = await userDbLocal.hasUser({ ...SAMPLE_USER, channelId: 'completelyDifferentCh' });
+
+      expect(from).toHaveBeenCalledTimes(1); // from が呼ばれていること
+      expect(where).toHaveBeenCalledTimes(1); // where が呼ばれていること
+      expect(limit).toHaveBeenCalledWith(1); // limit(1) が指定されていること
+      expect(res).toEqual([]); // channelId と videoId の両方で不一致のため該当なし
     });
   });
 
