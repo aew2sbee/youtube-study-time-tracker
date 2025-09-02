@@ -25,8 +25,7 @@ export const saveUser = async (user: User) => {
 export const updateTimeSec = async (user: User, userId: number) => {
   logger.info(`updateTimeSec - ${user.name} ${user.timeSec}`);
   const res = await db.update(users).set({ timeSec: user.timeSec }).where(eq(users.id, userId)).returning();
-  if (res.length > 0) {
-    logger.info(`updatedTimeSec - ${user.name} ${user.timeSec} => ${res[0].timeSec}`);
+    logger.info(`updatedTimeSec - ${user.name} ${user.timeSec} => ${res[0]?.timeSec}`);
   } else {
     logger.warn(`updatedTimeSec - ${user.name} id not found: ${userId}`);
   }
