@@ -4,11 +4,12 @@ import { users } from '@/db/schema';
 import { User } from '@/types/users';
 import { eq, and } from 'drizzle-orm';
 import { VIDEO_ID } from '@/app/api/youtube/route';
+type UserRow = typeof users.$inferSelect;
 
 // データを保存する関数
 export const saveUser = async (user: User) => {
   logger.info(`saveUser - ${user.name} ${user.timeSec}`);
-  let res;
+  let res: UserRow[];
   const existingUser = await hasUser(user);
   if (existingUser.length > 0) {
     // 既存のユーザーデータを更新
