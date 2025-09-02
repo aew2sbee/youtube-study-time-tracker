@@ -29,7 +29,7 @@ export const VIDEO_ID = targetVideoId;
 const response = await YOUTUBE.videos.list({ part: ['liveStreamingDetails'], id: [targetVideoId] });
 const video = response.data.items?.[0];
 const LIVE_CHAT_ID = video?.liveStreamingDetails?.activeLiveChatId;
-if (!LIVE_CHAT_ID)  logger.error('LIVE_CHAT_IDが取得できませんでした。環境変数 VIDEO_ID の設定や配信中かを確認してください。');
+if (!LIVE_CHAT_ID) logger.error('LIVE_CHAT_IDが取得できませんでした。環境変数 VIDEO_ID の設定や配信中かを確認してください。');
 logger.info(`liveChatId - ${LIVE_CHAT_ID}`);
 
 // OAuth2クライアントの設定（初期化時は削除）
@@ -102,7 +102,8 @@ export async function POST(request: NextRequest) {
   try {
     const user: User = await request.json();
     const totalTimeSec = await getTotalTimeSec(user.channelId);
-    const message = `@${user.name}: 累計は${calcTimeJP(totalTimeSec)}👏 ` + CHAT_MESSAGE[Math.floor(Math.random() * CHAT_MESSAGE.length)];
+    const random = Math.floor(Math.random() * CHAT_MESSAGE.length);
+    const message = `@${user.name}: 累計は${calcTimeJP(totalTimeSec)}👏 ` + CHAT_MESSAGE[random];
 
     if (!message) {
       return NextResponse.json({ error: 'Message is required' }, { status: 400 });

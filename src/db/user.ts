@@ -4,11 +4,12 @@ import { users } from '@/db/schema';
 import { User } from '@/types/users';
 import { eq, and } from 'drizzle-orm';
 import { VIDEO_ID } from '@/app/api/youtube/route';
+type UserRow = typeof users.$inferSelect;
 
 // データを保存する関数
 export const saveUser = async (user: User) => {
   logger.info(`saveUser - ${user.name} ${user.timeSec}`);
-  let res;
+  let res: UserRow[];
   const existingUser = await hasUser(user);
   if (existingUser.length > 0) {
     // 既存のユーザーデータを更新
@@ -24,7 +25,11 @@ export const saveUser = async (user: User) => {
 export const updateTimeSec = async (user: User, userId: number) => {
   logger.info(`updateTimeSec - ${user.name} ${user.timeSec}`);
   const res = await db.update(users).set({ timeSec: user.timeSec }).where(eq(users.id, userId)).returning();
-  logger.info(`updatedTimeSec - ${user.name} ${user.timeSec} => ${res[0].timeSec}`);
+  if (res.length > 0) {
+    logger.info(`updatedTimeSec - ${user.name} ${user.timeSec} => ${res[0]?.timeSec}`);
+  } else {
+    logger.warn(`updatedTimeSec - ${user.name} id not found: ${userId}`);
+  }
   return res;
 };
 
@@ -60,11 +65,8 @@ export const hasUser = async (user: User) => {
 
 export const getTotalTimeSec = async (channelId: string) => {
   logger.info(`getTotalTimeSec - ${channelId}`);
-  const res = await db
-    .select({ timeSec: users.timeSec })
-    .from(users)
-    .where(eq(users.channelId, channelId));
+  const res = await db.select({ timeSec: users.timeSec }).from(users).where(eq(users.channelId, channelId));
   const totalTimeSec = res.reduce((acc, curr) => acc + curr.timeSec, 0);
   logger.info(`totalTimeSec - ${channelId} ${totalTimeSec}`);
   return totalTimeSec;
-}
+};
