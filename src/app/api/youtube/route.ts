@@ -33,7 +33,7 @@ export async function GET() {
     // レート制御：YouTubeの推奨間隔より早い呼び出しはキャッシュを返す
     const now = Date.now();
     if (0 < nextFetchAvailableAt && now < nextFetchAvailableAt) {
-      logger.warn(`YouTube APIで指定された秒数(ms)よりも短い間隔で呼び出されました - ${nextFetchAvailableAt - now} ms`);
+      logger.warn(`YouTube APIで指定されたミリ秒よりも短い間隔で呼び出されました - ${nextFetchAvailableAt - now} ms`);
       return NextResponse.json({ messages: [] } as LiveChatResponse);
     }
 
