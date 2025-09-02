@@ -23,6 +23,9 @@ if (process.env.VIDEO_ID) {
   logger.info('配信中のvideoIdを使用します');
 }
 logger.info(`targetVideoId - ${targetVideoId}`);
+
+// src/db/user.ts でも使用するのでエクスポート
+export const VIDEO_ID = targetVideoId;
 const response = await YOUTUBE.videos.list({ part: ['liveStreamingDetails'], id: [targetVideoId] });
 const video = response.data.items?.[0];
 const LIVE_CHAT_ID = video?.liveStreamingDetails?.activeLiveChatId;
