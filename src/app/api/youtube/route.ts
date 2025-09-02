@@ -10,10 +10,26 @@ import { getOAuth2Client } from '@/utils/googleClient';
 
 // 公式ドキュメント：https://developers.google.com/youtube/v3/live/docs/liveChatMessages/list?hl=ja
 
+// このコードブロックはビルド時（npm run build）に一度だけ実行され、指定されたチャンネルの現在のライブ配信のvideoIdとliveChatIdを取得します。
 const YOUTUBE = await google.youtube({ version: 'v3', auth: process.env.YOUTUBE_API_KEY });
-const response = await YOUTUBE.videos.list({ part: ['liveStreamingDetails'], id: [process.env.VIDEO_ID!] });
+// 環境変数 VIDEO_ID があればそれを使用。なければ従来どおりチャンネルのライブ検索結果から取得
+let targetVideoId = undefined;
+if (process.env.VIDEO_ID) {
+  targetVideoId = process.env.VIDEO_ID.trim();
+  logger.info('.envファイルのVIDEO_IDを使用します');
+} else {
+  const channel = await YOUTUBE.search.list({ part: ['id'], channelId: process.env.CHANNEL_ID, eventType: 'live', type: ['video'], maxResults: 1});
+  targetVideoId = channel.data.items![0].id!.videoId as string;
+  logger.info('配信中のvideoIdを使用します');
+}
+logger.info(`targetVideoId - ${targetVideoId}`);
+
+// src/db/user.ts でも使用するのでエクスポート
+export const VIDEO_ID = targetVideoId;
+const response = await YOUTUBE.videos.list({ part: ['liveStreamingDetails'], id: [targetVideoId] });
 const video = response.data.items?.[0];
 const LIVE_CHAT_ID = video?.liveStreamingDetails?.activeLiveChatId;
+if (!LIVE_CHAT_ID) logger.error('LIVE_CHAT_IDが取得できませんでした。環境変数 VIDEO_ID の設定や配信中かを確認してください。');
 logger.info(`liveChatId - ${LIVE_CHAT_ID}`);
 
 // OAuth2クライアントの設定（初期化時は削除）
@@ -21,12 +37,21 @@ const oauth2Client = await getOAuth2Client();
 const youtubeWithOAuth = google.youtube({ version: 'v3', auth: oauth2Client });
 
 let nextPageToken: string | undefined;
+// レート制御用：次回フェッチ可能な時刻（ms）
+let nextFetchAvailableAt = 0;
 
 export async function GET() {
   try {
     logger.info(`nextPageToken - ${nextPageToken}`);
 
     if (!LIVE_CHAT_ID) return NextResponse.json({ error: 'No live chat found' }, { status: 404 });
+
+    // レート制御：YouTubeの推奨間隔より早い呼び出しはキャッシュを返す
+    const now = Date.now();
+    if (0 < nextFetchAvailableAt && now < nextFetchAvailableAt) {
+      logger.warn(`YouTube APIで指定されたミリ秒よりも短い間隔で呼び出されました - ${nextFetchAvailableAt - now} ms`);
+      return NextResponse.json({ messages: [] } as LiveChatResponse);
+    }
 
     const liveChatMessages = await YOUTUBE.liveChatMessages.list({
       liveChatId: LIVE_CHAT_ID,
@@ -52,6 +77,10 @@ export async function GET() {
 
     nextPageToken = liveChatMessages.data.nextPageToken || undefined;
 
+    // 次回フェッチ可能時刻を設定（YouTubeの推奨間隔）
+    const pollingInterval = liveChatMessages.data.pollingIntervalMillis ?? 5000; // デフォルトは5秒
+    nextFetchAvailableAt = Date.now() + pollingInterval;
+
     messages.forEach((message) => {
       logger.info(
         `message received - ${convertHHMMSS(message.publishedAt)} ${message.authorDisplayName} ${
@@ -73,7 +102,8 @@ export async function POST(request: NextRequest) {
   try {
     const user: User = await request.json();
     const totalTimeSec = await getTotalTimeSec(user.channelId);
-    const message = `@${user.name}: 累計は${calcTimeJP(totalTimeSec)}👏 ` + CHAT_MESSAGE[Math.floor(Math.random() * CHAT_MESSAGE.length)];
+    const random = Math.floor(Math.random() * CHAT_MESSAGE.length);
+    const message = `@${user.name}: 累計は${calcTimeJP(totalTimeSec)}👏 ` + CHAT_MESSAGE[random];
 
     if (!message) {
       return NextResponse.json({ error: 'Message is required' }, { status: 400 });
@@ -103,7 +133,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       messageId: result.data.id,
-      message: message
+      message: message,
     });
   } catch (error) {
     logger.error(`Error posting comment - ${error}`);
