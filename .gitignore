@@ -40,8 +40,8 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# claude code
-.claude/*
+# claude code 配下をすべて無視
+.claude/**
 
-# database
-database/*
+# database 配下をすべて無視
+database/**
