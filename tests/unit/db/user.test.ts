@@ -33,7 +33,7 @@ jest.mock('@/db', () => {
 
 // トップレベル await を含む実ファイルを読みに行かないよう、VIDEO_ID を返す仮想モックを定義
 // 注意: jest は jest.mock 呼び出しをホイストするため、工場関数内で外部変数を参照しない
-jest.mock('@/app/api/youtube/route', () => ({ VIDEO_ID: SAMPLE_VIDEO_ID }), { virtual: true });
+jest.mock('@/app/api/youtube/route', () => ({ VIDEO_ID: SAMPLE_VIDEO_ID }));
 
 describe('db/user', () => {
   // モックデータ（tests/mock/user.ts）を使用
