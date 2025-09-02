@@ -82,8 +82,8 @@ export const useUsers = () => {
             newList = newList.filter((u) => u.channelId !== existingUser.channelId).concat(stopUser);
             // useSWRMutation経由でデータ保存
             (async () => {
-              await saveUser(stopUser);
-              await postComment(stopUser);
+              await saveUser(stopUser, { throwOnError: false });
+              await postComment(stopUser, { throwOnError: false });
             })();
           }
         } else {
