@@ -13,17 +13,17 @@ import { getOAuth2Client } from '@/utils/googleClient';
 // このコードブロックはビルド時（npm run build）に一度だけ実行され、指定されたチャンネルの現在のライブ配信のvideoIdとliveChatIdを取得します。
 const YOUTUBE = await google.youtube({ version: 'v3', auth: process.env.YOUTUBE_API_KEY });
 // 環境変数 VIDEO_ID があればそれを使用。なければ従来どおりチャンネルのライブ検索結果から取得
-let tagetVideoId = undefined;
+let targetVideoId = undefined;
 if (process.env.VIDEO_ID) {
-  tagetVideoId = process.env.VIDEO_ID.trim();
+  targetVideoId = process.env.VIDEO_ID.trim();
   logger.info('.envファイルのVIDEO_IDを使用します');
 } else {
   const channel = await YOUTUBE.search.list({ part: ['id'], channelId: process.env.CHANNEL_ID, eventType: 'live', type: ['video'], maxResults: 1});
-  tagetVideoId = channel.data.items![0].id!.videoId as string;
+  targetVideoId = channel.data.items![0].id!.videoId as string;
   logger.info('配信中のvideoIdを使用します');
 }
-logger.info(`tagetVideoId - ${tagetVideoId}`);
-const response = await YOUTUBE.videos.list({ part: ['liveStreamingDetails'], id: [tagetVideoId] });
+logger.info(`targetVideoId - ${targetVideoId}`);
+const response = await YOUTUBE.videos.list({ part: ['liveStreamingDetails'], id: [targetVideoId] });
 const video = response.data.items?.[0];
 const LIVE_CHAT_ID = video?.liveStreamingDetails?.activeLiveChatId;
 if (!LIVE_CHAT_ID)  logger.error('LIVE_CHAT_IDが取得できませんでした。環境変数 VIDEO_ID の設定や配信中かを確認してください。');
