@@ -16,7 +16,7 @@ COPY . .
 RUN npm run build
 
 # 不要な開発依存関係を削除
-RUN npm prune --production
+RUN npm ci --only=production
 
 # データベースディレクトリを作成
 RUN mkdir -p database
