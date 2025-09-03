@@ -1,6 +1,6 @@
-## Markdown に対して textlint を実行する CI
-## - PR の差分 Markdown のみを対象
-## - 変更がなければスキップして時間/リソースを節約
+# Markdown に対して textlint を実行する CI
+# - PR の差分 Markdown のみを対象
+# - 変更がなければスキップして時間/リソースを節約
 name: CI - Textlint
 
 on:
