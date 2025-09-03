@@ -13,7 +13,7 @@ import { getOAuth2Client } from '@/utils/googleClient';
 // このコードブロックはビルド時（npm run build）に一度だけ実行され、指定されたチャンネルの現在のライブ配信のvideoIdとliveChatIdを取得します。
 const YOUTUBE = await google.youtube({ version: 'v3', auth: process.env.YOUTUBE_API_KEY });
 // 環境変数 VIDEO_ID があればそれを使用。なければ従来どおりチャンネルのライブ検索結果から取得
-let targetVideoId = 'defaultVideoId';
+let targetVideoId = undefined;
 if (process.env.VIDEO_ID) {
   targetVideoId = process.env.VIDEO_ID.trim();
   logger.info('.envファイルのVIDEO_IDを使用します');
