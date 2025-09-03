@@ -6,6 +6,8 @@
 docker-compose up -d
 ```
 
+http://localhost:3000/ を開く。
+
 ## 停止
 
 ```bash
