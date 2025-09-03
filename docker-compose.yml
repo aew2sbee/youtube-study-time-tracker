@@ -15,7 +15,7 @@ services:
     restart: unless-stopped
     healthcheck:
       # アプリケーションの稼働状況を確認するためのヘルスチェック
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/api/health"]
+      test: ["CMD", "curl", "--fail", "--silent", "--head", "http://localhost:3000/api/health"]
       interval: 30s    # 30秒間隔でチェック実行
       timeout: 10s     # 10秒でタイムアウト
       retries: 3       # 失敗時は3回まで再試行
