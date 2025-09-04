@@ -1,4 +1,3 @@
-
 import { checkRefreshTokenValidity, ensureValidRefreshToken, getAuthenticatedClient } from '@/utils/googleClient';
 import dotenv from 'dotenv';
 
