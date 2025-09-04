@@ -1,6 +1,6 @@
 # ブランチ命名ルール
 
-- [GitHub Branchs一覧](https://github.com/aew2sbee/youtube-study-time-tracker/branches)
+- [GitHub branches 一覧](https://github.com/aew2sbee/youtube-study-time-tracker/branches)
 
 ## 基本ルール
 

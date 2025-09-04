@@ -1,5 +1,7 @@
 # ブランチ整理
 
+- [GitHub branches 一覧](https://github.com/aew2sbee/youtube-study-time-tracker/branches)
+
 ## リモート参照の整理
 
 ```bash
