@@ -1,6 +1,8 @@
-import { ADDITIONAL_STUDY_TIME } from '../../database/parameter';
 import { parameter } from '@/config/system';
 import { User } from '@/types/users';
+
+// 追加の勉強時間（秒: h * m + sec）- 1時間
+export const ADDITIONAL_STUDY_TIME = 0 * 60 * 60;
 
 export const calcStudyTime = (start: Date, end: Date): number => {
   const diffMs = end.getTime() - start.getTime();
@@ -54,9 +56,4 @@ export const convertYYYYMMDD = (updateTime: Date | string): string => {
       timeZone: 'Asia/Tokyo',
     });
   }
-};
-
-export const calcUserTotalTime = (users: User[]): number => {
-  const totalTimeSec = users.reduce((total, user) => total + user.timeSec, 0);
-  return totalTimeSec;
 };
