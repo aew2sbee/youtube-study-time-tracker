@@ -8,7 +8,7 @@ export const calcStudyTime = (start: Date, end: Date): number => {
   return Math.floor(safeDiffMs / 1000);
 };
 export const calcTotalTime = (users: User[]): number => {
-  const total = users.reduce((total, u) => total + u.timeSec, ADDITIONAL_STUDY_TIME ?? 0);
+  const total = users.reduce((total, u) => total + u.timeSec, ADDITIONAL_STUDY_TIME);
   return total;
 };
 
