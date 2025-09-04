@@ -3,6 +3,11 @@ import { YouTubeLiveChatMessage } from '@/types/youtube';
 import { calcStudyTime, calcTime } from '@/lib/calcTime';
 import { logger } from '@/utils/logger';
 
+/**
+ * YouTubeライブチャットメッセージから新しいユーザーを作成し、学習を開始します。
+ * @param message - YouTubeライブチャットメッセージ
+ * @returns 学習開始状態の新しいユーザーオブジェクト
+ */
 export const startTime = (message: YouTubeLiveChatMessage): User => {
   const startUser = {
     channelId: message.channelId,
@@ -16,6 +21,12 @@ export const startTime = (message: YouTubeLiveChatMessage): User => {
   return startUser;
 };
 
+/**
+ * 既存ユーザーの学習を再開します。
+ * @param user - 対象ユーザー
+ * @param startTime - 学習再開時刻
+ * @returns 学習再開状態に更新されたユーザーオブジェクト
+ */
 export const restartTime = (user: User, startTime: Date): User => {
   const restartUser = {
     ...user,
@@ -26,6 +37,12 @@ export const restartTime = (user: User, startTime: Date): User => {
   return restartUser;
 };
 
+/**
+ * ユーザーの学習を停止し、学習時間を累積します。
+ * @param user - 対象ユーザー
+ * @param endTime - 学習終了時刻
+ * @returns 学習時間が更新され、学習停止状態になったユーザーオブジェクト。updateTimeがない場合は元のユーザーをそのまま返す
+ */
 export const stopTime = (user: User, endTime: Date): User => {
   if (user.updateTime) {
     const stopUser = {
@@ -41,6 +58,12 @@ export const stopTime = (user: User, endTime: Date): User => {
   return user;
 };
 
+/**
+ * 学習中のユーザーの学習時間を現在時刻で更新します。
+ * @param user - 対象ユーザー
+ * @param currentTime - 現在時刻
+ * @returns 学習時間が更新されたユーザーオブジェクト。updateTimeがない場合は元のユーザーをそのまま返す
+ */
 export const updateTime = (user: User, currentTime: Date): User => {
   if (user.updateTime) {
     const updatedUser = {
