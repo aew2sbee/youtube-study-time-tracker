@@ -1,0 +1,22 @@
+
+services:
+  youtube-study-time-tracker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: youtube-study-time-tracker
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+    volumes:
+      # SQLiteデータベースの永続化
+      - ./database:/app/database
+    restart: unless-stopped
+    healthcheck:
+      # アプリケーションの稼働状況を確認するためのヘルスチェック
+      test: ["CMD", "curl", "--fail", "--silent", "--head", "http://localhost:3000/api/health"]
+      interval: 30s    # 30秒間隔でチェック実行
+      timeout: 10s     # 10秒でタイムアウト
+      retries: 3       # 失敗時は3回まで再試行
+      start_period: 40s # 起動後40秒間は失敗を無視（起動時間の猶予）
