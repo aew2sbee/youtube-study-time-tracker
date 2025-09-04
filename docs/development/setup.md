@@ -40,7 +40,7 @@ npm run db:migrate
 npm run dev
 ```
 
-http://localhost:3000 でアクセス可能
+http://localhost:3000 でアクセス可能。
 
 ### 5. 開発サーバーの起動(本番)
 
