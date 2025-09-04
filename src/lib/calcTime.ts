@@ -40,20 +40,3 @@ export const convertHHMMSS = (publishedAt: string) =>
     timeZone: 'Asia/Tokyo',
   });
 
-export const convertYYYYMMDD = (updateTime: Date | string): string => {
-  if (typeof updateTime === 'string') {
-    return new Date(updateTime).toLocaleDateString('ja-JP', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      timeZone: 'Asia/Tokyo',
-    });
-  } else {
-    return updateTime.toLocaleDateString('ja-JP', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      timeZone: 'Asia/Tokyo',
-    });
-  }
-};
