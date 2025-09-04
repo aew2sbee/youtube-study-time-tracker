@@ -1,7 +1,6 @@
 # プルリクエスト タイトル規則
 
-- [GitHub Pull Request 一覧](
-https://github.com/aew2sbee/youtube-study-time-tracker/pulls)
+- [GitHub Pull Request 一覧](https://github.com/aew2sbee/youtube-study-time-tracker/pulls)
 
 ## 基本形式
 
