@@ -10,7 +10,7 @@ import { parameter } from '@/config/system';
 import { restartTime, startTime, stopTime, updateTime } from '@/lib/user';
 
 const YOUTUBE_API_URL = '/api/youtube';
-const LOWDB_API_URL = '/api/lowdb';
+const SQLITE_API_URL = '/api/sqlite';
 
 export const useUsers = () => {
   const [user, setUser] = useState<User[]>([]);
@@ -20,7 +20,7 @@ export const useUsers = () => {
 
   const { data, error, isLoading } = useSWR<LiveChatResponse>(YOUTUBE_API_URL, fetcher, { refreshInterval: parameter.API_POLLING_INTERVAL });
 
-  const { trigger: saveUser } = useSWRMutation(LOWDB_API_URL, postUser);
+  const { trigger: saveUser } = useSWRMutation(SQLITE_API_URL, postUser);
   const { trigger: postComment } = useSWRMutation(YOUTUBE_API_URL, postUser);
 
   // currentTimeを定期的に更新（dataに関係なく）
