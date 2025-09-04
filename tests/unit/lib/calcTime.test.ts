@@ -45,7 +45,7 @@ describe('calcTime.ts', () => {
     const testUsers = [SAMPLE_USER_002, SAMPLE_USER_003]; // 200秒 + 300秒 = 500秒
 
     it('全ユーザーの学習時間と追加学習時間を合計する', () => {
-      expect(calcTotalTime(testUsers)).toBe(500 + ADDITIONAL_STUDY_TIME);
+      expect(sut.calcTotalTime(testUsers)).toBe(500 + ADDITIONAL_STUDY_TIME);
     });
 
     it('ユーザー配列が空の場合は追加学習時間のみを返す', () => {
