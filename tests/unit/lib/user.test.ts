@@ -1,5 +1,5 @@
 import * as sut from '@/lib/user';
-import { SAMPLE_USER } from '../../mock/user';
+import { SAMPLE_USER_001 } from '../../mock/user';
 import { SAMPLE_MESSAGE } from '../../mock/liveChatMessage';
 
 // logger の副作用を抑止（呼び出し有無だけ確認できるように）
@@ -19,7 +19,7 @@ describe('src/lib/user.ts のユーティリティ関数', () => {
     it('メッセージから正しいユーザー情報を生成し、学習開始状態にする', () => {
       // 準備(Arrange)
       const expectedValue = {
-        ...SAMPLE_USER,
+        ...SAMPLE_USER_001,
         isStudying: true,
         timeSec: 0,
       };
@@ -39,9 +39,9 @@ describe('src/lib/user.ts のユーティリティ関数', () => {
   describe('stopTime', () => {
     it('計測を停止するユーザーがある場合は経過時間を加算して停止状態にする', () => {
       // 準備(Arrange)
-      const beforeUser = SAMPLE_USER;
-      const endTime = new Date(SAMPLE_USER.updateTime.getTime() + 100 * 1000); // 100 秒後
-      const expectedValue = { ...SAMPLE_USER, isStudying: false, timeSec: 100, updateTime: endTime };
+      const beforeUser = SAMPLE_USER_001;
+      const endTime = new Date(SAMPLE_USER_001.updateTime.getTime() + 100 * 1000); // 100 秒後
+      const expectedValue = { ...SAMPLE_USER_001, isStudying: false, timeSec: 100, updateTime: endTime };
 
       // 実行(Act)
       const result = sut.stopTime(beforeUser, endTime);
@@ -57,8 +57,8 @@ describe('src/lib/user.ts のユーティリティ関数', () => {
     it('学習中フラグを true にし、updateTime を指定した開始時刻に更新する（timeSec は維持）', () => {
       // 準備(Arrange)
       const restartTime = new Date('2025-01-01T01:23:45.000Z');
-      const beforeUser = { ...SAMPLE_USER, isStudying: false, timeSec: 100 }; // 停止中、100 秒経過
-      const expectedValue = { ...SAMPLE_USER, isStudying: true, timeSec: 100, updateTime: restartTime };
+      const beforeUser = { ...SAMPLE_USER_001, isStudying: false, timeSec: 100 }; // 停止中、100 秒経過
+      const expectedValue = { ...SAMPLE_USER_001, isStudying: true, timeSec: 100, updateTime: restartTime };
 
       // 実行(Act)
       const result = sut.restartTime(beforeUser, restartTime);
@@ -73,8 +73,8 @@ describe('src/lib/user.ts のユーティリティ関数', () => {
     it('updateTime を現在時刻に更新する', () => {
       // 準備(Arrange)
       const currentTime = new Date('2025-01-01T00:01:00.000Z');
-      const beforeUser = { ...SAMPLE_USER, isStudying: true, timeSec: 100 };
-      const expectedValue = { ...SAMPLE_USER, isStudying: true, timeSec: 160, updateTime: currentTime };
+      const beforeUser = { ...SAMPLE_USER_001, isStudying: true, timeSec: 100 };
+      const expectedValue = { ...SAMPLE_USER_001, isStudying: true, timeSec: 160, updateTime: currentTime };
 
       // 実行(Act)
       const result = sut.updateTime(beforeUser, currentTime);

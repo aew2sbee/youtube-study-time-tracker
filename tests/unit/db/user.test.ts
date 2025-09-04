@@ -1,5 +1,5 @@
 import { users } from '@/db/schema';
-import { SAMPLE_USER } from '@/../tests/mock/user';
+import { SAMPLE_USER_001 } from '@/../tests/mock/user';
 type UserRow = typeof users.$inferSelect;
 
 type MockDb = {
@@ -55,9 +55,9 @@ describe('db/user', () => {
       const returning: UserRow[] = [
         {
           id: 20,
-          channelId: SAMPLE_USER.channelId,
-          name: SAMPLE_USER.name,
-          timeSec: SAMPLE_USER.timeSec,
+          channelId: SAMPLE_USER_001.channelId,
+          name: SAMPLE_USER_001.name,
+          timeSec: SAMPLE_USER_001.timeSec,
           videoId: SAMPLE_VIDEO_ID,
         },
       ];
@@ -68,13 +68,13 @@ describe('db/user', () => {
       const values = jest.fn().mockReturnValue({ returning: returningFn });
       (mockedDb.insert as jest.Mock).mockReturnValue({ values });
 
-      const res = await userDb.insertUser({ ...SAMPLE_USER });
+      const res = await userDb.insertUser({ ...SAMPLE_USER_001 });
 
       // values の引数に VIDEO_ID が入っているかも確認
       expect(values).toHaveBeenCalledWith({
-        channelId: SAMPLE_USER.channelId,
-        name: SAMPLE_USER.name,
-        timeSec: SAMPLE_USER.timeSec,
+        channelId: SAMPLE_USER_001.channelId,
+        name: SAMPLE_USER_001.name,
+        timeSec: SAMPLE_USER_001.timeSec,
         videoId: SAMPLE_VIDEO_ID,
       }); // values(...) に VIDEO_ID を含む正しいデータが渡されたこと
       expect(returningFn).toHaveBeenCalledTimes(1); // returning() が 1 回呼ばれたこと（チェーンの終端が実行されたこと）
@@ -88,8 +88,8 @@ describe('db/user', () => {
       const returning: UserRow[] = [
         {
           id: 30,
-          channelId: SAMPLE_USER.channelId,
-          name: SAMPLE_USER.name,
+          channelId: SAMPLE_USER_001.channelId,
+          name: SAMPLE_USER_001.name,
           timeSec: 1000,
           videoId: SAMPLE_VIDEO_ID,
         },
@@ -102,7 +102,7 @@ describe('db/user', () => {
       const set = jest.fn().mockReturnValue({ where });
       (mockedDb.update as jest.Mock).mockReturnValue({ set });
 
-      const res = await userDb.updateTimeSec({ ...SAMPLE_USER, timeSec: 1000 }, 30);
+      const res = await userDb.updateTimeSec({ ...SAMPLE_USER_001, timeSec: 1000 }, 30);
 
       expect(set).toHaveBeenCalledWith({ timeSec: 1000 }); // set(...) で timeSec のみが期待値で更新されること
       expect(where).toHaveBeenCalledTimes(1); // where(...) が 1 回呼ばれていること（更新対象を絞っていること）
@@ -117,7 +117,7 @@ describe('db/user', () => {
       const set = jest.fn().mockReturnValue({ where });
       (mockedDb.update as jest.Mock).mockReturnValue({ set });
 
-      const res = await userDb.updateTimeSec({ ...SAMPLE_USER, timeSec: 999 }, /* not matching id */ 99999);
+      const res = await userDb.updateTimeSec({ ...SAMPLE_USER_001, timeSec: 999 }, /* not matching id */ 99999);
 
       expect(set).toHaveBeenCalledWith({ timeSec: 999 }); // 指定の timeSec で更新しようとしていること
       expect(where).toHaveBeenCalledTimes(1); // where で id 条件を付与していること
@@ -138,7 +138,7 @@ describe('db/user', () => {
       const from = jest.fn().mockReturnValue({ where });
       (mockedDb.select as jest.Mock).mockReturnValue({ from });
 
-      const res = await userDb.hasUser({ ...SAMPLE_USER });
+      const res = await userDb.hasUser({ ...SAMPLE_USER_001 });
 
       expect(from).toHaveBeenCalledTimes(1); // select(...).from(...) が 1 回呼ばれたこと
       expect(where).toHaveBeenCalledTimes(1); // where(...) が 1 回呼ばれたこと（条件で絞っていること）
@@ -161,7 +161,7 @@ describe('db/user', () => {
 
       // VIDEO_ID が異なる状態で実装を読み込み直す
       const userDbLocal = await import('@/db/user');
-      const res = await userDbLocal.hasUser({ ...SAMPLE_USER });
+      const res = await userDbLocal.hasUser({ ...SAMPLE_USER_001 });
 
       expect(from).toHaveBeenCalledTimes(1); // from が呼ばれていること
       expect(where).toHaveBeenCalledTimes(1); // where が呼ばれていること
@@ -171,7 +171,7 @@ describe('db/user', () => {
 
     it('channelId は一致しないが videoId は一致する場合は空配列を返す', async () => {
       // VIDEO_ID はグローバルモックのまま一致させ、channelId のみ異なるユーザーを検索する
-      const userWithDifferentChannel = { ...SAMPLE_USER, channelId: 'anotherChannel' };
+      const userWithDifferentChannel = { ...SAMPLE_USER_001, channelId: 'anotherChannel' };
 
       // drizzle チェーンをモックして空配列を返す
       const limit = jest.fn<Promise<Array<Pick<UserRow, 'id'>>>, [number]>().mockResolvedValue([]);
@@ -200,7 +200,7 @@ describe('db/user', () => {
       (mockedDbLocal.select as jest.Mock).mockReturnValue({ from });
 
       const userDbLocal = await import('@/db/user');
-      const res = await userDbLocal.hasUser({ ...SAMPLE_USER, channelId: 'completelyDifferentCh' });
+      const res = await userDbLocal.hasUser({ ...SAMPLE_USER_001, channelId: 'completelyDifferentCh' });
 
       expect(from).toHaveBeenCalledTimes(1); // from が呼ばれていること
       expect(where).toHaveBeenCalledTimes(1); // where が呼ばれていること
@@ -217,9 +217,9 @@ describe('db/user', () => {
       const updated: UserRow[] = [
         {
           id: 10,
-          channelId: SAMPLE_USER.channelId,
-          name: SAMPLE_USER.name,
-          timeSec: SAMPLE_USER.timeSec,
+          channelId: SAMPLE_USER_001.channelId,
+          name: SAMPLE_USER_001.name,
+          timeSec: SAMPLE_USER_001.timeSec,
           videoId: SAMPLE_VIDEO_ID,
         },
       ];
@@ -230,18 +230,18 @@ describe('db/user', () => {
       const spyInsert = jest.spyOn(userDb, 'insertUser').mockResolvedValue([
         {
           id: 99,
-          channelId: SAMPLE_USER.channelId,
-          name: SAMPLE_USER.name,
-          timeSec: SAMPLE_USER.timeSec,
+          channelId: SAMPLE_USER_001.channelId,
+          name: SAMPLE_USER_001.name,
+          timeSec: SAMPLE_USER_001.timeSec,
           videoId: SAMPLE_VIDEO_ID,
         },
       ] as UserRow[]);
 
-      const res = await userDb.saveUser({ ...SAMPLE_USER });
+      const res = await userDb.saveUser({ ...SAMPLE_USER_001 });
 
       // 既存がいるので update が呼ばれ、insert は呼ばれない
       expect(spyHas).toHaveBeenCalledTimes(1); // saveUser 内で hasUser が 1 回呼ばれていること
-      expect(spyUpdate).toHaveBeenCalledWith({ ...SAMPLE_USER }, 10); // 既存ユーザーの id=10 で updateTimeSec が呼ばれたこと
+      expect(spyUpdate).toHaveBeenCalledWith({ ...SAMPLE_USER_001 }, 10); // 既存ユーザーの id=10 で updateTimeSec が呼ばれたこと
       expect(spyInsert).not.toHaveBeenCalled(); // 既存がいる場合は insertUser が呼ばれないこと
       expect(res).toEqual(updated); // saveUser の戻り値が update の結果であること
     });
@@ -251,9 +251,9 @@ describe('db/user', () => {
       const inserted: UserRow[] = [
         {
           id: 11,
-          channelId: SAMPLE_USER.channelId,
-          name: SAMPLE_USER.name,
-          timeSec: SAMPLE_USER.timeSec,
+          channelId: SAMPLE_USER_001.channelId,
+          name: SAMPLE_USER_001.name,
+          timeSec: SAMPLE_USER_001.timeSec,
           videoId: SAMPLE_VIDEO_ID,
         },
       ];
@@ -262,19 +262,19 @@ describe('db/user', () => {
       const spyUpdate = jest.spyOn(userDb, 'updateTimeSec').mockResolvedValue([
         {
           id: 1,
-          channelId: SAMPLE_USER.channelId,
-          name: SAMPLE_USER.name,
-          timeSec: SAMPLE_USER.timeSec,
+          channelId: SAMPLE_USER_001.channelId,
+          name: SAMPLE_USER_001.name,
+          timeSec: SAMPLE_USER_001.timeSec,
           videoId: SAMPLE_VIDEO_ID,
         },
       ] as UserRow[]);
       const spyInsert = jest.spyOn(userDb, 'insertUser').mockResolvedValue(inserted);
 
-      const res = await userDb.saveUser({ ...SAMPLE_USER });
+      const res = await userDb.saveUser({ ...SAMPLE_USER_001 });
 
       // 未登録なので insert が呼ばれ、update は呼ばれない
       expect(spyHas).toHaveBeenCalledTimes(1); // hasUser が 1 回呼ばれていること
-      expect(spyInsert).toHaveBeenCalledWith({ ...SAMPLE_USER }); // 未登録時は insertUser が引数のユーザーで呼ばれること
+      expect(spyInsert).toHaveBeenCalledWith({ ...SAMPLE_USER_001 }); // 未登録時は insertUser が引数のユーザーで呼ばれること
       expect(spyUpdate).not.toHaveBeenCalled(); // 未登録時は updateTimeSec が呼ばれないこと
       expect(res).toEqual(inserted); // saveUser の戻り値が insert の結果であること
     });
@@ -290,7 +290,7 @@ describe('db/user', () => {
       const from = jest.fn().mockReturnValue({ where });
       (mockedDb.select as jest.Mock).mockReturnValue({ from });
 
-      const total = await userDb.getTotalTimeSec(SAMPLE_USER.channelId);
+      const total = await userDb.getTotalTimeSec(SAMPLE_USER_001.channelId);
 
       expect(mockedDb.select).toHaveBeenCalledTimes(1); // select(...) が 1 回呼ばれていること
       expect(from).toHaveBeenCalledTimes(1); // from(...) が 1 回呼ばれていること
