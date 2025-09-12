@@ -18,9 +18,7 @@ export const useUsers = () => {
   const [liveChatMessage, setLiveChatMessage] = useState<YouTubeLiveChatMessage[]>([]);
   const lastProcessedIndexRef = useRef(0); // 追加: 再処理防止用のインデックス
 
-  const { data, error, isLoading } = useSWR<LiveChatResponse>(YOUTUBE_API_URL, fetcher, {
-    refreshInterval: parameter.API_POLLING_INTERVAL,
-  });
+  const { data, error, isLoading } = useSWR<LiveChatResponse>(YOUTUBE_API_URL, fetcher, { refreshInterval: parameter.API_POLLING_INTERVAL });
 
   const { trigger: saveUser } = useSWRMutation(SQLITE_API_URL, postUser);
   const { trigger: postComment } = useSWRMutation(YOUTUBE_API_URL, postUser);
