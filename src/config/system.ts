@@ -9,4 +9,7 @@ export const parameter = {
   USERS_PER_PAGE: 3, // 1ページあたりのユーザー数
   TRANSITION_DURATION: 1 * 1000, // フェードトランジション時間（ミリ秒）
   PAGE_DISPLAY_INTERVAL: 10 * 1000, // ページ表示間隔（ミリ秒）
+  REFRESH_INTERVAL_TIME: 1 * 60 * 60 + 1 * 50 * 60, // 1時間50分（秒）- リフレッシュメッセージのタイミング
+  REFRESH_FLAG: 'refresh',
+  END_FLAG: 'end',
 } as const;
