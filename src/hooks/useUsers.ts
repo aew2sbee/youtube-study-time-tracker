@@ -104,6 +104,9 @@ export const useUsers = () => {
             newList = newList.filter((u) => u.channelId !== existingUser.channelId).concat(stopUser);
             // useSWRMutation経由でデータ保存
             (async () => {
+              //  - populateCache: このミューテーション結果をSWRキャッシュへ反映せず既存データを維持
+              //  - revalidate: 成功後に追加の再フェッチを発行しない（ポーリングのみで同期）
+              //  - throwOnError: エラーでも例外を投げず後続/他ユーザー処理を継続
               await saveUser(stopUser, { populateCache: false, revalidate: false, throwOnError: false });
               await postComment(
                 { user: stopUser, flag: parameter.END_FLAG },
