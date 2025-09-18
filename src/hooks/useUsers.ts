@@ -37,7 +37,10 @@ export const useUsers = () => {
             const updatedUser = updateTime(user, now);
             const refreshedUser = resetRefresh(updatedUser);
             (async () => {
-              await postComment({ user: refreshedUser, flag: parameter.REFRESH_FLAG }, { throwOnError: false });
+              await postComment(
+                { user: refreshedUser, flag: parameter.REFRESH_FLAG },
+                { populateCache: false, revalidate: false, throwOnError: false },
+              );
             })();
             return refreshedUser;
             // 時間のみを更新
@@ -55,8 +58,7 @@ export const useUsers = () => {
     const interval = setInterval(updateCurrentTime, parameter.API_POLLING_INTERVAL);
 
     return () => clearInterval(interval);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [postComment]);
 
   // データの処理（新規メッセージの追加）
   useEffect(() => {
@@ -102,8 +104,11 @@ export const useUsers = () => {
             newList = newList.filter((u) => u.channelId !== existingUser.channelId).concat(stopUser);
             // useSWRMutation経由でデータ保存
             (async () => {
-              await saveUser(stopUser, { throwOnError: false });
-              await postComment({ user: stopUser, flag: parameter.END_FLAG }, { throwOnError: false });
+              await saveUser(stopUser, { populateCache: false, revalidate: false, throwOnError: false });
+              await postComment(
+                { user: stopUser, flag: parameter.END_FLAG },
+                { populateCache: false, revalidate: false, throwOnError: false },
+              );
             })();
           }
         } else {
