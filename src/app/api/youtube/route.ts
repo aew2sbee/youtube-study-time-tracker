@@ -2,11 +2,12 @@ import { NextRequest, NextResponse } from 'next/server';
 import { YouTubeLiveChatMessage, LiveChatResponse } from '@/types/youtube';
 import { User } from '@/types/users';
 import { google } from 'googleapis';
-import { CHAT_MESSAGE, isEndMessage, isStartMessage } from '@/lib/liveChatMessage';
+import { CHAT_MESSAGE, isEndMessage, isStartMessage, REFRESH_MESSAGE } from '@/lib/liveChatMessage';
 import { calcTimeJP, convertHHMMSS } from '@/lib/calcTime';
 import { logger } from '@/utils/logger';
 import { getTotalTimeSec } from '@/db/user';
 import { getOAuth2Client } from '@/utils/googleClient';
+import { parameter } from '@/config/system';
 
 // 公式ドキュメント：https://developers.google.com/youtube/v3/live/docs/liveChatMessages/list?hl=ja
 
@@ -100,10 +101,20 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
-    const user: User = await request.json();
-    const totalTimeSec = await getTotalTimeSec(user.channelId);
-    const random = Math.floor(Math.random() * CHAT_MESSAGE.length);
-    const message = `@${user.name}: 累計は${calcTimeJP(totalTimeSec)}👏 ` + CHAT_MESSAGE[random];
+    let message = '';
+    const body = await request.json();
+    const user: User = body.user;
+    const flag: string = body.flag;
+
+    if (flag === parameter.END_FLAG) {
+      const totalTimeSec = await getTotalTimeSec(user.channelId);
+      const random = Math.floor(Math.random() * CHAT_MESSAGE.length);
+      message = `@${user.name}: 累計は${calcTimeJP(totalTimeSec)}👏 ` + CHAT_MESSAGE[random];
+    } else if (flag === parameter.REFRESH_FLAG) {
+      message = `@${user.name}: ${REFRESH_MESSAGE}`;
+    } else {
+      logger.error(`flagが不正です - ${flag}`);
+    }
 
     if (!message) {
       return NextResponse.json({ error: 'Message is required' }, { status: 400 });
