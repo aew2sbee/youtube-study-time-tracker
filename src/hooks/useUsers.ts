@@ -1,13 +1,13 @@
 import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
-import { fetcher, postUser } from '@/utils/useSWR';
+import { fetcher, postUser, postYoutubeComment } from '@/utils/useSWR';
 import { useState, useEffect, useRef } from 'react';
 import { LiveChatResponse, YouTubeLiveChatMessage } from '@/types/youtube';
 import { isEndMessage, isStartMessage } from '@/lib/liveChatMessage';
 import { User } from '@/types/users';
 import { calcTotalTime } from '@/lib/calcTime';
 import { parameter } from '@/config/system';
-import { restartTime, startTime, stopTime, updateTime } from '@/lib/user';
+import { resetRefresh, restartTime, startTime, stopTime, updateTime } from '@/lib/user';
 
 const YOUTUBE_API_URL = '/api/youtube';
 const SQLITE_API_URL = '/api/sqlite';
@@ -18,17 +18,36 @@ export const useUsers = () => {
   const [liveChatMessage, setLiveChatMessage] = useState<YouTubeLiveChatMessage[]>([]);
   const lastProcessedIndexRef = useRef(0); // 追加: 再処理防止用のインデックス
 
-  const { data, error, isLoading } = useSWR<LiveChatResponse>(YOUTUBE_API_URL, fetcher, { refreshInterval: parameter.API_POLLING_INTERVAL });
+  const { data, error, isLoading } = useSWR<LiveChatResponse>(YOUTUBE_API_URL, fetcher, {
+    refreshInterval: parameter.API_POLLING_INTERVAL,
+  });
 
   const { trigger: saveUser } = useSWRMutation(SQLITE_API_URL, postUser);
-  const { trigger: postComment } = useSWRMutation(YOUTUBE_API_URL, postUser);
+  const { trigger: postComment } = useSWRMutation(YOUTUBE_API_URL, postYoutubeComment);
 
   // currentTimeを定期的に更新（dataに関係なく）
   useEffect(() => {
     const updateCurrentTime = () => {
       const now = new Date();
       setCurrentTime(now);
-      setUser((prev) => prev.map((user) => (user.isStudying ? updateTime(user, now) : user)));
+      setUser((prev) =>
+        prev.map((user) => {
+          // リフレッシュ間隔を超えたユーザーは通知する
+          if (user.isStudying && parameter.REFRESH_INTERVAL_TIME <= user.refreshInterval) {
+            const updatedUser = updateTime(user, now);
+            const refreshedUser = resetRefresh(updatedUser);
+            (async () => {
+              await postComment({ user: refreshedUser, flag: parameter.REFRESH_FLAG }, { throwOnError: false });
+            })();
+            return refreshedUser;
+            // 時間のみを更新
+          } else if (user.isStudying) {
+            return updateTime(user, now);
+          } else {
+            return user;
+          }
+        }),
+      );
     };
 
     updateCurrentTime(); // 初回実行
@@ -36,6 +55,7 @@ export const useUsers = () => {
     const interval = setInterval(updateCurrentTime, parameter.API_POLLING_INTERVAL);
 
     return () => clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // データの処理（新規メッセージの追加）
@@ -83,7 +103,7 @@ export const useUsers = () => {
             // useSWRMutation経由でデータ保存
             (async () => {
               await saveUser(stopUser, { throwOnError: false });
-              await postComment(stopUser, { throwOnError: false });
+              await postComment({ user: stopUser, flag: parameter.END_FLAG }, { throwOnError: false });
             })();
           }
         } else {
@@ -102,7 +122,6 @@ export const useUsers = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [liveChatMessage]);
 
-
   return {
     currentTime: currentTime,
     users: user,
@@ -111,4 +130,3 @@ export const useUsers = () => {
     isError: error,
   };
 };
-

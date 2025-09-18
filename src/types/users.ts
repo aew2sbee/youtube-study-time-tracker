@@ -5,4 +5,5 @@ export interface User {
   profileImageUrl: string;
   updateTime: Date;
   isStudying: boolean;
+  refreshInterval: number;
 }

@@ -1,5 +1,7 @@
-import { parameter } from "@/config/system";
+import { parameter } from '@/config/system';
 
+export const REFRESH_MESSAGE =
+  'そろそろ2時間経過します。次に休憩で20分ぐらい休憩しませんか? ポモドーロ・テクニックでは2時間後に「長めの休憩(15〜30分)」を推奨されています。';
 
 export const CHAT_MESSAGE = [
   '素晴らしい努力ですね!!',
@@ -17,18 +19,20 @@ export const CHAT_MESSAGE = [
   'あなたの努力は必ず報われますよ!!',
   '無理しすぎてませんか? 休憩も大事ですよ!!',
   '頑張った自分にご褒美をあげてください!!',
-]
+];
 
 /**
  * 指定されたメッセージが学習開始メッセージかどうかを判定します。
  * @param {string} messageText - 判定するメッセージテキスト
  * @returns {boolean} 学習開始メッセージの場合はtrue
  */
-export const isStartMessage = (messageText: string): boolean => messageText.toLowerCase().trim() === parameter.START_STUDY_KEYWORDS;
+export const isStartMessage = (messageText: string): boolean =>
+  messageText.toLowerCase().trim() === parameter.START_STUDY_KEYWORDS;
 
 /**
  * 指定されたメッセージが学習終了メッセージかどうかを判定します。
  * @param {string} messageText - 判定するメッセージテキスト
  * @returns {boolean} 学習終了メッセージの場合はtrue
  */
-export const isEndMessage = (messageText: string): boolean => messageText.toLowerCase().trim() === parameter.END_STUDY_KEYWORDS;
+export const isEndMessage = (messageText: string): boolean =>
+  messageText.toLowerCase().trim() === parameter.END_STUDY_KEYWORDS;
