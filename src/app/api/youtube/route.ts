@@ -112,7 +112,7 @@ export async function POST(request: NextRequest) {
       message = `@${user.name}: 累計は${calcTimeJP(totalTimeSec)}👏 ` + CHAT_MESSAGE[random];
     } else if (flag === parameter.REFRESH_FLAG) {
       message = `@${user.name}: ${REFRESH_MESSAGE}`;
-    } else{
+    } else {
       logger.error(`flagが不正です - ${flag}`);
     }
 
