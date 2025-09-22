@@ -1,11 +1,21 @@
 export default function HowToJoin() {
   return (
     <div className="text-black text-3xl space-y-3 items-start justify-start pt-2">
-      <p>誰でも気軽に参加できます😊</p>
-      <p className="pt-4">チャット欄に<strong>「start」</strong>のみを入力 → 計測開始</p>
-      <p>チャット欄に<strong>「end」 </strong>のみを入力 → 計測終了</p>
-      <p className="pt-4">何回でも参加OK。時間は自動で累積されます</p>
-      <p>計測終了にモデレーターから<strong>累計時間</strong>を通知</p>
+      <p className="pt-2">手順</p>
+
+      <p className="text-4xl pt-4 font-bold">1. 計測開始</p>
+      <p className="pl-4">チャット欄に<strong>「start」</strong>のみを入力</p>
+      <p className="pl-4">※Botくんが受付をしてくれます。</p>
+      <p className="text-4xl pt-4 font-bold">2. 計測終了</p>
+      <p className="pl-4">チャット欄に<strong>「end」</strong>のみを入力</p>
+      <p className="pl-4">※Botくんがこれまでの参加時間を教えてくれます。</p>
+
+      <p className="text-4xl pt-4 font-bold">補足情報</p>
+      <ul className="pl-4">
+        <li>1. 何回でも参加OK。時間は自動で累積されます。</li>
+        <li>2. 計測終了コマンドがないと、記録しません。</li>
+        <li>3. 2時間ごとにBotくんから休憩を促してくれます。</li>
+      </ul>
     </div>
   );
 }
