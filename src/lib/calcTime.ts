@@ -1,5 +1,3 @@
-import { parameter } from '@/config/system';
-
 export const calcStudyTime = (start: Date, end: Date): number => {
   const diffMs = end.getTime() - start.getTime();
   const safeDiffMs = Math.max(diffMs, 0); // マイナスにならないように
@@ -7,23 +5,10 @@ export const calcStudyTime = (start: Date, end: Date): number => {
 };
 
 export const calcTime = (seconds: number): string => {
-  if (seconds === 0) return '0h 00min';
-  const hours = Math.floor(seconds / 3600);
-  const minutes = Math.floor((seconds % 3600) / 60);
-  return `${hours.toString()}h ${minutes.toString().padStart(2, '0')}min`;
-};
-
-export const calcTimeJP = (seconds: number): string => {
-  if (seconds === 0) return '0分';
+  if (seconds === 0) return '0時00分';
   const hours = Math.floor(seconds / 3600);
   const minutes = Math.floor((seconds % 3600) / 60);
   return `${hours.toString()}時${minutes.toString().padStart(2, '0')}分`;
-};
-
-export const calculateTargetValues = (totalTime: number) => {
-  const targetPercentage = Math.floor((totalTime / parameter.TARGET_STUDY_TIME) * 100);
-  const targetFlowerLevel = Math.min(Math.floor(targetPercentage / 10), 10);
-  return { targetPercentage, targetFlowerLevel };
 };
 
 export const convertHHMMSS = (publishedAt: string) =>
