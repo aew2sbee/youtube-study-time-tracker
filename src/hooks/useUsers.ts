@@ -5,7 +5,6 @@ import { useState, useEffect, useRef } from 'react';
 import { LiveChatResponse, YouTubeLiveChatMessage } from '@/types/youtube';
 import { isEndMessage, isStartMessage } from '@/lib/liveChatMessage';
 import { User } from '@/types/users';
-import { calcTotalTime } from '@/lib/calcTime';
 import { parameter } from '@/config/system';
 import { resetRefresh, restartTime, startTime, stopTime, updateTime } from '@/lib/user';
 
@@ -14,7 +13,6 @@ const SQLITE_API_URL = '/api/sqlite';
 
 export const useUsers = () => {
   const [user, setUser] = useState<User[]>([]);
-  const [currentTime, setCurrentTime] = useState<Date>(new Date());
   const [liveChatMessage, setLiveChatMessage] = useState<YouTubeLiveChatMessage[]>([]);
   const lastProcessedIndexRef = useRef(0); // 追加: 再処理防止用のインデックス
 
@@ -29,7 +27,6 @@ export const useUsers = () => {
   useEffect(() => {
     const updateCurrentTime = () => {
       const now = new Date();
-      setCurrentTime(now);
       setUser((prev) =>
         prev.map((user) => {
           // リフレッシュ間隔を超えたユーザーは通知する
@@ -143,9 +140,7 @@ export const useUsers = () => {
   }, [liveChatMessage]);
 
   return {
-    currentTime: currentTime,
     users: user,
-    totalStudyTime: calcTotalTime(user),
     isLoading,
     isError: error,
   };
