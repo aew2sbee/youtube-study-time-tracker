@@ -116,7 +116,7 @@ export async function POST(request: NextRequest) {
     } else if (flag === parameter.END_FLAG) {
       const totalTimeSec = await getTotalTimeSec(user.channelId);
       const random = Math.floor(Math.random() * CHAT_MESSAGE.length);
-      message = `@${user.name}: +${calcTime(user.timeSec)}(累計値:${calcTime(totalTimeSec)})👏 ` + CHAT_MESSAGE[random];
+      message = `@${user.name}: +${calcTime(user.timeSec)} (累計値: ${calcTime(totalTimeSec)}) 👏 ` + CHAT_MESSAGE[random];
     } else {
       logger.error(`flagが不正です - ${flag}`);
     }
