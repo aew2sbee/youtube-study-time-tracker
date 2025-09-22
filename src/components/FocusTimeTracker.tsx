@@ -33,9 +33,9 @@ export default function FocusTimeTracker({ user }: { user: User[] }) {
 
           <div className="text-white font-bold flex items-center text-4xl">
             {user.isStudying ? (
-              <span className="text-green-400 w-32 text-center text-3xl mr-4 animate-pulse">Focusing</span>
+              <span className="text-green-400 w-32 text-right mr-3 animate-pulse">&#x25CF;</span>
             ) : user.timeSec > 0 ? (
-              <span className="text-blue-400 w-32 text-center text-3xl mr-4">Finished</span>
+              <span className="text-gray-400 w-32 text-right mr-3">&#x25CF;</span>
             ) : null}
             <span className="text-4xl">{calcTime(user.timeSec)}</span>
           </div>

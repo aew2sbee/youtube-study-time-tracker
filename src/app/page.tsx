@@ -24,7 +24,7 @@ export default function Home() {
 
     return {
       key: `users-${pageIndex}`,
-      title: totalUserPages > 1 ? `Focus Tracker (${pageIndex + 1}/${totalUserPages})` : 'Focus Tracker',
+      title: totalUserPages > 1 ? `時間計測 (${pageIndex + 1}/${totalUserPages})` : '時間計測',
       component: (
         <FocusTimeTracker
           user={pageUsers}
@@ -34,7 +34,7 @@ export default function Home() {
   });
 
   const pages = [
-    { key: 'How to join', title: 'How to join', component: <HowToJoin /> },
+    { key: 'How to join', title: '参加方法', component: <HowToJoin /> },
     ...userPages,
   ];
 
@@ -54,8 +54,8 @@ export default function Home() {
   const currentPageData = pages[currentPage];
 
   return (
-    <div className="fixed inset-0 w-[1920px] h-[1080px] overflow-hidden pointer-events-none from-slate-900 via-slate-800 to-slate-900">
-      <div className="absolute bottom-0 left-0 w-[850px] h-[480px] p-4 pointer-events-auto">
+    <div className="fixed inset-0 w-[1920px] h-[1080px] overflow-hidden pointer-events-none bg-black">
+      <div className="absolute bottom-0 left-0 w-[640px] h-[1080px] p-4 pointer-events-auto">
         <div className="bg-black/30 backdrop-blur-md rounded-xl p-6 h-full border border-white/20 shadow-2xl">
           {/* Header */}
           <motion.div

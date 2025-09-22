@@ -6,7 +6,7 @@ export const parameter = {
   SHOW_PROGRESS_BAR: true, // 進捗バーの表示/非表示
   CRON_TIME_SILVER: 30 * 60, // 30分（秒）
   CRON_TIME_GOLD: 1 * 60 * 60, // 1時間（秒）
-  USERS_PER_PAGE: 3, // 1ページあたりのユーザー数
+  USERS_PER_PAGE: 10, // 1ページあたりのユーザー数
   TRANSITION_DURATION: 1 * 1000, // フェードトランジション時間（ミリ秒）
   PAGE_DISPLAY_INTERVAL: 10 * 1000, // ページ表示間隔（ミリ秒）
   REFRESH_INTERVAL_TIME: 1 * 60 * 60 + 1 * 50 * 60, // 1時間50分（秒）- リフレッシュメッセージのタイミング
