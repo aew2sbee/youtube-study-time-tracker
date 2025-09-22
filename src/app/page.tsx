@@ -4,8 +4,6 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { parameter } from '@/config/system';
 import FocusTimeTracker from '@/components/FocusTimeTracker';
-import MyStudyProgress from '@/components/MyStudyProgress';
-import MonthlyChallenge from '@/components/MonthlyChallenge';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import ErrorMessage from '@/components/ErrorMessage';
 import { useUsers } from '@/hooks/useUsers';
@@ -14,8 +12,7 @@ import HowToJoin from '@/components/HowToJoin';
 
 export default function Home() {
   const [currentPage, setCurrentPage] = useState<number>(0);
-
-  const { currentTime, users, totalStudyTime, isLoading, isError } = useUsers();
+  const { users, isLoading, isError } = useUsers();
 
   // 3人ずつでページ分割
   const totalUserPages = Math.ceil(users.length / parameter.USERS_PER_PAGE);
@@ -39,8 +36,6 @@ export default function Home() {
   const pages = [
     { key: 'How to join', title: 'How to join', component: <HowToJoin /> },
     ...userPages,
-    { key: 'Monthly Challenge', title: 'Monthly Challenge', component: <MonthlyChallenge now={currentTime} totalStudyTime={totalStudyTime} /> },
-    { key: 'My study progress', title: 'My Study Progress', component: <MyStudyProgress /> },
   ];
 
   useEffect(() => {
