@@ -139,7 +139,7 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    logger.info(`Comment posted successfully: ${message}`);
+    logger.info(`Comment posted successfully: ${user.name}`);
 
     return NextResponse.json({
       success: true,
