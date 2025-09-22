@@ -98,6 +98,12 @@ export const useUsers = () => {
           if (isStartMessage(messageText) && !existingUser.isStudying) {
             const restartUser = restartTime(existingUser, publishedAt);
             newList = newList.filter((u) => u.channelId !== existingUser.channelId).concat(restartUser);
+            (async () => {
+              await postComment(
+                { user: restartUser, flag: parameter.START_FLAG },
+                { populateCache: false, revalidate: false, throwOnError: false },
+              );
+            })();
             // 停止
           } else if (isEndMessage(messageText) && existingUser.isStudying) {
             const stopUser = stopTime(existingUser, publishedAt);
@@ -119,6 +125,12 @@ export const useUsers = () => {
           if (isStartMessage(messageText)) {
             const startUser = startTime(message);
             newList.push(startUser);
+            (async () => {
+              await postComment(
+                { user: startUser, flag: parameter.START_FLAG },
+                { populateCache: false, revalidate: false, throwOnError: false },
+              );
+            })();
           }
         }
       });
