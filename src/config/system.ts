@@ -10,4 +10,5 @@ export const parameter = {
   REFRESH_INTERVAL_TIME: 1 * 60 * 60 + 1 * 50 * 60, // 1時間50分（秒）- リフレッシュメッセージのタイミング
   REFRESH_FLAG: 'refresh',
   END_FLAG: 'end',
+  START_FLAG: 'start',
 } as const;
