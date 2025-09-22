@@ -54,9 +54,9 @@ export default function Home() {
   const currentPageData = pages[currentPage];
 
   return (
-    <div className="fixed inset-0 w-[1920px] h-[1080px] overflow-hidden pointer-events-none bg-black">
-      <div className="absolute bottom-0 left-0 w-[640px] h-[1080px] p-4 pointer-events-auto">
-        <div className="bg-black/30 backdrop-blur-md rounded-xl p-6 h-full border border-white/20 shadow-2xl">
+    <div className="fixed inset-0 w-[1920px] h-[1080px] overflow-hidden pointer-events-none from-slate-900 via-slate-800 to-slate-900">
+      <div className="absolute bottom-0 left-0 w-[640px] h-[1080px] p-4 pointer-events-auto bg-white">
+        <div className="bg-white/95 backdrop-blur-md rounded-xl p-6 h-full border border-gray-200 shadow-2xl">
           {/* Header */}
           <motion.div
             className="flex justify-between items-center mb-6"
@@ -64,7 +64,7 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <h1 className="text-5xl font-bold text-white">
+            <h1 className="text-5xl font-bold text-black">
               {currentPageData.title}
             </h1>
           </motion.div>
@@ -92,8 +92,8 @@ export default function Home() {
                 key={index}
                 className={`w-2 h-2 rounded-full transition-all duration-300 ${
                   index === currentPage
-                    ? 'bg-white'
-                    : 'bg-white/30'
+                    ? 'bg-black'
+                    : 'bg-gray-400'
                 }`}
               />
             ))}

@@ -1,6 +1,6 @@
 export default function HowToJoin() {
   return (
-    <div className="text-white text-3xl space-y-3 items-start justify-start pt-2">
+    <div className="text-black text-3xl space-y-3 items-start justify-start pt-2">
       <p>誰でも気軽に参加できます😊</p>
       <p className="pt-4">チャット欄に<strong>「start」</strong>のみを入力 → 計測開始</p>
       <p>チャット欄に<strong>「end」 </strong>のみを入力 → 計測終了</p>
