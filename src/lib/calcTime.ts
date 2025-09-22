@@ -5,7 +5,7 @@ export const calcStudyTime = (start: Date, end: Date): number => {
 };
 
 export const calcTime = (seconds: number): string => {
-  if (seconds === 0) return '0時 00分';
+  if (seconds === 0) return '0時00分';
   const hours = Math.floor(seconds / 3600);
   const minutes = Math.floor((seconds % 3600) / 60);
   return `${hours.toString()}時${minutes.toString().padStart(2, '0')}分`;
