@@ -13,7 +13,7 @@ export default function HowToJoin() {
       <p className="text-4xl pt-4 font-bold">補足情報</p>
       <ul className="pl-4">
         <li>1. 何回でも参加OK。時間は自動で累積されます。</li>
-        <li>2. 計測終了コマンドがないと、記録しません。</li>
+        <li>2. 計測終了がないと、記録しません。</li>
         <li>3. 2時間ごとにBotくんから休憩を促してくれます。</li>
       </ul>
     </div>
