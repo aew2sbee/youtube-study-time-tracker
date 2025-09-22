@@ -8,13 +8,13 @@ export default function HowToJoin() {
       <p className="pl-4">※Botくんが受付をしてくれます。</p>
       <p className="text-4xl pt-4 font-bold">2. 計測終了</p>
       <p className="pl-4">チャット欄に<strong>「end」</strong>のみを入力</p>
-      <p className="pl-4">※Botくんがこれまでの参加時間を教えてくれます。</p>
+      <p className="pl-4">※Botくんが結果を教えてくれます。</p>
 
       <p className="text-4xl pt-4 font-bold">補足情報</p>
-      <ul className="pl-4">
-        <li>1. 何回でも参加OK。時間は自動で累積されます。</li>
-        <li>2. 計測終了がないと、記録しません。</li>
-        <li>3. 2時間ごとにBotくんから休憩を促してくれます。</li>
+      <ul className="pl-8">
+        <li>1. 配信中なら、何回でも参加OK!!</li>
+        <li>2. 同じ配信なら、時間は累積します。</li>
+        <li>3. 計測終了がないと、記録しません。</li>
       </ul>
     </div>
   );

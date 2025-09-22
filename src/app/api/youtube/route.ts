@@ -109,7 +109,7 @@ export async function POST(request: NextRequest) {
     if (flag === parameter.END_FLAG) {
       const totalTimeSec = await getTotalTimeSec(user.channelId);
       const random = Math.floor(Math.random() * CHAT_MESSAGE.length);
-      message = `@${user.name}: 累計は${calcTime(totalTimeSec)}👏 ` + CHAT_MESSAGE[random];
+      message = `@${user.name}: +${calcTime(user.timeSec)}(累計値:${calcTime(totalTimeSec)})👏 ` + CHAT_MESSAGE[random];
     } else if (flag === parameter.REFRESH_FLAG) {
       message = `@${user.name}: ${REFRESH_MESSAGE}`;
     } else {
