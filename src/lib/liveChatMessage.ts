@@ -3,6 +3,9 @@ import { parameter } from '@/config/system';
 export const REFRESH_MESSAGE =
   'そろそろ2時間が経過しますので、20分ほど休憩しませんか？ ポモドーロ・テクニックでは、2時間ごとに「15〜30分程度の長めの休憩」を取ることが推奨されています。';
 
+export const START_MESSAGE =
+  '計測を受け付けました。一緒に頑張りましょう♪ 計測終了する場合は、「end」とコメントしてくださいね';
+
 export const CHAT_MESSAGE = [
   '素晴らしい努力ですね!!',
   'その調子!!',

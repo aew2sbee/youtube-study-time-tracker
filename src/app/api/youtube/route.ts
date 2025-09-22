@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { YouTubeLiveChatMessage, LiveChatResponse } from '@/types/youtube';
 import { User } from '@/types/users';
 import { google } from 'googleapis';
-import { CHAT_MESSAGE, isEndMessage, isStartMessage, REFRESH_MESSAGE } from '@/lib/liveChatMessage';
+import { CHAT_MESSAGE, isEndMessage, isStartMessage, REFRESH_MESSAGE, START_MESSAGE } from '@/lib/liveChatMessage';
 import { calcTimeJP, convertHHMMSS } from '@/lib/calcTime';
 import { logger } from '@/utils/logger';
 import { getTotalTimeSec } from '@/db/user';
@@ -106,12 +106,17 @@ export async function POST(request: NextRequest) {
     const user: User = body.user;
     const flag: string = body.flag;
 
-    if (flag === parameter.END_FLAG) {
+    // 開始
+    if (flag === parameter.START_FLAG) {
+      message = `@${user.name}: ${START_MESSAGE}`;
+      // リフレッシュ
+    } else if (flag === parameter.REFRESH_FLAG) {
+      message = `@${user.name}: ${REFRESH_MESSAGE}`;
+      // 停止
+    } else if (flag === parameter.END_FLAG) {
       const totalTimeSec = await getTotalTimeSec(user.channelId);
       const random = Math.floor(Math.random() * CHAT_MESSAGE.length);
       message = `@${user.name}: 累計は${calcTimeJP(totalTimeSec)}👏 ` + CHAT_MESSAGE[random];
-    } else if (flag === parameter.REFRESH_FLAG) {
-      message = `@${user.name}: ${REFRESH_MESSAGE}`;
     } else {
       logger.error(`flagが不正です - ${flag}`);
     }
