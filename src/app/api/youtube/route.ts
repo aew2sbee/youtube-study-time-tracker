@@ -131,6 +131,10 @@ export async function POST(request: NextRequest) {
 
     logger.info(`Attempting to post comment: ${message}`);
 
+    if (!parameter.IS_COMMENT_ENABLED) {
+      logger.info('コメント投稿は無効化されています');
+      return NextResponse.json({ success: true, message: 'Commenting is disabled' });
+    }
     const result = await youtubeWithOAuth.liveChatMessages.insert({
       part: ['snippet'],
       requestBody: {
