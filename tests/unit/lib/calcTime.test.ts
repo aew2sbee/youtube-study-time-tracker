@@ -23,7 +23,7 @@ describe('calcTime.ts', () => {
     it('ミリ秒が含まれる場合は切り捨てて計算する', () => {
       const start = new Date('2023-01-01T10:00:00.500Z');
       const end = new Date('2023-01-01T10:00:01.400Z');
-      expect(sut.calcStudyTime(start, end)).toBe(0); // 0.9秒 → floor(0) = 0
+      expect(sut.calcStudyTime(start, end)).toBe(0); // 0.9秒 → floor(0.9) = 0
     });
 
     it('1秒未満の差は0秒として処理される', () => {
@@ -33,7 +33,7 @@ describe('calcTime.ts', () => {
     });
   });
 
-  describe('calcTime - 英語形式時間フォーマット', () => {
+  describe('calcTime - 日本語形式時間フォーマット', () => {
     it('秒数を時間と分の形式で正しく表示する', () => {
       expect(sut.calcTime(3661)).toBe('1時01分'); // 1時間1分1秒
       expect(sut.calcTime(3600)).toBe('1時00分'); // 1時間
@@ -41,7 +41,7 @@ describe('calcTime.ts', () => {
       expect(sut.calcTime(59)).toBe('0時00分'); // 59秒
     });
 
-    it('0秒の場合は0時00分返す', () => {
+    it('0秒の場合は0時00分を返す', () => {
       expect(sut.calcTime(0)).toBe('0時00分');
     });
 
