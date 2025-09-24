@@ -33,7 +33,7 @@ describe('calcTime.ts', () => {
     });
   });
 
-  describe('calcTime - 英語形式時間フォーマット', () => {
+  describe('calcTime - 日本語形式時間フォーマット', () => {
     it('秒数を時間と分の形式で正しく表示する', () => {
       expect(sut.calcTime(3661)).toBe('1時01分'); // 1時間1分1秒
       expect(sut.calcTime(3600)).toBe('1時00分'); // 1時間
