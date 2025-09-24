@@ -4,23 +4,9 @@ import { users } from '@/db/schema';
 import { User } from '@/types/users';
 import { eq, and } from 'drizzle-orm';
 import { VIDEO_ID } from '@/app/api/youtube/route';
-/** データベースのusersテーブルから推論される行型 */
+
 type UserRow = typeof users.$inferSelect;
 
-/**
- * ユーザーデータをデータベースに保存します。既存ユーザーの場合は更新、新規ユーザーの場合は挿入します。
- * @param user - 保存するユーザーオブジェクト
- * @returns 保存されたユーザーデータの配列
- * @example
- * const result = await saveUser({
- *   channelId: 'UC123',
- *   name: 'テストユーザー',
- *   timeSec: 3600,
- *   profileImageUrl: 'https://example.com/avatar.jpg',
- *   updateTime: new Date(),
- *   isStudying: false
- * });
- */
 export const saveUser = async (user: User) => {
   logger.info(`saveUser - ${user.name} ${user.timeSec}`);
   let res: UserRow[];
@@ -36,12 +22,7 @@ export const saveUser = async (user: User) => {
   return res;
 };
 
-/**
- * 指定されたユーザーIDの学習時間を更新します。
- * @param user - 更新するユーザーオブジェクト
- * @param userId - 更新対象のユーザーID
- * @returns 更新されたユーザーデータの配列
- */
+
 export const updateTimeSec = async (user: User, userId: number) => {
   logger.info(`updateTimeSec - ${user.name} ${user.timeSec}`);
   const res = await db.update(users).set({ timeSec: user.timeSec }).where(eq(users.id, userId)).returning();
@@ -53,11 +34,7 @@ export const updateTimeSec = async (user: User, userId: number) => {
   return res;
 };
 
-/**
- * 新しいユーザーをデータベースに挿入します。
- * @param user - 挿入するユーザーオブジェクト
- * @returns 挿入されたユーザーデータの配列
- */
+
 export const insertUser = async (user: User) => {
   logger.info(`insertUser - ${user.name} ${user.timeSec}`);
   const res = await db
@@ -73,11 +50,6 @@ export const insertUser = async (user: User) => {
   return res;
 };
 
-/**
- * 指定されたユーザーがデータベースに存在するかチェックします。
- * @param user - 検索するユーザーオブジェクト
- * @returns 見つかった場合はユーザーIDを含む配列、見つからない場合は空配列
- */
 export const hasUser = async (user: User) => {
   logger.info(`hasUser - ${user.name} ${user.timeSec}`);
   const res = await db
@@ -93,14 +65,7 @@ export const hasUser = async (user: User) => {
   return res;
 };
 
-/**
- * 指定されたチャンネルIDの全ての動画における総学習時間を取得します。
- * @param channelId - 検索するユーザーのチャンネルID
- * @returns 総学習時間（秒）
- * @example
- * const totalTime = await getTotalTimeSec('UC123');
- * console.log(`総学習時間: ${totalTime}秒`);
- */
+
 export const getTotalTimeSec = async (channelId: string) => {
   logger.info(`getTotalTimeSec - ${channelId}`);
   const res = await db.select({ timeSec: users.timeSec }).from(users).where(eq(users.channelId, channelId));
