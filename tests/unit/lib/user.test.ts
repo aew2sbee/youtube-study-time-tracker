@@ -64,7 +64,7 @@ describe('src/lib/user.ts のユーティリティ関数', () => {
     it('updateTime を現在時刻に更新する', () => {
       // 準備(Arrange)
       const currentTime = new Date('2025-01-01T00:01:00.000Z');
-      const beforeUser = { ...SAMPLE_USER, isStudying: true, timeSec: 100 };
+      const beforeUser = { ...SAMPLE_USER_001, isStudying: true, timeSec: 100 };
       const expectedValue = {
         ...beforeUser,
         isStudying: true,
@@ -83,7 +83,7 @@ describe('src/lib/user.ts のユーティリティ関数', () => {
   describe('resetRefresh', () => {
     it('refreshInterval を 0 にリセットする', () => {
       // 準備(Arrange)
-      const beforeUser = { ...SAMPLE_USER, refreshInterval: 300 };
+      const beforeUser = { ...SAMPLE_USER_001, refreshInterval: 300 };
       const expectedValue = { ...beforeUser, refreshInterval: 0 };
 
       // 実行(Act)

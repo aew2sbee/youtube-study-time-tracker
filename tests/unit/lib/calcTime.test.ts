@@ -35,29 +35,29 @@ describe('calcTime.ts', () => {
 
   describe('calcTime - 英語形式時間フォーマット', () => {
     it('秒数を時間と分の形式で正しく表示する', () => {
-      expect(sut.calcTime(3661)).toBe('1h 01min'); // 1時間1分1秒
-      expect(sut.calcTime(3600)).toBe('1h 00min'); // 1時間
-      expect(sut.calcTime(60)).toBe('0h 01min'); // 1分
-      expect(sut.calcTime(59)).toBe('0h 00min'); // 59秒
+      expect(sut.calcTime(3661)).toBe('1時01分'); // 1時間1分1秒
+      expect(sut.calcTime(3600)).toBe('1時00分'); // 1時間
+      expect(sut.calcTime(60)).toBe('0時01分'); // 1分
+      expect(sut.calcTime(59)).toBe('0時00分'); // 59秒
     });
 
-    it('0秒の場合は0h 00minを返す', () => {
-      expect(sut.calcTime(0)).toBe('0h 00min');
+    it('0秒の場合は0時00分返す', () => {
+      expect(sut.calcTime(0)).toBe('0時00分');
     });
 
     it('大きな値も正しく処理する', () => {
-      expect(sut.calcTime(36000)).toBe('10h 00min'); // 10時間
-      expect(sut.calcTime(90061)).toBe('25h 01min'); // 25時間1分1秒
+      expect(sut.calcTime(36000)).toBe('10時00分'); // 10時間
+      expect(sut.calcTime(90061)).toBe('25時01分'); // 25時間1分1秒
     });
 
     it('分の部分は2桁でゼロパディングされる', () => {
-      expect(sut.calcTime(3665)).toBe('1h 01min'); // 1時間1分5秒
-      expect(sut.calcTime(7260)).toBe('2h 01min'); // 2時間1分
+      expect(sut.calcTime(3665)).toBe('1時01分'); // 1時間1分5秒
+      expect(sut.calcTime(7260)).toBe('2時01分'); // 2時間1分
     });
 
     it('サンプルユーザーの学習時間を正しくフォーマットする', () => {
-      expect(sut.calcTime(SAMPLE_USER_002.timeSec)).toBe('0h 03min'); // 200秒 = 3分20秒
-      expect(sut.calcTime(SAMPLE_USER_003.timeSec)).toBe('0h 05min'); // 300秒 = 5分
+      expect(sut.calcTime(SAMPLE_USER_002.timeSec)).toBe('0時03分'); // 200秒 = 3分20秒
+      expect(sut.calcTime(SAMPLE_USER_003.timeSec)).toBe('0時05分'); // 300秒 = 5分
     });
   });
 
