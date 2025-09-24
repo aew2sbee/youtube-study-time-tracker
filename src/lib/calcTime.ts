@@ -5,10 +5,10 @@ export const calcStudyTime = (start: Date, end: Date): number => {
 };
 
 export const calcTime = (seconds: number): string => {
-  if (seconds === 0) return '0h 00min';
+  if (seconds === 0) return '0時00分';
   const hours = Math.floor(seconds / 3600);
   const minutes = Math.floor((seconds % 3600) / 60);
-  return `${hours.toString()}h ${minutes.toString().padStart(2, '0')}min`;
+  return `${hours.toString()}時${minutes.toString().padStart(2, '0')}分`;
 };
 
 export const convertHHMMSS = (publishedAt: string) =>
