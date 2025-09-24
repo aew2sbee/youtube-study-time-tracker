@@ -41,7 +41,7 @@ describe('calcTime.ts', () => {
       expect(sut.calcTime(59)).toBe('0時00分'); // 59秒
     });
 
-    it('0秒の場合は0時00分返す', () => {
+    it('0秒の場合は0時00分を返す', () => {
       expect(sut.calcTime(0)).toBe('0時00分');
     });
 
