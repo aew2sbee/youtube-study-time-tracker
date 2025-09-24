@@ -16,4 +16,3 @@ export const convertHHMMSS = (publishedAt: string) =>
     hour12: false,
     timeZone: 'Asia/Tokyo',
   });
-

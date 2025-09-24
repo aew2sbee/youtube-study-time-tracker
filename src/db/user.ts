@@ -6,7 +6,6 @@ import { eq, and } from 'drizzle-orm';
 import { VIDEO_ID } from '@/app/api/youtube/route';
 type UserRow = typeof users.$inferSelect;
 
-// データを保存する関数
 export const saveUser = async (user: User) => {
   logger.info(`saveUser - ${user.name} ${user.timeSec}`);
   let res: UserRow[];
