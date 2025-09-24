@@ -16,6 +16,7 @@ export const startTime = (message: YouTubeLiveChatMessage): User => {
     profileImageUrl: message.profileImageUrl,
     updateTime: new Date(message.publishedAt),
     isStudying: true,
+    refreshInterval: 0,
   };
   logger.info(`startTime - ${startUser.name} ${calcTime(startUser.timeSec)}`);
   return startUser;
@@ -32,6 +33,7 @@ export const restartTime = (user: User, startTime: Date): User => {
     ...user,
     isStudying: true,
     updateTime: startTime,
+    refreshInterval: 0,
   };
   logger.info(`restartTime - ${restartUser.name} ${calcTime(user.timeSec)} => ${calcTime(restartUser.timeSec)}`);
   return restartUser;
@@ -70,10 +72,20 @@ export const updateTime = (user: User, currentTime: Date): User => {
       ...user,
       timeSec: user.timeSec + calcStudyTime(user.updateTime, currentTime),
       updateTime: currentTime,
+      refreshInterval: user.refreshInterval + calcStudyTime(user.updateTime, currentTime),
     };
     logger.info(`updateTime - ${updatedUser.name} ${calcTime(user.timeSec)} => ${calcTime(updatedUser.timeSec)}`);
     return updatedUser;
   }
   logger.warn(`No updateTime: ${user.name}`);
   return user;
+};
+
+export const resetRefresh = (user: User): User => {
+  const refreshUser = {
+    ...user,
+    refreshInterval: 0,
+  };
+  logger.info(`resetRefresh - ${refreshUser.name} ${calcTime(user.refreshInterval)} => ${calcTime(refreshUser.refreshInterval)}`);
+  return refreshUser;
 };

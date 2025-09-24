@@ -2,11 +2,12 @@ import { NextRequest, NextResponse } from 'next/server';
 import { YouTubeLiveChatMessage, LiveChatResponse } from '@/types/youtube';
 import { User } from '@/types/users';
 import { google } from 'googleapis';
-import { CHAT_MESSAGE, isEndMessage, isStartMessage } from '@/lib/liveChatMessage';
-import { calcTimeJP, convertHHMMSS } from '@/lib/calcTime';
+import { calcTime, convertHHMMSS } from '@/lib/calcTime';
+import { CHAT_MESSAGE, isEndMessage, isStartMessage, REFRESH_MESSAGE, START_MESSAGE } from '@/lib/liveChatMessage';
 import { logger } from '@/utils/logger';
 import { getTotalTimeSec } from '@/db/user';
 import { getOAuth2Client } from '@/utils/googleClient';
+import { parameter } from '@/config/system';
 
 // 公式ドキュメント：https://developers.google.com/youtube/v3/live/docs/liveChatMessages/list?hl=ja
 
@@ -100,10 +101,25 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
-    const user: User = await request.json();
-    const totalTimeSec = await getTotalTimeSec(user.channelId);
-    const random = Math.floor(Math.random() * CHAT_MESSAGE.length);
-    const message = `@${user.name}: 累計は${calcTimeJP(totalTimeSec)}👏 ` + CHAT_MESSAGE[random];
+    let message = '';
+    const body = await request.json();
+    const user: User = body.user;
+    const flag: string = body.flag;
+
+    // 開始
+    if (flag === parameter.START_FLAG) {
+      message = `@${user.name}: ${START_MESSAGE}`;
+      // リフレッシュ
+    } else if (flag === parameter.REFRESH_FLAG) {
+      message = `@${user.name}: ${REFRESH_MESSAGE}`;
+      // 停止
+    } else if (flag === parameter.END_FLAG) {
+      const totalTimeSec = await getTotalTimeSec(user.channelId);
+      const random = Math.floor(Math.random() * CHAT_MESSAGE.length);
+      message = `@${user.name}: +${calcTime(user.timeSec)} (累計値: ${calcTime(totalTimeSec)}) 👏 ` + CHAT_MESSAGE[random];
+    } else {
+      logger.error(`flagが不正です - ${flag}`);
+    }
 
     if (!message) {
       return NextResponse.json({ error: 'Message is required' }, { status: 400 });
@@ -115,6 +131,10 @@ export async function POST(request: NextRequest) {
 
     logger.info(`Attempting to post comment: ${message}`);
 
+    if (!parameter.IS_COMMENT_ENABLED) {
+      logger.info('コメント投稿は無効化されています');
+      return NextResponse.json({ success: true, message: 'Commenting is disabled' });
+    }
     const result = await youtubeWithOAuth.liveChatMessages.insert({
       part: ['snippet'],
       requestBody: {
@@ -128,7 +148,7 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    logger.info(`Comment posted successfully: ${message}`);
+    logger.info(`Comment posted successfully: ${user.name}`);
 
     return NextResponse.json({
       success: true,

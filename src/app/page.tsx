@@ -4,8 +4,6 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { parameter } from '@/config/system';
 import FocusTimeTracker from '@/components/FocusTimeTracker';
-import MyStudyProgress from '@/components/MyStudyProgress';
-import MonthlyChallenge from '@/components/MonthlyChallenge';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import ErrorMessage from '@/components/ErrorMessage';
 import { useUsers } from '@/hooks/useUsers';
@@ -14,8 +12,7 @@ import HowToJoin from '@/components/HowToJoin';
 
 export default function Home() {
   const [currentPage, setCurrentPage] = useState<number>(0);
-
-  const { currentTime, users, totalStudyTime, isLoading, isError } = useUsers();
+  const { users, isLoading, isError } = useUsers();
 
   // 3人ずつでページ分割
   const totalUserPages = Math.ceil(users.length / parameter.USERS_PER_PAGE);
@@ -27,7 +24,7 @@ export default function Home() {
 
     return {
       key: `users-${pageIndex}`,
-      title: totalUserPages > 1 ? `Focus Tracker (${pageIndex + 1}/${totalUserPages})` : 'Focus Tracker',
+      title: totalUserPages > 1 ? `時間計測 (${pageIndex + 1}/${totalUserPages})` : '時間計測',
       component: (
         <FocusTimeTracker
           user={pageUsers}
@@ -37,10 +34,8 @@ export default function Home() {
   });
 
   const pages = [
-    { key: 'How to join', title: 'How to join', component: <HowToJoin /> },
+    { key: 'How to join', title: '参加方法', component: <HowToJoin /> },
     ...userPages,
-    { key: 'Monthly Challenge', title: 'Monthly Challenge', component: <MonthlyChallenge now={currentTime} totalStudyTime={totalStudyTime} /> },
-    { key: 'My study progress', title: 'My Study Progress', component: <MyStudyProgress /> },
   ];
 
   useEffect(() => {
@@ -60,8 +55,8 @@ export default function Home() {
 
   return (
     <div className="fixed inset-0 w-[1920px] h-[1080px] overflow-hidden pointer-events-none from-slate-900 via-slate-800 to-slate-900">
-      <div className="absolute bottom-0 left-0 w-[850px] h-[480px] p-4 pointer-events-auto">
-        <div className="bg-black/30 backdrop-blur-md rounded-xl p-6 h-full border border-white/20 shadow-2xl">
+      <div className="absolute bottom-0 left-0 w-[640px] h-[1080px] p-4 pointer-events-auto">
+        <div className="bg-white/80 backdrop-blur-md rounded-xl p-6 h-full border border-gray-200 shadow-2xl">
           {/* Header */}
           <motion.div
             className="flex justify-between items-center mb-6"
@@ -69,7 +64,7 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <h1 className="text-5xl font-bold text-white">
+            <h1 className="text-5xl font-bold text-black">
               {currentPageData.title}
             </h1>
           </motion.div>
@@ -97,8 +92,8 @@ export default function Home() {
                 key={index}
                 className={`w-2 h-2 rounded-full transition-all duration-300 ${
                   index === currentPage
-                    ? 'bg-white'
-                    : 'bg-white/30'
+                    ? 'bg-black'
+                    : 'bg-gray-400'
                 }`}
               />
             ))}
