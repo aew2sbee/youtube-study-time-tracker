@@ -23,7 +23,7 @@ describe('calcTime.ts', () => {
     it('ミリ秒が含まれる場合は切り捨てて計算する', () => {
       const start = new Date('2023-01-01T10:00:00.500Z');
       const end = new Date('2023-01-01T10:00:01.400Z');
-      expect(sut.calcStudyTime(start, end)).toBe(0); // 0.9秒 → floor(0) = 0
+      expect(sut.calcStudyTime(start, end)).toBe(0); // 0.9秒 → floor(0.9) = 0
     });
 
     it('1秒未満の差は0秒として処理される', () => {
