@@ -4,7 +4,6 @@ import { users } from '@/db/schema';
 import { User } from '@/types/users';
 import { eq, and } from 'drizzle-orm';
 import { VIDEO_ID } from '@/app/api/youtube/route';
-
 type UserRow = typeof users.$inferSelect;
 
 export const saveUser = async (user: User) => {
@@ -22,7 +21,6 @@ export const saveUser = async (user: User) => {
   return res;
 };
 
-
 export const updateTimeSec = async (user: User, userId: number) => {
   logger.info(`updateTimeSec - ${user.name} ${user.timeSec}`);
   const res = await db.update(users).set({ timeSec: user.timeSec }).where(eq(users.id, userId)).returning();
@@ -33,7 +31,6 @@ export const updateTimeSec = async (user: User, userId: number) => {
   }
   return res;
 };
-
 
 export const insertUser = async (user: User) => {
   logger.info(`insertUser - ${user.name} ${user.timeSec}`);
@@ -64,7 +61,6 @@ export const hasUser = async (user: User) => {
   }
   return res;
 };
-
 
 export const getTotalTimeSec = async (channelId: string) => {
   logger.info(`getTotalTimeSec - ${channelId}`);
