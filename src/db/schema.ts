@@ -6,4 +6,5 @@ export const users = sqliteTable('users', {
   name: text('name').notNull(),
   timeSec: integer('time_sec').notNull().default(0),
   videoId: text('video_id').notNull(), // YouTube動画ID
+  timestamp: integer("timestamp", { mode: "timestamp" }).notNull().default(sql`(unixepoch())`),
 });

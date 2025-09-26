@@ -23,7 +23,7 @@ export const saveUser = async (user: User) => {
 
 export const updateTimeSec = async (user: User, userId: number) => {
   logger.info(`updateTimeSec - ${user.name} ${user.timeSec}`);
-  const res = await db.update(users).set({ timeSec: user.timeSec }).where(eq(users.id, userId)).returning();
+  const res = await db.update(users).set({ timeSec: user.timeSec, timestamp: user.updateTime }).where(eq(users.id, userId)).returning();
   if (res.length > 0) {
     logger.info(`updatedTimeSec - ${user.name} ${user.timeSec} => ${res[0]?.timeSec}`);
   } else {
@@ -41,6 +41,7 @@ export const insertUser = async (user: User) => {
       name: user.name,
       timeSec: user.timeSec,
       videoId: VIDEO_ID,
+      timestamp: user.updateTime,
     })
     .returning();
   logger.info(`insertedUser - ${user.name} ${user.timeSec}`);

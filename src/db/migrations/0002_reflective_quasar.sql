@@ -1,0 +1,1 @@
+ALTER TABLE `users` ADD `timestamp` integer NOT NULL DEFAULT 0;
