@@ -1,4 +1,5 @@
 import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core';
+import { sql } from 'drizzle-orm';
 
 export const users = sqliteTable('users', {
   id: integer('id').primaryKey({ autoIncrement: true }),
@@ -6,5 +7,5 @@ export const users = sqliteTable('users', {
   name: text('name').notNull(),
   timeSec: integer('time_sec').notNull().default(0),
   videoId: text('video_id').notNull(), // YouTube動画ID
-  timestamp: integer("timestamp", { mode: "timestamp" }).notNull().default(sql`(unixepoch())`),
+  timestamp: integer('timestamp', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
 });
