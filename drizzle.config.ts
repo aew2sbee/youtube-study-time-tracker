@@ -4,8 +4,8 @@ import 'dotenv/config';
 export default {
   schema: './src/db/schema.ts',
   out: './src/db/migrations',
-  dialect: 'postgresql', // ← Supabase(Postgres)なのでこれ！
+  dialect: 'postgresql',
   dbCredentials: {
-    url: process.env.DATABASE_URL!, // Supabase の接続URLを.envから取得
+    url: process.env.DATABASE_URL!,
   },
 } satisfies Config;
