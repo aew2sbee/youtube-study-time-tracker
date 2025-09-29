@@ -1,7 +1,7 @@
 import { logger } from '@/utils/logger';
 import { db } from '@/db';
 import { study } from '@/db/schema';
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import { User } from '@/types/users';
 import { getUserByChannelId, insertUser } from './user';
 
@@ -15,9 +15,14 @@ export const saveLog = async (user: User) => {
     // 新規ユーザー登録
     const userRows = await insertUser(user);
     await insertStudy(userRows[0].id, user);
+    return userRows;
   } else {
     // 既存ユーザー
-    await insertStudy(existing.id, user);
+    if (await checkStudy(existing.id, user)) {
+      logger.info(`savelog: 重複データがありました。${user.name}`);
+    } else {
+      await insertStudy(existing.id, user);
+    }
   }
 };
 
@@ -32,6 +37,21 @@ export const insertStudy = async (userId: number, user: User) => {
     })
     .returning();
   return res[0];
+};
+
+export const checkStudy = async (userId: number, user: User) => {
+  const res = await db
+    .select()
+    .from(study)
+    .where(
+      and(
+        eq(study.userId, userId),
+        eq(study.timeSec, user.timeSec),
+        eq(study.timestamp, typeof user.updateTime === 'string' ? new Date(user.updateTime) : user.updateTime),
+      ),
+    );
+  logger.info(`checkStudy count=${res.length}`);
+  return res.length > 0;
 };
 
 export const getTotalTimeSecByChannelId = async (channelId: string) => {
