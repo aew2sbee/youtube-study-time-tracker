@@ -9,7 +9,7 @@ import { parameter } from '@/config/system';
 import { resetRefresh, restartTime, startTime, stopTime, updateTime } from '@/lib/user';
 
 const YOUTUBE_API_URL = '/api/youtube';
-const SQLITE_API_URL = '/api/sqlite';
+const SQLITE_API_URL = '/api/db';
 
 export const useUsers = () => {
   const [user, setUser] = useState<User[]>([]);
