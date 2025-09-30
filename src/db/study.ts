@@ -1,7 +1,7 @@
 import { logger } from '@/utils/logger';
 import { db } from '@/db';
 import { study } from '@/db/schema';
-import { and, eq } from 'drizzle-orm';
+import { and, eq, sql } from 'drizzle-orm';
 import { User } from '@/types/users';
 import { getUserByChannelId, insertUser } from './user';
 
@@ -11,18 +11,21 @@ export type InsertStudyRow = typeof study.$inferInsert;
 export const saveLog = async (user: User) => {
   logger.info(`savelog: ${user.name}`);
   const existing = await getUserByChannelId(user.channelId);
-  if (!existing) {
+  if (existing) {
+    // 既存ユーザー
+    const studyId = await hasSameDateData(existing.id, user)
+    if (studyId) {
+      logger.info(`savelog: 本日のデータを更新します。${user.name}`);
+      await updateStudy(studyId, user);
+    } else {
+      logger.info(`savelog: 本日のデータを追加します。${user.name}`);
+      await insertStudy(existing.id, user);
+    }
+  } else {
     // 新規ユーザー登録
     const userRows = await insertUser(user);
     await insertStudy(userRows.id, user);
-    return userRows;
-  } else {
-    // 既存ユーザー
-    if (await checkStudy(existing.id, user)) {
-      logger.info(`savelog: 重複データがありました。${user.name}`);
-    } else {
-      await insertStudy(existing.id, user);
-    }
+    logger.info(`savelog: 新規ユーザーを追加しました。${user.name}`);
   }
 };
 
@@ -39,21 +42,21 @@ export const insertStudy = async (userId: number, user: User) => {
   return res[0];
 };
 
-export const updateStudy = async (userId: number, user: User) => {
+export const updateStudy = async (studyId: number, user: User) => {
     const res = await db
       .update(study)
       .set({
         timeSec: user.timeSec,
         timestamp: typeof user.updateTime === 'string' ? new Date(user.updateTime) : user.updateTime,
       })
-      .where(study.id.eq(existing[0].id))
+      .where(eq(study.id, studyId))
       .returning();
     return res[0];
 }
 
-export const checkStudy = async (userId: number, user: User) => {
+export const hasSameDateData = async (userId: number, user: User) => {
   const userDate = typeof user.updateTime === 'string' ? new Date(user.updateTime) : user.updateTime;
-  const userYYYYMMDD = userDate.toISOString().slice(0, 10); // 'YYYY-MM-DD'
+  const dateStr = userDate.toISOString().slice(0, 10); // 'YYYY-MM-DD'
 
   const res = await db
     .select()
@@ -61,12 +64,16 @@ export const checkStudy = async (userId: number, user: User) => {
     .where(
       and(
         eq(study.userId, userId),
-        eq(study.timeSec, user.timeSec),
-        eq(study.timestamp, typeof user.updateTime === 'string' ? new Date(user.updateTime) : user.updateTime),
+        sql`to_char(${study.timestamp}, 'YYYY-MM-DD') = ${dateStr}`
       ),
     );
   logger.info(`checkStudy count=${res.length}`);
-  return res.length > 0;
+  if (res.length > 0) {
+    logger.info(`checkStudy found: ${user.name} ${dateStr}`);
+    return res[0].id;
+  } else {
+    return null;
+  }
 };
 
 export const getTotalTimeSecByChannelId = async (channelId: string) => {
