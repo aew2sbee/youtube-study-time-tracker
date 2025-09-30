@@ -21,7 +21,7 @@ export const saveLog = async (user: User) => {
   if (!existing) {
     // 新規ユーザー登録
     const userRows = await insertUser(user);
-    await insertStudy(userRows[0].id, user);
+    await insertStudy(userRows.id, user);
     return userRows;
   } else {
     // 既存ユーザー

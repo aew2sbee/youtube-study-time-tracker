@@ -12,7 +12,7 @@ export const insertUser = async (user: User) => {
   logger.info(`insertUser name=${user.name}`);
   const res = await db.insert(users).values({ channelId: user.channelId, name: user.name }).returning();
   logger.info(`insertUser new name=${res[0].name}`);
-  return res;
+  return res[0];
 };
 
 export const getUserByChannelId = async (channelId: string) => {
