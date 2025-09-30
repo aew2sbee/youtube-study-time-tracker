@@ -5,12 +5,11 @@ import { and, eq } from 'drizzle-orm';
 import { User } from '@/types/users';
 import { getUserByChannelId, insertUser } from './user';
 
-// JST(UTC+9) に正規化する。文字列は Date 化後、元のタイムゾーンとの差を補正して JST に合わせる。
+// JST(UTC+9) に正規化するヘルパー
 const toJstDate = (value: string | Date) => {
   const d = typeof value === 'string' ? new Date(value) : value;
-  // d を一旦 UTC エポックにし、JST オフセット(+9h)を付与
-  const utcTime = d.getTime() + d.getTimezoneOffset() * 60000;
-  return new Date(utcTime + 9 * 60 * 60000);
+  const utcMs = d.getTime() + d.getTimezoneOffset() * 60000; // 元 Date を UTC 基準に
+  return new Date(utcMs + 9 * 60 * 60000); // JST (+9h)
 };
 
 export type StudyRow = typeof study.$inferSelect;
