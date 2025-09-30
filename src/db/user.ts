@@ -16,18 +16,19 @@ export const insertUser = async (user: User) => {
 };
 
 export const getUserByChannelId = async (channelId: string) => {
-  const rows = await db.select().from(users).where(eq(users.channelId, channelId)).limit(1);
-  return rows[0];
+  return await db.query.users.findFirst({
+    where: eq(users.channelId, channelId),
+  });
 };
 
 export const updateUserNameByChannelId = async (channelId: string, name: string) => {
   logger.info(`updateUserNameByChannelId name=${name}`);
   const existing = await getUserByChannelId(channelId);
-  if (existing.name === name) {
+  if (existing && existing.name === name) {
     logger.info(`updateUserNameByChannelId same name=${existing.name}`);
     return;
   } else {
-    logger.info(`updateUserNameByChannelId diff name=${existing.name}`);
+    logger.info(`updateUserNameByChannelId diff name`);
     return await db.update(users).set({ name }).where(eq(users.channelId, channelId)).returning();
   }
 };
