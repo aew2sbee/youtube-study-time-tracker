@@ -9,7 +9,7 @@ import { parameter } from '@/config/system';
 import { resetRefresh, restartTime, startTime, stopTime, updateTime } from '@/lib/user';
 
 const YOUTUBE_API_URL = '/api/youtube';
-const SQLITE_API_URL = '/api/sqlite';
+const DB_API_URL = '/api/db';
 
 export const useUsers = () => {
   const [user, setUser] = useState<User[]>([]);
@@ -20,7 +20,7 @@ export const useUsers = () => {
     refreshInterval: parameter.API_POLLING_INTERVAL,
   });
 
-  const { trigger: saveUser } = useSWRMutation(SQLITE_API_URL, postUser);
+  const { trigger: saveUser } = useSWRMutation(DB_API_URL, postUser);
   const { trigger: postComment } = useSWRMutation(YOUTUBE_API_URL, postYoutubeComment);
 
   // currentTimeを定期的に更新（dataに関係なく）
