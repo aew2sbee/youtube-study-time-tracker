@@ -69,9 +69,10 @@ export const hasSameDateData = async (userId: number, user: User) => {
     );
   logger.info(`checkStudy count=${res.length}`);
   if (res.length > 0) {
-    logger.info(`checkStudy found: ${user.name} ${dateStr}`);
+    logger.info(`同じ日付のデータを見つけました。: ${user.name} ${dateStr}`);
     return res[0].id;
   } else {
+    logger.info(`同じ日付のデータはありませんでした。: ${user.name} ${dateStr}`);
     return null;
   }
 };
