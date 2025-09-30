@@ -5,29 +5,15 @@ import { google } from 'googleapis';
 import { calcTime, convertHHMMSS } from '@/lib/calcTime';
 import { CHAT_MESSAGE, isEndMessage, isStartMessage, REFRESH_MESSAGE, START_MESSAGE } from '@/lib/liveChatMessage';
 import { logger } from '@/utils/logger';
-import { getTotalTimeSec } from '@/db/user';
 import { getOAuth2Client } from '@/utils/googleClient';
 import { parameter } from '@/config/system';
+import { getTotalTimeSecByChannelId } from '@/db/study';
 
 // 公式ドキュメント：https://developers.google.com/youtube/v3/live/docs/liveChatMessages/list?hl=ja
 
 // このコードブロックはビルド時（npm run build）に一度だけ実行され、指定されたチャンネルの現在のライブ配信のvideoIdとliveChatIdを取得します。
 const YOUTUBE = await google.youtube({ version: 'v3', auth: process.env.YOUTUBE_API_KEY });
-// 環境変数 VIDEO_ID があればそれを使用。なければ従来どおりチャンネルのライブ検索結果から取得
-let targetVideoId = undefined;
-if (process.env.VIDEO_ID) {
-  targetVideoId = process.env.VIDEO_ID.trim();
-  logger.info('.envファイルのVIDEO_IDを使用します');
-} else {
-  const channel = await YOUTUBE.search.list({ part: ['id'], channelId: process.env.CHANNEL_ID, eventType: 'live', type: ['video'], maxResults: 1});
-  targetVideoId = channel.data.items![0].id!.videoId as string;
-  logger.info('配信中のvideoIdを使用します');
-}
-logger.info(`targetVideoId - ${targetVideoId}`);
-
-// src/db/user.ts でも使用するのでエクスポート
-export const VIDEO_ID = targetVideoId;
-const response = await YOUTUBE.videos.list({ part: ['liveStreamingDetails'], id: [targetVideoId] });
+const response = await YOUTUBE.videos.list({ part: ['liveStreamingDetails'], id: [process.env.VIDEO_ID!.trim()] });
 const video = response.data.items?.[0];
 const LIVE_CHAT_ID = video?.liveStreamingDetails?.activeLiveChatId;
 if (!LIVE_CHAT_ID) logger.error('LIVE_CHAT_IDが取得できませんでした。環境変数 VIDEO_ID の設定や配信中かを確認してください。');
@@ -114,7 +100,7 @@ export async function POST(request: NextRequest) {
       message = `@${user.name}: ${REFRESH_MESSAGE}`;
       // 停止
     } else if (flag === parameter.END_FLAG) {
-      const totalTimeSec = await getTotalTimeSec(user.channelId);
+      const totalTimeSec = await getTotalTimeSecByChannelId(user.channelId);
       const random = Math.floor(Math.random() * CHAT_MESSAGE.length);
       message = `@${user.name}: +${calcTime(user.timeSec)} (累計値: ${calcTime(totalTimeSec)}) 👏 ` + CHAT_MESSAGE[random];
     } else {

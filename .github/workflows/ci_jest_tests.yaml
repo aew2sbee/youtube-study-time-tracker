@@ -35,4 +35,4 @@ jobs:
         run: npm run lint --if-present
 
       - name: Run Jest # Jest をCIモードで実行（カラー出力付き）
-        run: npm test -- --ci --color
+        run: npm test --ci --color

@@ -1,72 +1,33 @@
 import { logger } from '@/utils/logger';
 import { db } from '@/db';
 import { users } from '@/db/schema';
+import { eq } from 'drizzle-orm';
 import { User } from '@/types/users';
-import { eq, and } from 'drizzle-orm';
-import { VIDEO_ID } from '@/app/api/youtube/route';
-type UserRow = typeof users.$inferSelect;
 
-// データを保存する関数
-export const saveUser = async (user: User) => {
-  logger.info(`saveUser - ${user.name} ${user.timeSec}`);
-  let res: UserRow[];
-  const existingUser = await hasUser(user);
-  if (existingUser.length > 0) {
-    // 既存のユーザーデータを更新
-    res = await updateTimeSec(user, existingUser[0].id);
-  } else {
-    // 新しいユーザーデータとして追加
-    res = await insertUser(user);
-  }
-  logger.info(`savedUser - ${res[0].name} ${res[0].timeSec}`);
-  return res;
-};
-
-export const updateTimeSec = async (user: User, userId: number) => {
-  logger.info(`updateTimeSec - ${user.name} ${user.timeSec}`);
-  const res = await db.update(users).set({ timeSec: user.timeSec }).where(eq(users.id, userId)).returning();
-  if (res.length > 0) {
-    logger.info(`updatedTimeSec - ${user.name} ${user.timeSec} => ${res[0]?.timeSec}`);
-  } else {
-    logger.warn(`updatedTimeSec - ${user.name} id not found: ${userId}`);
-  }
-  return res;
-};
+// 型
+export type UserRow = typeof users.$inferSelect;
+export type InsertUserRow = typeof users.$inferInsert;
 
 export const insertUser = async (user: User) => {
-  logger.info(`insertUser - ${user.name} ${user.timeSec}`);
-  const res = await db
-    .insert(users)
-    .values({
-      channelId: user.channelId,
-      name: user.name,
-      timeSec: user.timeSec,
-      videoId: VIDEO_ID,
-    })
-    .returning();
-  logger.info(`insertedUser - ${user.name} ${user.timeSec}`);
-  return res;
+  logger.info(`insertUser name=${user.name}`);
+  const res = await db.insert(users).values({ channelId: user.channelId, name: user.name }).returning();
+  logger.info(`insertUser new name=${res[0].name}`);
+  return res[0];
 };
 
-export const hasUser = async (user: User) => {
-  logger.info(`hasUser - ${user.name} ${user.timeSec}`);
-  const res = await db
-    .select({ id: users.id })
-    .from(users)
-    .where(and(eq(users.channelId, user.channelId), eq(users.videoId, VIDEO_ID)))
-    .limit(1);
-  if (res.length > 0) {
-    logger.info(`existingUser - ${user.name} ${res[0].id}`);
+export const getUserByChannelId = async (channelId: string) => {
+  const rows = await db.select().from(users).where(eq(users.channelId, channelId));
+  return rows[0];
+};
+
+export const updateUserNameByChannelId = async (channelId: string, name: string) => {
+  logger.info(`updateUserNameByChannelId name=${name}`);
+  const existing = await getUserByChannelId(channelId);
+  if (existing.name === name) {
+    logger.info(`updateUserNameByChannelId same name=${existing.name}`);
+    return;
   } else {
-    logger.info(`existingUser - ${user.name} not found`);
+    logger.info(`updateUserNameByChannelId diff name=${existing.name}`);
+    return await db.update(users).set({ name }).where(eq(users.channelId, channelId)).returning();
   }
-  return res;
-};
-
-export const getTotalTimeSec = async (channelId: string) => {
-  logger.info(`getTotalTimeSec - ${channelId}`);
-  const res = await db.select({ timeSec: users.timeSec }).from(users).where(eq(users.channelId, channelId));
-  const totalTimeSec = res.reduce((acc, curr) => acc + curr.timeSec, 0);
-  logger.info(`totalTimeSec - ${channelId} ${totalTimeSec}`);
-  return totalTimeSec;
 };

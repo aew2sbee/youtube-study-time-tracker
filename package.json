@@ -14,19 +14,19 @@
     "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
-    "better-sqlite3": "^12.2.0",
+    "@supabase/supabase-js": "^2.58.0",
     "dotenv": "^17.2.1",
     "drizzle-orm": "^0.44.4",
     "framer-motion": "^12.23.12",
     "googleapis": "^134.0.0",
     "next": "15.3.4",
+    "postgres": "^3.4.7",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "swr": "^2.3.4"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
-    "@types/better-sqlite3": "^7.6.13",
     "@types/jest": "^29.5.12",
     "@types/node": "^20",
     "@types/react": "^18",
