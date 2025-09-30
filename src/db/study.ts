@@ -5,6 +5,14 @@ import { and, eq } from 'drizzle-orm';
 import { User } from '@/types/users';
 import { getUserByChannelId, insertUser } from './user';
 
+// JST(UTC+9) に正規化する。文字列は Date 化後、元のタイムゾーンとの差を補正して JST に合わせる。
+const toJstDate = (value: string | Date) => {
+  const d = typeof value === 'string' ? new Date(value) : value;
+  // d を一旦 UTC エポックにし、JST オフセット(+9h)を付与
+  const utcTime = d.getTime() + d.getTimezoneOffset() * 60000;
+  return new Date(utcTime + 9 * 60 * 60000);
+};
+
 export type StudyRow = typeof study.$inferSelect;
 export type InsertStudyRow = typeof study.$inferInsert;
 
@@ -28,28 +36,24 @@ export const saveLog = async (user: User) => {
 
 export const insertStudy = async (userId: number, user: User) => {
   logger.info(`insertStudy name=${user.name}`);
+  const jstTimestamp = toJstDate(user.updateTime);
   const res = await db
     .insert(study)
     .values({
       userId,
       timeSec: user.timeSec,
-      timestamp: typeof user.updateTime === 'string' ? new Date(user.updateTime) : user.updateTime,
+      timestamp: jstTimestamp,
     })
     .returning();
   return res[0];
 };
 
 export const checkStudy = async (userId: number, user: User) => {
+  const jstTimestamp = toJstDate(user.updateTime);
   const res = await db
     .select()
     .from(study)
-    .where(
-      and(
-        eq(study.userId, userId),
-        eq(study.timeSec, user.timeSec),
-        eq(study.timestamp, typeof user.updateTime === 'string' ? new Date(user.updateTime) : user.updateTime),
-      ),
-    );
+    .where(and(eq(study.userId, userId), eq(study.timeSec, user.timeSec), eq(study.timestamp, jstTimestamp)));
   logger.info(`checkStudy count=${res.length}`);
   return res.length > 0;
 };
