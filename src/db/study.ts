@@ -39,7 +39,22 @@ export const insertStudy = async (userId: number, user: User) => {
   return res[0];
 };
 
+export const updateStudy = async (userId: number, user: User) => {
+    const res = await db
+      .update(study)
+      .set({
+        timeSec: user.timeSec,
+        timestamp: typeof user.updateTime === 'string' ? new Date(user.updateTime) : user.updateTime,
+      })
+      .where(study.id.eq(existing[0].id))
+      .returning();
+    return res[0];
+}
+
 export const checkStudy = async (userId: number, user: User) => {
+  const userDate = typeof user.updateTime === 'string' ? new Date(user.updateTime) : user.updateTime;
+  const userYYYYMMDD = userDate.toISOString().slice(0, 10); // 'YYYY-MM-DD'
+
   const res = await db
     .select()
     .from(study)
