@@ -15,6 +15,7 @@ export default function HowToJoin() {
         <li>1. 配信中なら、何回でも参加OK!!</li>
         <li>2. 同じ配信なら、時間は累積します。</li>
         <li>3. 計測終了がないと、記録しません。</li>
+        <li>4. 24時間配信は、Bot機能はOFFです。</li>
       </ul>
     </div>
   );
