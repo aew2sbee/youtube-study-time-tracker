@@ -51,7 +51,9 @@ export default function Home() {
   if (isLoading) return <LoadingSpinner />;
   if (isError) return <ErrorMessage error={isError} />;
 
-  const currentPageData = pages[currentPage];
+  const currentPageData = pages[currentPage] || pages[0];
+
+  if (!currentPageData) return <LoadingSpinner />;
 
   return (
     <div className="fixed inset-0 w-[1920px] h-[1080px] overflow-hidden pointer-events-none from-slate-900 via-slate-800 to-slate-900">
