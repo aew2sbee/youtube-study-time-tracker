@@ -11,7 +11,7 @@ export default function HowToJoin() {
       <p className="pl-4">※Botくんが結果を教えてくれます。</p>
 
       <p className="text-4xl pt-4 font-bold">補足情報</p>
-      <ul className="pl-8">
+      <ul className="pl-4">
         <li>1. 配信中なら、何回でも参加OK!!</li>
         <li>2. 同じ配信なら、時間は累積します。</li>
         <li>3. 計測終了がないと、記録しません。</li>
