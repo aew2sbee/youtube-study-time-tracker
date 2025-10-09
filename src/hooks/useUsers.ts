@@ -15,6 +15,7 @@ export const useUsers = () => {
   const [user, setUser] = useState<User[]>([]);
   const [liveChatMessage, setLiveChatMessage] = useState<YouTubeLiveChatMessage[]>([]);
   const lastProcessedIndexRef = useRef(0); // 追加: 再処理防止用のインデックス
+  const lastResetDateRef = useRef<string>(''); // 最後にリセットした日付
 
   const { data, error, isLoading } = useSWR<LiveChatResponse>(YOUTUBE_API_URL, fetcher, {
     refreshInterval: parameter.API_POLLING_INTERVAL,
@@ -22,6 +23,28 @@ export const useUsers = () => {
 
   const { trigger: saveUser } = useSWRMutation(DB_API_URL, postUser);
   const { trigger: postComment } = useSWRMutation(YOUTUBE_API_URL, postYoutubeComment);
+
+  // AM 3時にユーザーデータを初期化（1日1回のみ）
+  useEffect(() => {
+    const checkAndResetAt3AM = () => {
+      const now = new Date();
+      const hours = now.getHours();
+      const today = now.toDateString();
+
+      // AM 3時以降で、今日まだリセットしていない場合に初期化
+      if (hours >= 3 && lastResetDateRef.current !== today) {
+        setUser([]);
+        lastResetDateRef.current = today;
+      }
+    };
+
+    checkAndResetAt3AM(); // 初回実行
+
+    // 1時間ごとにチェック
+    const interval = setInterval(checkAndResetAt3AM, 3600000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   // currentTimeを定期的に更新（dataに関係なく）
   useEffect(() => {

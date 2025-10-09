@@ -5,7 +5,7 @@ import { google } from 'googleapis';
 import { calcTime, convertHHMMSS } from '@/lib/calcTime';
 import { CHAT_MESSAGE, isEndMessage, isStartMessage, REFRESH_MESSAGE, START_MESSAGE } from '@/lib/liveChatMessage';
 import { logger } from '@/utils/logger';
-import { getOAuth2Client } from '@/utils/googleClient';
+import { getAuthenticatedClient } from '@/utils/googleClient';
 import { parameter } from '@/config/system';
 import { getTotalTimeSecByChannelId } from '@/db/study';
 
@@ -18,10 +18,6 @@ const video = response.data.items?.[0];
 const LIVE_CHAT_ID = video?.liveStreamingDetails?.activeLiveChatId;
 if (!LIVE_CHAT_ID) logger.error('LIVE_CHAT_IDが取得できませんでした。環境変数 VIDEO_ID の設定や配信中かを確認してください。');
 logger.info(`liveChatId - ${LIVE_CHAT_ID}`);
-
-// OAuth2クライアントの設定（初期化時は削除）
-const oauth2Client = await getOAuth2Client();
-const youtubeWithOAuth = google.youtube({ version: 'v3', auth: oauth2Client });
 
 let nextPageToken: string | undefined;
 // レート制御用：次回フェッチ可能な時刻（ms）
@@ -121,6 +117,11 @@ export async function POST(request: NextRequest) {
       logger.info('コメント投稿は無効化されています');
       return NextResponse.json({ success: true, message: 'Commenting is disabled' });
     }
+
+    // リクエストごとに認証済みクライアントを取得（自動でトークン検証・更新）
+    const oauth2Client = await getAuthenticatedClient();
+    const youtubeWithOAuth = google.youtube({ version: 'v3', auth: oauth2Client });
+
     const result = await youtubeWithOAuth.liveChatMessages.insert({
       part: ['snippet'],
       requestBody: {
@@ -141,8 +142,26 @@ export async function POST(request: NextRequest) {
       messageId: result.data.id,
       message: message,
     });
-  } catch (error) {
-    logger.error(`Error posting comment - ${error}`);
+  } catch (error: unknown) {
+    const err = error as Error & { code?: string; message?: string };
+    logger.error(`Error posting comment - ${err.message || error}`);
+
+    // リフレッシュトークンが無効な場合
+    if (err.code === 'invalid_grant' || err.message?.includes('invalid_grant')) {
+      logger.error('❌ Refresh tokenが無効です。再認証が必要です。');
+      return NextResponse.json(
+        {
+          error: 'Authentication required',
+          message: '認証トークンが無効です。再認証してください。',
+          needsReauth: true,
+          authUrl: process.env.NODE_ENV === 'development'
+            ? 'http://localhost:3000/api/oauth/callback'
+            : '/api/oauth/callback'
+        },
+        { status: 401 }
+      );
+    }
+
     return NextResponse.json({ error: 'Failed to post comment' }, { status: 500 });
   }
 }
