@@ -28,14 +28,14 @@ export default function FocusTimeTracker({ user }: { user: User[] }) {
                 <ImageCrown src="/crown/silver.png" alt="crown silver" />
               ) : null}
             </div>
-            <span className="text-black font-medium truncate max-w-[160px] text-3xl">{user.name}</span>
+            <span className="text-black font-medium truncate max-w-[300px] text-3xl">{user.name}</span>
           </div>
 
           <div className="text-black flex items-center text-4xl">
             {user.isStudying ? (
-              <span className="text-green-600 w-32 text-right mr-3 animate-pulse">&#x25CF;</span>
+              <span className="text-green-600 w-6 text-right mr-3 animate-pulse">&#x25CF;</span>
             ) : user.timeSec > 0 ? (
-              <span className="text-gray-400 w-32 text-right mr-3">&#x25CF;</span>
+              <span className="text-gray-400 w-6 text-right mr-3">&#x25CF;</span>
             ) : null}
             <span className="text-3xl">{calcTime(user.timeSec)}</span>
           </div>

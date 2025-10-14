@@ -25,6 +25,18 @@ export const CHAT_MESSAGE = [
 ];
 
 /**
+ * メッセージの先頭に付与されている@を削除します。
+ * @param {string} message - 処理するメッセージテキスト
+ * @returns {string} @が削除されたメッセージ
+ * @example
+ * removeMentionPrefix('@username') // => 'username'
+ * removeMentionPrefix('@username こんにちは') // => 'username こんにちは'
+ * removeMentionPrefix('こんにちは') // => 'こんにちは'
+ */
+export const removeMentionPrefix = (message: string): string =>
+  message.startsWith('@') ? message.slice(1) : message;
+
+/**
  * 指定されたメッセージが学習開始メッセージかどうかを判定します。
  * @param {string} messageText - 判定するメッセージテキスト
  * @returns {boolean} 学習開始メッセージの場合はtrue

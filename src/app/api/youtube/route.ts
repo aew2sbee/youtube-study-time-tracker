@@ -3,7 +3,7 @@ import { YouTubeLiveChatMessage, LiveChatResponse } from '@/types/youtube';
 import { User } from '@/types/users';
 import { google } from 'googleapis';
 import { calcTime, convertHHMMSS } from '@/lib/calcTime';
-import { CHAT_MESSAGE, isEndMessage, isStartMessage, REFRESH_MESSAGE, START_MESSAGE } from '@/lib/liveChatMessage';
+import { CHAT_MESSAGE, isEndMessage, isStartMessage, REFRESH_MESSAGE, removeMentionPrefix, START_MESSAGE } from '@/lib/liveChatMessage';
 import { logger } from '@/utils/logger';
 import { getOAuth2Client } from '@/utils/googleClient';
 import { parameter } from '@/config/system';
@@ -56,7 +56,7 @@ export async function GET() {
         .map((item) => ({
           id: item.id || '',
           channelId: item.authorDetails?.channelId || '',
-          authorDisplayName: item.authorDetails?.displayName || '',
+          authorDisplayName: removeMentionPrefix(item.authorDetails?.displayName || ''),
           displayMessage: item.snippet?.displayMessage || '',
           publishedAt: item.snippet?.publishedAt || '',
           profileImageUrl: item.authorDetails?.profileImageUrl || '',
