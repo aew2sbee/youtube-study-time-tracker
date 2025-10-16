@@ -3,6 +3,7 @@ import ImageCrown from './ImageCrown';
 import ImageProfile from './ImageProfile';
 import { User } from '@/types/users';
 import { calcTime } from '@/lib/calcTime';
+import { Timer, TimerOff } from 'lucide-react';
 
 export default function FocusTimeTracker({ user }: { user: User[] }) {
   if (!user || user.length === 0) {
@@ -28,14 +29,14 @@ export default function FocusTimeTracker({ user }: { user: User[] }) {
                 <ImageCrown src="/crown/silver.png" alt="crown silver" />
               ) : null}
             </div>
-            <span className="text-black font-medium truncate max-w-[300px] text-3xl">{user.name}</span>
+            <span className="text-black font-medium truncate max-w-[280px] text-3xl">{user.name}</span>
           </div>
 
           <div className="text-black flex items-center text-4xl">
             {user.isStudying ? (
-              <span className="text-green-600 w-6 text-right mr-3 animate-pulse">&#x25CF;</span>
+              <Timer className="text-green-600 w-10 h-10 mr-3 animate-pulse" />
             ) : user.timeSec > 0 ? (
-              <span className="text-gray-400 w-6 text-right mr-3">&#x25CF;</span>
+              <TimerOff className="text-gray-400 w-10 h-10 mr-3" />
             ) : null}
             <span className="text-3xl">{calcTime(user.timeSec)}</span>
           </div>
