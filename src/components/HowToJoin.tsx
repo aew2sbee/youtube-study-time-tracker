@@ -1,3 +1,5 @@
+import { Monitor, BookOpen, Pen} from 'lucide-react';
+
 export default function HowToJoin() {
   return (
     <div className="text-black text-3xl space-y-3 items-start justify-start pt-2">
@@ -15,6 +17,23 @@ export default function HowToJoin() {
         <li>1. 配信中なら、何回でも参加OK!!</li>
         <li>2. 同じ配信なら、時間は累積します。</li>
         <li>3. 計測終了がないと、記録しません。</li>
+      </ul>
+
+      <p className="text-4xl pt-4 font-bold">オプション機能</p>
+      <p className="pl-4">取り組み内容も表示できます。</p>
+      <ul className="pl-4 space-y-2">
+        <li className="flex items-center space-x-2">
+          <Monitor className="w-10 h-10" />
+          <span>:「作業」のみを入力</span>
+        </li>
+        <li className="flex items-center space-x-2">
+          <Pen className="w-10 h-10" />
+          <span>:「勉強」のみを入力</span>
+        </li>
+        <li className="flex items-center space-x-2">
+          <BookOpen className="w-10 h-10" />
+          <span>:「読書」のみを入力</span>
+        </li>
       </ul>
     </div>
   );
