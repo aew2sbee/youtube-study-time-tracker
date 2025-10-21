@@ -35,8 +35,8 @@ export default function HowToJoin() {
       </ul>
 
       <p className="text-4xl pt-4 font-bold">おまけ機能</p>
-      <p className="pl-4">アナリティクスアプリ無料を配布中</p>
-      <p className="pl-4">詳細→ 配信の説明欄に記載</p>
+      <p className="pl-4">アナリティクスアプリを配布中</p>
+      <p className="pl-4">詳細→ 配信の説明欄へ</p>
     </div>
   );
 }
