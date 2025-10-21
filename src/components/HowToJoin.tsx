@@ -21,22 +21,22 @@ export default function HowToJoin() {
       <p className="pl-4">取り組み内容も表示できます。</p>
       <ul className="pl-4 space-y-2">
         <li className="flex items-center space-x-2">
-          <Monitor className="w-10 h-10" />
+          <Monitor className="w-9 h-9" />
           <span>:「作業」のみを追加で入力</span>
         </li>
         <li className="flex items-center space-x-2">
-          <Pen className="w-10 h-10" />
+          <Pen className="w-9 h-9" />
           <span>:「勉強」のみを追加で入力</span>
         </li>
         <li className="flex items-center space-x-2">
-          <BookOpen className="w-10 h-10" />
+          <BookOpen className="w-9 h-9" />
           <span>:「読書」のみを追加で入力</span>
         </li>
       </ul>
 
       <p className="text-4xl pt-4 font-bold">おまけ機能</p>
-      <p className="pl-4">アナリティクスアプリ無料を配布中</p>
-      <p className="pl-4">詳細→ 配信の説明欄に記載</p>
+      <p className="pl-4">アナリティクスアプリを配布中</p>
+      <p className="pl-4">詳細→ 配信の説明欄へ</p>
     </div>
   );
 }
