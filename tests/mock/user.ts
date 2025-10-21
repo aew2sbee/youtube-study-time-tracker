@@ -8,6 +8,7 @@ export const SAMPLE_USER_001: User = {
   updateTime: new Date('2025-01-01T00:00:00.000Z'),
   isStudying: false,
   refreshInterval: 0,
+  category: '作業',
 } as const;
 
 export const SAMPLE_USER_002: User = {
@@ -18,6 +19,7 @@ export const SAMPLE_USER_002: User = {
   updateTime: new Date('2025-01-01T02:00:00.000Z'),
   isStudying: false,
   refreshInterval: 200,
+  category: '勉強',
 } as const;
 
 export const SAMPLE_USER_003: User = {
@@ -28,5 +30,6 @@ export const SAMPLE_USER_003: User = {
   updateTime: new Date('2025-01-01T03:00:00.000Z'),
   isStudying: false,
   refreshInterval: 300,
+  category: '読書',
 } as const;
 

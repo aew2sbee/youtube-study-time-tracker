@@ -51,3 +51,13 @@ export const isStartMessage = (messageText: string): boolean =>
  */
 export const isEndMessage = (messageText: string): boolean =>
   messageText.toLowerCase().trim() === parameter.END_STUDY_KEYWORDS;
+
+/**
+ * 指定されたメッセージがカテゴリーメッセージ（作業、勉強、読書）かどうかを判定します。
+ * @param {string} messageText - 判定するメッセージテキスト
+ * @returns {boolean} カテゴリーメッセージの場合はtrue
+ */
+export const isCategoryMessage = (messageText: string): boolean => {
+  const trimmedMessage = messageText.trim();
+  return (parameter.ALLOW_WORDS as readonly string[]).includes(trimmedMessage);
+};
