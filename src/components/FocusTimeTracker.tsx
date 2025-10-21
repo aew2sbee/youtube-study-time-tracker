@@ -36,7 +36,7 @@ export default function FocusTimeTracker({ user }: { user: User[] }) {
               }
             </div>
             <div className="flex items-center">
-              <span className="text-black font-medium truncate max-w-[250px] text-3xl">{user.name}</span>
+              <span className="text-black font-medium truncate max-w-[230px] text-3xl">{user.name}</span>
             </div>
           </div>
 
