@@ -2,6 +2,7 @@ import { User } from '@/types/users';
 import { YouTubeLiveChatMessage } from '@/types/youtube';
 import { calcStudyTime, calcTime } from '@/lib/calcTime';
 import { logger } from '@/utils/logger';
+import { Category } from '@/types/category';
 
 export const startTime = (message: YouTubeLiveChatMessage): User => {
   const startUser = {
@@ -12,6 +13,7 @@ export const startTime = (message: YouTubeLiveChatMessage): User => {
     updateTime: new Date(message.publishedAt),
     isStudying: true,
     refreshInterval: 0,
+    category: '',
   };
   logger.info(`startTime - ${startUser.name} ${calcTime(startUser.timeSec)}`);
   return startUser;
@@ -65,4 +67,13 @@ export const resetRefresh = (user: User): User => {
   };
   logger.info(`resetRefresh - ${refreshUser.name} ${calcTime(user.refreshInterval)} => ${calcTime(refreshUser.refreshInterval)}`);
   return refreshUser;
+};
+
+export const updateCategory = (user: User, messageText: string): User => {
+  const updatedUser = {
+    ...user,
+    category: messageText,
+  };
+  logger.info(`updateCategory - ${updatedUser.name} category: ${updatedUser.category}`);
+  return updatedUser;
 };

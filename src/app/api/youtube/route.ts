@@ -3,7 +3,7 @@ import { YouTubeLiveChatMessage, LiveChatResponse } from '@/types/youtube';
 import { User } from '@/types/users';
 import { google } from 'googleapis';
 import { calcTime, convertHHMMSS } from '@/lib/calcTime';
-import { CHAT_MESSAGE, isEndMessage, isStartMessage, REFRESH_MESSAGE, removeMentionPrefix, START_MESSAGE } from '@/lib/liveChatMessage';
+import { CHAT_MESSAGE, extractCategory, isEndMessage, isStartMessage, REFRESH_MESSAGE, removeMentionPrefix, START_MESSAGE } from '@/lib/liveChatMessage';
 import { logger } from '@/utils/logger';
 import { getOAuth2Client } from '@/utils/googleClient';
 import { parameter } from '@/config/system';
@@ -51,7 +51,7 @@ export async function GET() {
       liveChatMessages.data.items
         ?.filter((item) => {
           const displayMessage = item.snippet?.displayMessage || '';
-          return isStartMessage(displayMessage) || isEndMessage(displayMessage);
+          return isStartMessage(displayMessage) || isEndMessage(displayMessage) || extractCategory(displayMessage);
         })
         .map((item) => ({
           id: item.id || '',
