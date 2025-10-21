@@ -1,7 +1,7 @@
 import ImageProfile from './ImageProfile';
 import { User } from '@/types/users';
 import { calcTime } from '@/lib/calcTime';
-import { Timer, TimerOff, Monitor, BookOpen, Pen} from 'lucide-react';
+import { Monitor, BookOpen, Pen} from 'lucide-react';
 import { parameter } from '@/config/system';
 
 
@@ -25,25 +25,25 @@ export default function FocusTimeTracker({ user }: { user: User[] }) {
               <ImageProfile src={user.profileImageUrl} alt={user.name} />
             </div>
             <span className="text-black font-medium truncate max-w-[300px] ">{user.name}</span>
-            {
-              // 作業
-              user.category === parameter.ALLOW_WORDS[0] ? (<Monitor className="text-black w-8 h-8" />)
-              // 勉強
-              : user.category === parameter.ALLOW_WORDS[1] ? (<Pen className="text-black w-8 h-8" />)
-              // 読書
-              : user.category === parameter.ALLOW_WORDS[2] ? (<BookOpen className="text-black w-8 h-8" />)
-              : <div className="w-8 h-8" />
-            }
           </div>
 
-          <div className="flex items-end text-3xl">
-          {
-            user.isStudying
-            ? <span className="text-black">{calcTime(user.timeSec)}</span>
-            : <span className="text-gray-400">{calcTime(user.timeSec)}</span>
-          }
+          <div className="flex items-center text-3xl">
+            {
+              // 作業
+              user.category === parameter.ALLOW_WORDS[0] ? (<Monitor className="text-black w-10 h-10 mr-2" />)
+              // 勉強
+              : user.category === parameter.ALLOW_WORDS[1] ? (<Pen className="text-black w-10 h-10 mr-2" />)
+              // 読書
+              : user.category === parameter.ALLOW_WORDS[2] ? (<BookOpen className="text-black w-10 h-10 mr-2" />)
+              : <div className="w-10 h-10 mr-2" />
+            }
+            {
+              user.isStudying
+              ? <span className="text-black">{calcTime(user.timeSec)}</span>
+              : <span className="text-gray-400">{calcTime(user.timeSec)}</span>
+            }
           </div>
-        </div>
+      </div>
       ))}
     </div>
   );
