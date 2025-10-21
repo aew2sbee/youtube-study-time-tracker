@@ -3,10 +3,10 @@ import useSWRMutation from 'swr/mutation';
 import { fetcher, postUser, postYoutubeComment } from '@/utils/useSWR';
 import { useState, useEffect, useRef } from 'react';
 import { LiveChatResponse, YouTubeLiveChatMessage } from '@/types/youtube';
-import { isEndMessage, isStartMessage } from '@/lib/liveChatMessage';
+import { isCategoryMessage, isEndMessage, isStartMessage } from '@/lib/liveChatMessage';
 import { User } from '@/types/users';
 import { parameter } from '@/config/system';
-import { resetRefresh, restartTime, startTime, stopTime, updateTime } from '@/lib/user';
+import { resetRefresh, restartTime, startTime, stopTime, updateCategory, updateTime } from '@/lib/user';
 
 const YOUTUBE_API_URL = '/api/youtube';
 const DB_API_URL = '/api/db';
@@ -116,6 +116,9 @@ export const useUsers = () => {
                 { populateCache: false, revalidate: false, throwOnError: false },
               );
             })();
+          } else if (isCategoryMessage(messageText) && existingUser.isStudying) {
+            const categoryUser = updateCategory(existingUser, messageText);
+            newList = newList.filter((u) => u.channelId !== existingUser.channelId).concat(categoryUser);
           }
         } else {
           // 新規ユーザーの開始

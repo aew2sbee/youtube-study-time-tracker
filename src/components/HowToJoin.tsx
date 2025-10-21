@@ -1,12 +1,12 @@
+import { Monitor, BookOpen, Pen} from 'lucide-react';
+
 export default function HowToJoin() {
   return (
-    <div className="text-black text-3xl space-y-3 items-start justify-start pt-2">
-      <p className="pt-2">手順</p>
-
-      <p className="text-4xl pt-4 font-bold">1. 計測開始</p>
+    <div className="text-black text-3xl space-y-3 items-start justify-start">
+      <p className="text-4xl pt-2 font-bold">1. 計測開始</p>
       <p className="pl-4">チャット欄に<strong>「start」</strong>のみを入力</p>
       <p className="pl-4">※Botくんが受付をしてくれます。</p>
-      <p className="text-4xl pt-4 font-bold">2. 計測終了</p>
+      <p className="text-4xl pt-2 font-bold">2. 計測終了</p>
       <p className="pl-4">チャット欄に<strong>「end」</strong>のみを入力</p>
       <p className="pl-4">※Botくんが結果を教えてくれます。</p>
 
@@ -16,6 +16,27 @@ export default function HowToJoin() {
         <li>2. 同じ配信なら、時間は累積します。</li>
         <li>3. 計測終了がないと、記録しません。</li>
       </ul>
+
+      <p className="text-4xl pt-4 font-bold">オプション機能</p>
+      <p className="pl-4">取り組み内容も表示できます。</p>
+      <ul className="pl-4 space-y-2">
+        <li className="flex items-center space-x-2">
+          <Monitor className="w-10 h-10" />
+          <span>:「作業」のみを追加で入力</span>
+        </li>
+        <li className="flex items-center space-x-2">
+          <Pen className="w-10 h-10" />
+          <span>:「勉強」のみを追加で入力</span>
+        </li>
+        <li className="flex items-center space-x-2">
+          <BookOpen className="w-10 h-10" />
+          <span>:「読書」のみを追加で入力</span>
+        </li>
+      </ul>
+
+      <p className="text-4xl pt-4 font-bold">おまけ機能</p>
+      <p className="pl-4">アナリティクスアプリ無料を配布中</p>
+      <p className="pl-4">詳細→ 配信の説明欄に記載</p>
     </div>
   );
 }
