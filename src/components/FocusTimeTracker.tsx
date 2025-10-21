@@ -32,7 +32,7 @@ export default function FocusTimeTracker({ user }: { user: User[] }) {
                 : user.category === parameter.ALLOW_WORDS[1] ? (<Pen className="text-black w-10 h-10" />)
                 // 読書
                 : user.category === parameter.ALLOW_WORDS[2] ? (<BookOpen className="text-black w-10 h-10" />)
-                : null
+                : <div className="w-10 h-10" />
               }
             </div>
             <div className="flex items-center">
