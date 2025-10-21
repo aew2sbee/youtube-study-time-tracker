@@ -22,6 +22,7 @@ describe('src/lib/user.ts のユーティリティ関数', () => {
         ...SAMPLE_USER_001,
         isStudying: true,
         timeSec: 0,
+        category: '', // 新規作成時はカテゴリーは空文字列
       };
 
       // 実行(Act)
