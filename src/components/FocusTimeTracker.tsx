@@ -30,12 +30,12 @@ export default function FocusTimeTracker({ user }: { user: User[] }) {
           <div className="flex items-center text-3xl">
             {
               // 作業
-              user.category === parameter.ALLOW_WORDS[0] ? (<Monitor className="text-black w-10 h-10 mr-2" />)
+              user.category === parameter.ALLOW_WORDS[0] ? (<Monitor className="text-black w-9 h-9 mr-2" />)
               // 勉強
-              : user.category === parameter.ALLOW_WORDS[1] ? (<Pen className="text-black w-10 h-10 mr-2" />)
+              : user.category === parameter.ALLOW_WORDS[1] ? (<Pen className="text-black w-9 h-9 mr-2" />)
               // 読書
-              : user.category === parameter.ALLOW_WORDS[2] ? (<BookOpen className="text-black w-10 h-10 mr-2" />)
-              : <div className="w-10 h-10 mr-2" />
+              : user.category === parameter.ALLOW_WORDS[2] ? (<BookOpen className="text-black w-9 h-9 mr-2" />)
+              : <div className="w-9 h-9 mr-2" />
             }
             {
               user.isStudying
