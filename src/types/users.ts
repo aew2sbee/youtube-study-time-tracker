@@ -6,5 +6,5 @@ export interface User {
   updateTime: Date;
   isStudying: boolean;
   refreshInterval: number;
-  category: string; // ALLOW_WORDSに一致したカテゴリー
+  category: string;
 }
