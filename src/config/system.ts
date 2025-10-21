@@ -1,8 +1,8 @@
 export const parameter = {
-  ALLOW_WORDS: ['作業', '勉強', '読書'],
+  ALLOW_WORDS: ['作業', '勉強', '読書'] as readonly string[],
   START_STUDY_KEYWORDS: 'start',
   END_STUDY_KEYWORDS: 'end',
-  IS_COMMENT_ENABLED: false,
+  IS_COMMENT_ENABLED: true,
   API_POLLING_INTERVAL: 1 * 60 * 1000, // 1分間隔
   USERS_PER_PAGE: 10, // 1ページあたりのユーザー数
   TRANSITION_DURATION: 1 * 1000, // フェードトランジション時間（ミリ秒）

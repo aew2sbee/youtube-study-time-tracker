@@ -53,14 +53,11 @@ export const isEndMessage = (messageText: string): boolean =>
   messageText.toLowerCase().trim() === parameter.END_STUDY_KEYWORDS;
 
 /**
- * メッセージにALLOW_WORDSのいずれかが含まれているかをチェックします。
- * @param {string} messageText - チェックするメッセージテキスト
- * @returns {string | undefined} 含まれている単語、含まれていない場合はundefined
- * @example
- * extractCategory('今日は勉強します') // => '勉強'
- * extractCategory('作業中です') // => '作業'
- * extractCategory('おはようございます') // => undefined
+ * 指定されたメッセージがカテゴリーメッセージ（作業、勉強、読書）かどうかを判定します。
+ * @param {string} messageText - 判定するメッセージテキスト
+ * @returns {boolean} カテゴリーメッセージの場合はtrue
  */
-export const extractCategory = (messageText: string): string | undefined => {
-  return parameter.ALLOW_WORDS.find((word) => messageText.includes(word));
+export const isCategoryMessage = (messageText: string): boolean => {
+  const trimmedMessage = messageText.trim();
+  return (parameter.ALLOW_WORDS as readonly string[]).includes(trimmedMessage);
 };

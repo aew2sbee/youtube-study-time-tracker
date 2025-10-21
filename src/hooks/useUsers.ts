@@ -3,7 +3,7 @@ import useSWRMutation from 'swr/mutation';
 import { fetcher, postUser, postYoutubeComment } from '@/utils/useSWR';
 import { useState, useEffect, useRef } from 'react';
 import { LiveChatResponse, YouTubeLiveChatMessage } from '@/types/youtube';
-import { extractCategory, isEndMessage, isStartMessage } from '@/lib/liveChatMessage';
+import { isCategoryMessage, isEndMessage, isStartMessage } from '@/lib/liveChatMessage';
 import { User } from '@/types/users';
 import { parameter } from '@/config/system';
 import { resetRefresh, restartTime, startTime, stopTime, updateCategory, updateTime } from '@/lib/user';
@@ -116,7 +116,7 @@ export const useUsers = () => {
                 { populateCache: false, revalidate: false, throwOnError: false },
               );
             })();
-          } else if (extractCategory(messageText) && existingUser.isStudying) {
+          } else if (isCategoryMessage(messageText) && existingUser.isStudying) {
             const categoryUser = updateCategory(existingUser, messageText);
             newList = newList.filter((u) => u.channelId !== existingUser.channelId).concat(categoryUser);
           }

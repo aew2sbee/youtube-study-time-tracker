@@ -1,9 +1,9 @@
-import { parameter } from '@/config/system';
-import ImageCrown from './ImageCrown';
 import ImageProfile from './ImageProfile';
 import { User } from '@/types/users';
 import { calcTime } from '@/lib/calcTime';
-import { Timer, TimerOff } from 'lucide-react';
+import { Timer, TimerOff, Monitor, BookOpen, Pen} from 'lucide-react';
+import { parameter } from '@/config/system';
+
 
 export default function FocusTimeTracker({ user }: { user: User[] }) {
   if (!user || user.length === 0) {
@@ -23,13 +23,21 @@ export default function FocusTimeTracker({ user }: { user: User[] }) {
           <div className="flex items-center space-x-4">
             <div className="relative">
               <ImageProfile src={user.profileImageUrl} alt={user.name} />
-              {user.timeSec >= parameter.CRON_TIME_GOLD ? (
-                <ImageCrown src="/crown/gold.png" alt="crown gold" />
-              ) : user.timeSec >= parameter.CRON_TIME_SILVER ? (
-                <ImageCrown src="/crown/silver.png" alt="crown silver" />
-              ) : null}
             </div>
-            <span className="text-black font-medium truncate max-w-[280px] text-3xl">{user.name}</span>
+            <div className="flex items-center space-x-2">
+              {
+                // 作業
+                user.category === parameter.ALLOW_WORDS[0] ? (<Monitor className="text-black w-10 h-10" />)
+                // 勉強
+                : user.category === parameter.ALLOW_WORDS[1] ? (<Pen className="text-black w-10 h-10" />)
+                // 読書
+                : user.category === parameter.ALLOW_WORDS[2] ? (<BookOpen className="text-black w-10 h-10" />)
+                : null
+              }
+            </div>
+            <div className="flex items-center">
+              <span className="text-black font-medium truncate max-w-[250px] text-3xl">{user.name}</span>
+            </div>
           </div>
 
           <div className="text-black flex items-center text-4xl">
