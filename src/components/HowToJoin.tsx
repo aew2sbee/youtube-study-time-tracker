@@ -24,15 +24,15 @@ export default function HowToJoin() {
       <ul className="pl-4 space-y-2">
         <li className="flex items-center space-x-2">
           <Monitor className="w-10 h-10" />
-          <span>:「作業」のみを入力</span>
+          <span>:「作業」のみを追加で入力</span>
         </li>
         <li className="flex items-center space-x-2">
           <Pen className="w-10 h-10" />
-          <span>:「勉強」のみを入力</span>
+          <span>:「勉強」のみを追加で入力</span>
         </li>
         <li className="flex items-center space-x-2">
           <BookOpen className="w-10 h-10" />
-          <span>:「読書」のみを入力</span>
+          <span>:「読書」のみを追加で入力</span>
         </li>
       </ul>
     </div>
