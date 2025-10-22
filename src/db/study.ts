@@ -46,7 +46,7 @@ export const updateStudy = async (studyId: number, user: User) => {
     const res = await db
       .update(study)
       .set({
-        timeSec: user.timeSec,
+        timeSec: sql`${study.timeSec} + ${user.timeSec}`,
         timestamp: typeof user.updateTime === 'string' ? new Date(user.updateTime) : user.updateTime,
       })
       .where(eq(study.id, studyId))
