@@ -10,5 +10,6 @@ export const study = pgTable('study', {
   id: serial('id').primaryKey(),
   userId: integer('user_id').notNull().references(() => users.id),
   timeSec: integer('time_sec').notNull().default(0),
+  videoId: text('video_id'),
   timestamp: timestamp("timestamp", { withTimezone: true }).defaultNow().notNull(),
 });
