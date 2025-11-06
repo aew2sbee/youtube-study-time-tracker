@@ -26,6 +26,9 @@ const youtubeWithOAuth = google.youtube({ version: 'v3', auth: oauth2Client });
 let nextPageToken: string | undefined;
 // レート制御用：次回フェッチ可能な時刻（ms）
 let nextFetchAvailableAt = 0;
+// コメント投稿のレート制御用：最後に投稿した時刻（ms）
+let lastCommentPostTime = 0;
+const COMMENT_POST_INTERVAL_MS = 2000; // 2秒間隔
 
 export async function GET() {
   try {
@@ -87,6 +90,15 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
+    // レート制御：前回の投稿から2秒未満の場合は待機
+    const now = Date.now();
+    const timeSinceLastPost = now - lastCommentPostTime;
+    if (lastCommentPostTime > 0 && timeSinceLastPost < COMMENT_POST_INTERVAL_MS) {
+      const waitTime = COMMENT_POST_INTERVAL_MS - timeSinceLastPost;
+      logger.info(`レート制御: ${waitTime}ms 待機中...`);
+      await new Promise(resolve => setTimeout(resolve, waitTime));
+    }
+
     let message = '';
     const body = await request.json();
     const user: User = body.user;
@@ -135,6 +147,9 @@ export async function POST(request: NextRequest) {
     });
 
     logger.info(`Comment posted successfully: ${user.name}`);
+
+    // 投稿時刻を記録
+    lastCommentPostTime = Date.now();
 
     return NextResponse.json({
       success: true,
