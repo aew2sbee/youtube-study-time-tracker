@@ -3,11 +3,11 @@ import { YouTubeLiveChatMessage, LiveChatResponse } from '@/types/youtube';
 import { User } from '@/types/users';
 import { google } from 'googleapis';
 import { calcTime, convertHHMMSS } from '@/lib/calcTime';
-import { CHAT_MESSAGE, isCategoryMessage, isEndMessage, isStartMessage, REFRESH_MESSAGE, removeMentionPrefix, START_MESSAGE } from '@/lib/liveChatMessage';
+import { isCategoryMessage, isEndMessage, isStartMessage, REFRESH_MESSAGE, removeMentionPrefix, START_MESSAGE } from '@/lib/liveChatMessage';
 import { logger } from '@/utils/logger';
 import { getOAuth2Client } from '@/utils/googleClient';
 import { parameter } from '@/config/system';
-import { getTotalTimeSecByChannelId } from '@/db/study';
+import { getStudyTimeStatsByChannelId } from '@/db/study';
 
 // 公式ドキュメント：https://developers.google.com/youtube/v3/live/docs/liveChatMessages/list?hl=ja
 
@@ -112,9 +112,8 @@ export async function POST(request: NextRequest) {
       message = `@${user.name}: ${REFRESH_MESSAGE}`;
       // 停止
     } else if (flag === parameter.END_FLAG) {
-      const totalTimeSec = await getTotalTimeSecByChannelId(user.channelId);
-      const random = Math.floor(Math.random() * CHAT_MESSAGE.length);
-      message = `@${user.name}: +${calcTime(user.timeSec)} (累計値: ${calcTime(totalTimeSec)}) 👏 ` + CHAT_MESSAGE[random];
+      const stats = await getStudyTimeStatsByChannelId(user.channelId);
+      message = `@${user.name}さん お疲れ様でした👏 今日は${calcTime(user.timeSec)}集中しました。これまでに合計${stats.totalDays}日間集中して、なんと${calcTime(stats.totalTime)}も頑張りました!! ▶ 📅 過去7日間実績は、${stats.last7Days}日で${calcTime(stats.last7DaysTime)} 📆 過去28日間は、${stats.last28Days}日で${calcTime(stats.last28DaysTime)}`;
     } else {
       logger.error(`flagが不正です - ${flag}`);
     }
