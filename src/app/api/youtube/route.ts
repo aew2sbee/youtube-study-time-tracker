@@ -51,7 +51,7 @@ async function processCommentQueue() {
       try {
         logger.info(`Processing queued comment for: ${item.userName}`);
 
-        const result = await youtubeWithOAuth.liveChatMessages.insert({
+        await youtubeWithOAuth.liveChatMessages.insert({
           part: ['snippet'],
           requestBody: {
             snippet: {
