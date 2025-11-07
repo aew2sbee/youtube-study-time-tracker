@@ -29,6 +29,56 @@ let nextFetchAvailableAt = 0;
 
 const sleep = (ms: number): Promise<void> => new Promise(resolve => setTimeout(resolve, ms))
 
+// コメント投稿キュー管理
+type CommentQueueItem = {
+  message: string;
+  userName: string;
+};
+
+const commentQueue: CommentQueueItem[] = [];
+let isProcessingQueue = false;
+
+// キューを処理するワーカー関数
+async function processCommentQueue() {
+  if (isProcessingQueue) return; // 既に処理中の場合はスキップ
+  isProcessingQueue = true;
+
+  try {
+    while (commentQueue.length > 0) {
+      const item = commentQueue.shift();
+      if (!item) break;
+
+      try {
+        logger.info(`Processing queued comment for: ${item.userName}`);
+
+        const result = await youtubeWithOAuth.liveChatMessages.insert({
+          part: ['snippet'],
+          requestBody: {
+            snippet: {
+              liveChatId: LIVE_CHAT_ID,
+              type: 'textMessageEvent',
+              textMessageDetails: {
+                messageText: item.message,
+              },
+            },
+          },
+        });
+
+        logger.info(`Comment posted successfully: ${item.userName}`);
+      } catch (error) {
+        logger.error(`Error posting comment for ${item.userName} - ${error}`);
+      }
+
+      // 次の投稿まで1秒待機（キューに残りがある場合のみ）
+      if (commentQueue.length > 0) {
+        await sleep(1000);
+      }
+    }
+  } finally {
+    isProcessingQueue = false;
+  }
+}
+
 export async function GET() {
   try {
     logger.info(`nextPageToken - ${nextPageToken}`);
@@ -122,30 +172,27 @@ export async function POST(request: NextRequest) {
       logger.info('コメント投稿は無効化されています');
       return NextResponse.json({ success: true, message: 'Commenting is disabled' });
     }
-    const result = await youtubeWithOAuth.liveChatMessages.insert({
-      part: ['snippet'],
-      requestBody: {
-        snippet: {
-          liveChatId: LIVE_CHAT_ID,
-          type: 'textMessageEvent',
-          textMessageDetails: {
-            messageText: message,
-          },
-        },
-      },
+
+    // コメントをキューに追加
+    commentQueue.push({
+      message,
+      userName: user.name,
     });
 
-    logger.info(`Comment posted successfully: ${user.name}`);
+    logger.info(`Comment queued for ${user.name}. Queue length: ${commentQueue.length}`);
+
+    // ワーカーを起動（既に動いている場合はスキップされる）
+    processCommentQueue().catch((error) => {
+      logger.error(`Error in comment queue worker - ${error}`);
+    });
 
     return NextResponse.json({
       success: true,
-      messageId: result.data.id,
       message: message,
+      queued: true,
     });
   } catch (error) {
     logger.error(`Error posting comment - ${error}`);
     return NextResponse.json({ error: 'Failed to post comment' }, { status: 500 });
-  } finally {
-    await sleep(1000); // 1秒待機
   }
 }
