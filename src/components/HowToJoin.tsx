@@ -13,7 +13,7 @@ export default function HowToJoin() {
       <p className="text-4xl pt-4 font-bold">3. オプション機能</p>
       <p className="pl-4">以下の<strong>「アイコン名」</strong>を追加で入力</p>
       <p className="pl-4 text-2xl">一緒に頑張る仲間が見つかるかも!!</p>
-      <ul className="pl-4 grid grid-cols-3 gap-4">
+      <ul className="pl-4 grid grid-cols-3 gap-4 text-2xl">
         <li className="flex items-center space-x-2">
           <Briefcase className="w-9 h-9" />
           <span>:「仕事」</span>
