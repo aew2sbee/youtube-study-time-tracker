@@ -1,4 +1,5 @@
-import {BookOpen, Pen, GraduationCap, Award, Briefcase, ClipboardList, School, Boxes, Palette} from 'lucide-react';
+import { parameter } from '@/config/system';
+import {BookOpen, Pen, GraduationCap, Award, Briefcase, ClipboardList, FileText, School, CalendarDays} from 'lucide-react';
 
 export default function HowToJoin() {
   return (
@@ -13,42 +14,42 @@ export default function HowToJoin() {
       <p className="text-4xl pt-4 font-bold">3. オプション機能</p>
       <p className="pl-4">以下の<strong>「アイコン名」</strong>を追加で入力</p>
       <p className="pl-4 text-2xl">一緒に頑張る仲間が見つかるかも!!</p>
-      <ul className="pl-4 grid grid-cols-3 gap-4 text-2xl">
+      <ul className="pl-4 grid grid-cols-3 gap-4">
         <li className="flex items-center space-x-2">
           <Briefcase className="w-9 h-9" />
-          <span>:「仕事」</span>
+          <span>: {parameter.ALLOW_WORDS[0]}</span>
         </li>
         <li className="flex items-center space-x-2">
           <ClipboardList className="w-9 h-9" />
-          <span>:「作業」</span>
+          <span>: {parameter.ALLOW_WORDS[1]}</span>
         </li>
         <li className="flex items-center space-x-2">
           <BookOpen className="w-9 h-9" />
-          <span>:「読書」</span>
-        </li>
-        <li className="flex items-center space-x-2">
-          <Pen className="w-9 h-9" />
-          <span>:「勉強」</span>
+          <span>: {parameter.ALLOW_WORDS[2]}</span>
         </li>
         <li className="flex items-center space-x-2">
           <GraduationCap className="w-9 h-9" />
-          <span>:「受験」</span>
+          <span>: {parameter.ALLOW_WORDS[3]}</span>
         </li>
         <li className="flex items-center space-x-2">
           <Award className="w-9 h-9" />
-          <span>:「資格」</span>
+          <span>: {parameter.ALLOW_WORDS[4]}</span>
+        </li>
+        <li className="flex items-center space-x-2">
+          <CalendarDays className="w-9 h-9" />
+          <span>: {parameter.ALLOW_WORDS[5]}</span>
+        </li>
+        <li className="flex items-center space-x-2">
+          <Pen className="w-9 h-9" />
+          <span>: {parameter.ALLOW_WORDS[6]}</span>
+        </li>
+        <li className="flex items-center space-x-2">
+          <FileText className="w-9 h-9" />
+          <span>: {parameter.ALLOW_WORDS[7]}</span>
         </li>
         <li className="flex items-center space-x-2">
           <School className="w-9 h-9" />
-          <span>:「宿題」</span>
-        </li>
-        <li className="flex items-center space-x-2">
-          <Palette className="w-9 h-9" />
-          <span>:「趣味」</span>
-        </li>
-        <li className="flex items-center space-x-2">
-          <Boxes className="w-9 h-9" />
-          <span>:「雑多」</span>
+          <span>: {parameter.ALLOW_WORDS[8]}</span>
         </li>
       </ul>
 

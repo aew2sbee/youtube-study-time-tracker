@@ -29,23 +29,14 @@ export default function FocusTimeTracker({ user }: { user: User[] }) {
 
           <div className="flex items-center text-3xl">
             {
-              // 仕事
               user.category === parameter.ALLOW_WORDS[0] ? (<Briefcase className="text-black w-9 h-9 mr-2" />)
-              // 作業
               : user.category === parameter.ALLOW_WORDS[1] ? (<ClipboardList className="text-black w-9 h-9 mr-2" />)
-              // 読書
               : user.category === parameter.ALLOW_WORDS[2] ? (<BookOpen className="text-black w-9 h-9 mr-2" />)
-              // 勉強
               : user.category === parameter.ALLOW_WORDS[3] ? (<Pen className="text-black w-9 h-9 mr-2" />)
-              // 受験
               : user.category === parameter.ALLOW_WORDS[4] ? (<GraduationCap className="text-black w-9 h-9 mr-2" />)
-              // 資格
               : user.category === parameter.ALLOW_WORDS[5] ? (<Award className="text-black w-9 h-9 mr-2" />)
-              // 宿題
               : user.category === parameter.ALLOW_WORDS[6] ? (<School className="text-black w-9 h-9 mr-2" />)
-              // 趣味
               : user.category === parameter.ALLOW_WORDS[7] ? (<Palette className="text-black w-9 h-9 mr-2" />)
-              // 雑多
               : user.category === parameter.ALLOW_WORDS[8] ? (<Boxes className="text-black w-9 h-9 mr-2" />)
               : <div className="w-9 h-9 mr-2" />
             }
