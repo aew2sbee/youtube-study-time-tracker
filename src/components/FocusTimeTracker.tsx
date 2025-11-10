@@ -1,7 +1,7 @@
 import ImageProfile from './ImageProfile';
 import { User } from '@/types/users';
 import { calcTime } from '@/lib/calcTime';
-import { Briefcase, ClipboardList, BookOpen, Pen, GraduationCap, Award, School, Palette, Boxes } from 'lucide-react';
+import { Briefcase, ClipboardList, BookOpen, Pen, GraduationCap, Award, School, CalendarDays, FileText } from 'lucide-react';
 import { parameter } from '@/config/system';
 
 
@@ -32,12 +32,12 @@ export default function FocusTimeTracker({ user }: { user: User[] }) {
               user.category === parameter.ALLOW_WORDS[0] ? (<Briefcase className="text-black w-9 h-9 mr-2" />)
               : user.category === parameter.ALLOW_WORDS[1] ? (<ClipboardList className="text-black w-9 h-9 mr-2" />)
               : user.category === parameter.ALLOW_WORDS[2] ? (<BookOpen className="text-black w-9 h-9 mr-2" />)
-              : user.category === parameter.ALLOW_WORDS[3] ? (<Pen className="text-black w-9 h-9 mr-2" />)
-              : user.category === parameter.ALLOW_WORDS[4] ? (<GraduationCap className="text-black w-9 h-9 mr-2" />)
-              : user.category === parameter.ALLOW_WORDS[5] ? (<Award className="text-black w-9 h-9 mr-2" />)
-              : user.category === parameter.ALLOW_WORDS[6] ? (<School className="text-black w-9 h-9 mr-2" />)
-              : user.category === parameter.ALLOW_WORDS[7] ? (<Palette className="text-black w-9 h-9 mr-2" />)
-              : user.category === parameter.ALLOW_WORDS[8] ? (<Boxes className="text-black w-9 h-9 mr-2" />)
+              : user.category === parameter.ALLOW_WORDS[3] ? (<GraduationCap className="text-black w-9 h-9 mr-2" />)
+              : user.category === parameter.ALLOW_WORDS[4] ? (<Award className="text-black w-9 h-9 mr-2" />)
+              : user.category === parameter.ALLOW_WORDS[5] ? (<CalendarDays className="text-black w-9 h-9 mr-2" />)
+              : user.category === parameter.ALLOW_WORDS[6] ? (<Pen className="text-black w-9 h-9 mr-2" />)
+              : user.category === parameter.ALLOW_WORDS[7] ? (<FileText className="text-black w-9 h-9 mr-2" />)
+              : user.category === parameter.ALLOW_WORDS[8] ? (<School className="text-black w-9 h-9 mr-2" />)
               : <div className="w-9 h-9 mr-2" />
             }
             {
