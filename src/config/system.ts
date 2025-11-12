@@ -1,5 +1,5 @@
 export const parameter = {
-  ALLOW_WORDS: ['作業', '勉強', '読書'] as readonly string[],
+  ALLOW_WORDS: ['仕事', '作業', '読書', '受験', '資格', '試験', '勉強', '宿題', 'テスト'] as readonly string[],
   START_STUDY_KEYWORDS: 'start',
   END_STUDY_KEYWORDS: 'end',
   IS_COMMENT_ENABLED: true,
