@@ -3,11 +3,11 @@ import { YouTubeLiveChatMessage, LiveChatResponse } from '@/types/youtube';
 import { User } from '@/types/users';
 import { google } from 'googleapis';
 import { calcTime, convertHHMMSS } from '@/lib/calcTime';
-import { CHAT_MESSAGE, isCategoryMessage, isEndMessage, isStartMessage, REFRESH_MESSAGE, removeMentionPrefix, START_MESSAGE } from '@/lib/liveChatMessage';
+import { isCategoryMessage, isEndMessage, isStartMessage, REFRESH_MESSAGE, removeMentionPrefix, START_MESSAGE } from '@/lib/liveChatMessage';
 import { logger } from '@/utils/logger';
 import { getOAuth2Client } from '@/utils/googleClient';
 import { parameter } from '@/config/system';
-import { getTotalTimeSecByChannelId } from '@/db/study';
+import { getStudyTimeStatsByChannelId } from '@/db/study';
 
 // 公式ドキュメント：https://developers.google.com/youtube/v3/live/docs/liveChatMessages/list?hl=ja
 
@@ -26,6 +26,58 @@ const youtubeWithOAuth = google.youtube({ version: 'v3', auth: oauth2Client });
 let nextPageToken: string | undefined;
 // レート制御用：次回フェッチ可能な時刻（ms）
 let nextFetchAvailableAt = 0;
+
+const sleep = (ms: number): Promise<void> => new Promise(resolve => setTimeout(resolve, ms))
+
+// コメント投稿キュー管理
+type CommentQueueItem = {
+  message: string;
+  userName: string;
+};
+
+const commentQueue: CommentQueueItem[] = [];
+let isProcessingQueue = false;
+
+// キューを処理するワーカー関数
+async function processCommentQueue() {
+  if (isProcessingQueue) return; // 既に処理中の場合はスキップ
+  isProcessingQueue = true;
+
+  try {
+    while (commentQueue.length > 0) {
+      const item = commentQueue.shift();
+      if (!item) break;
+
+      try {
+        logger.info(`Processing queued comment for: ${item.userName}`);
+
+        await youtubeWithOAuth.liveChatMessages.insert({
+          part: ['snippet'],
+          requestBody: {
+            snippet: {
+              liveChatId: LIVE_CHAT_ID,
+              type: 'textMessageEvent',
+              textMessageDetails: {
+                messageText: item.message,
+              },
+            },
+          },
+        });
+
+        logger.info(`Comment posted successfully: ${item.userName}`);
+      } catch (error) {
+        logger.error(`Error posting comment for ${item.userName} - ${error}`);
+      }
+
+      // 次の投稿まで1秒待機（キューに残りがある場合のみ）
+      if (commentQueue.length > 0) {
+        await sleep(1000);
+      }
+    }
+  } finally {
+    isProcessingQueue = false;
+  }
+}
 
 export async function GET() {
   try {
@@ -100,9 +152,8 @@ export async function POST(request: NextRequest) {
       message = `@${user.name}: ${REFRESH_MESSAGE}`;
       // 停止
     } else if (flag === parameter.END_FLAG) {
-      const totalTimeSec = await getTotalTimeSecByChannelId(user.channelId);
-      const random = Math.floor(Math.random() * CHAT_MESSAGE.length);
-      message = `@${user.name}: +${calcTime(user.timeSec)} (累計値: ${calcTime(totalTimeSec)}) 👏 ` + CHAT_MESSAGE[random];
+      const stats = await getStudyTimeStatsByChannelId(user.channelId);
+      message = `@${user.name}さん お疲れ様でした👏 今日は${calcTime(user.timeSec)}集中しました!! これまでに合計${stats.totalDays}日間集中してなんと${calcTime(stats.totalTime)}も頑張りました!! ▶ 📅 過去7日間実績は、${stats.last7Days}日で${calcTime(stats.last7DaysTime)} 📆 過去28日間は、${stats.last28Days}日で${calcTime(stats.last28DaysTime)}`;
     } else {
       logger.error(`flagが不正です - ${flag}`);
     }
@@ -121,25 +172,24 @@ export async function POST(request: NextRequest) {
       logger.info('コメント投稿は無効化されています');
       return NextResponse.json({ success: true, message: 'Commenting is disabled' });
     }
-    const result = await youtubeWithOAuth.liveChatMessages.insert({
-      part: ['snippet'],
-      requestBody: {
-        snippet: {
-          liveChatId: LIVE_CHAT_ID,
-          type: 'textMessageEvent',
-          textMessageDetails: {
-            messageText: message,
-          },
-        },
-      },
+
+    // コメントをキューに追加
+    commentQueue.push({
+      message,
+      userName: user.name,
     });
 
-    logger.info(`Comment posted successfully: ${user.name}`);
+    logger.info(`Comment queued for ${user.name}. Queue length: ${commentQueue.length}`);
+
+    // ワーカーを起動（既に動いている場合はスキップされる）
+    processCommentQueue().catch((error) => {
+      logger.error(`Error in comment queue worker - ${error}`);
+    });
 
     return NextResponse.json({
       success: true,
-      messageId: result.data.id,
       message: message,
+      queued: true,
     });
   } catch (error) {
     logger.error(`Error posting comment - ${error}`);

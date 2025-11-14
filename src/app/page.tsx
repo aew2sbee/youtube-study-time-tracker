@@ -56,7 +56,7 @@ export default function Home() {
   return (
     <div className="fixed inset-0 w-[1920px] h-[1080px] overflow-hidden pointer-events-none from-slate-900 via-slate-800 to-slate-900">
       <div className="absolute bottom-0 left-0 w-[640px] h-[1080px] p-4 pointer-events-auto">
-        <div className="bg-white/80 backdrop-blur-md rounded-xl p-6 h-full border border-gray-200 shadow-2xl">
+        <div className="bg-gray-300 backdrop-blur-md rounded-xl p-6 h-full border border-gray-900 shadow-2xl">
           {/* Header */}
           <motion.div
             className="flex justify-between items-center mb-6"

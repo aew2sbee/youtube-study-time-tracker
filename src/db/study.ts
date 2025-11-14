@@ -82,14 +82,52 @@ export const hasSameVideoData = async (userId: number, user: User) => {
   }
 };
 
-export const getTotalTimeSecByChannelId = async (channelId: string) => {
+export const getStudyTimeStatsByChannelId = async (channelId: string) => {
   const user = await getUserByChannelId(channelId);
   if (!user) {
-    logger.info(`getTotalTimeSecByChannelId: user not found channelId=${channelId}`);
-    return 0;
+    logger.info(`getStudyTimeStatsByChannelId: user not found channelId=${channelId}`);
+    return {
+      totalDays: 0,
+      totalTime: 0,
+      last7Days: 0,
+      last7DaysTime: 0,
+      last7DaysDays: 0,
+      last28DaysTime: 0
+    };
   }
-  const rows = await db.select({ timeSec: study.timeSec }).from(study).where(eq(study.userId, user.id));
-  const total = rows.reduce((acc, r) => acc + r.timeSec, 0);
-  logger.info(`getTotalTimeSecByChannelId: channelId=${channelId} total=${total}`);
-  return total;
+
+  const now = Date.now();
+  const sevenDaysAgo = new Date(now - 7 * 24 * 60 * 60 * 1000);
+  const twentyEightDaysAgo = new Date(now - 28 * 24 * 60 * 60 * 1000);
+
+  // 全期間のデータを1回のクエリで取得
+  const allRows = await db
+    .select({ timeSec: study.timeSec, timestamp: study.timestamp })
+    .from(study)
+    .where(eq(study.userId, user.id));
+
+  // 全期間の集計
+  const totalTime = allRows.reduce((acc, r) => acc + r.timeSec, 0);
+  const totalDays = new Set(allRows.map(r => r.timestamp.toISOString().split('T')[0])).size;
+
+  // 過去7日間のデータをフィルタリング
+  const last7DaysRows = allRows.filter(r => r.timestamp >= sevenDaysAgo);
+  const last7DaysTime = last7DaysRows.reduce((acc, r) => acc + r.timeSec, 0);
+  const last7Days = new Set(last7DaysRows.map(r => r.timestamp.toISOString().split('T')[0])).size;
+
+  // 過去28日間のデータをフィルタリング
+  const last28DaysRows = allRows.filter(r => r.timestamp >= twentyEightDaysAgo);
+  const last28DaysTime = last28DaysRows.reduce((acc, r) => acc + r.timeSec, 0);
+  const last28Days = new Set(last28DaysRows.map(r => r.timestamp.toISOString().split('T')[0])).size;
+
+  logger.info(`getStudyTimeStatsByChannelId: channelId=${channelId} total=${totalTime} (${totalDays}日) last7DaysTime=${last7DaysTime} (${last7Days}日) last28DaysTime=${last28DaysTime} (${last28Days}日)`);
+
+  return {
+    totalDays,
+    totalTime,
+    last7Days,
+    last7DaysTime,
+    last28Days,
+    last28DaysTime,
+  };
 };
