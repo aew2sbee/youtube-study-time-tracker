@@ -1,18 +1,34 @@
 import { parameter } from '@/config/system';
-import {BookOpen, Pen, GraduationCap, Award, Briefcase, ClipboardList, FileText, School, CalendarDays} from 'lucide-react';
+import {
+  BookOpen,
+  Pen,
+  GraduationCap,
+  Award,
+  Briefcase,
+  ClipboardList,
+  FileText,
+  School,
+  CalendarDays,
+} from 'lucide-react';
 
 export default function HowToJoin() {
   return (
-    <div className="text-black text-3xl space-y-3 items-start justify-start">
+    <div className="text-neutral-200 text-3xl space-y-3 items-start justify-start">
       <p className="text-4xl pt-2 font-bold">1. 計測開始</p>
-      <p className="pl-4">チャット欄に<strong>「start」</strong>のみを入力</p>
+      <p className="pl-4">
+        チャット欄に<strong>「start」</strong>のみを入力
+      </p>
       <p className="pl-4">※Botくんが受付をしてくれます。</p>
       <p className="text-4xl pt-2 font-bold">2. 計測終了</p>
-      <p className="pl-4">チャット欄に<strong>「end」</strong>のみを入力</p>
+      <p className="pl-4">
+        チャット欄に<strong>「end」</strong>のみを入力
+      </p>
       <p className="pl-4">※Botくんが結果を教えてくれます。</p>
 
       <p className="text-4xl pt-4 font-bold">3. オプション機能</p>
-      <p className="pl-4">以下の<strong>「アイコン名」</strong>を追加で入力</p>
+      <p className="pl-4">
+        以下の<strong>「アイコン名」</strong>を追加で入力
+      </p>
       <p className="pl-4 text-2xl">一緒に頑張る仲間が見つかるかも!!</p>
       <ul className="pl-4 grid grid-cols-3 gap-4">
         <li className="flex items-center space-x-2">

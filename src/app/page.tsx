@@ -25,18 +25,11 @@ export default function Home() {
     return {
       key: `users-${pageIndex}`,
       title: totalUserPages > 1 ? `時間計測 (${pageIndex + 1}/${totalUserPages})` : '時間計測',
-      component: (
-        <FocusTimeTracker
-          user={pageUsers}
-        />
-      ),
+      component: <FocusTimeTracker user={pageUsers} />,
     };
   });
 
-  const pages = [
-    { key: 'How to join', title: '参加方法', component: <HowToJoin /> },
-    ...userPages,
-  ];
+  const pages = [{ key: 'How to join', title: '参加方法', component: <HowToJoin /> }, ...userPages];
 
   useEffect(() => {
     if (pages.length > 0) {
@@ -56,7 +49,7 @@ export default function Home() {
   return (
     <div className="fixed inset-0 w-[1920px] h-[1080px] overflow-hidden pointer-events-none from-slate-900 via-slate-800 to-slate-900">
       <div className="absolute bottom-0 left-0 w-[640px] h-[1080px] p-4 pointer-events-auto">
-        <div className="bg-gray-300 backdrop-blur-md rounded-xl p-6 h-full border border-gray-900 shadow-2xl">
+        <div className="bg-neutral-900 backdrop-blur-md rounded-xl p-6 h-full border border-gray-900 shadow-2xl">
           {/* Header */}
           <motion.div
             className="flex justify-between items-center mb-6"
@@ -64,9 +57,7 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <h1 className="text-5xl font-bold text-black">
-              {currentPageData.title}
-            </h1>
+            <h1 className="text-5xl font-bold text-neutral-200">{currentPageData.title}</h1>
           </motion.div>
 
           {/* Page Content */}
@@ -77,7 +68,7 @@ export default function Home() {
                 initial={{ opacity: 0, x: 50 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -50 }}
-                transition={{ duration: 0.8, ease: "easeInOut" }}
+                transition={{ duration: 0.8, ease: 'easeInOut' }}
                 className="h-full"
               >
                 {currentPageData.component}
@@ -91,9 +82,7 @@ export default function Home() {
               <div
                 key={index}
                 className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                  index === currentPage
-                    ? 'bg-black'
-                    : 'bg-gray-400'
+                  index === currentPage ? 'bg-gray-400' : 'bg-black'
                 }`}
               />
             ))}
