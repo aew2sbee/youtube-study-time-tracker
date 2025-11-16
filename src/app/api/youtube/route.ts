@@ -153,7 +153,7 @@ export async function POST(request: NextRequest) {
       // 停止
     } else if (flag === parameter.END_FLAG) {
       const stats = await getStudyTimeStatsByChannelId(user.channelId);
-      message = `@${user.name}さん お疲れ様でした👏 今日は${calcTime(user.timeSec)}集中しました!! これまでに合計${stats.totalDays}日間集中してなんと${calcTime(stats.totalTime)}も頑張りました!! ▶ 📅 過去7日間実績は、${stats.last7Days}日で${calcTime(stats.last7DaysTime)} 📆 過去28日間は、${stats.last28Days}日で${calcTime(stats.last28DaysTime)}`;
+      message = `@${user.name}さん お疲れ様でした👏 今日は${calcTime(user.timeSec)}集中しました!! これまでに合計${stats.totalDays}日間集中してなんと${calcTime(stats.totalTime)}も頑張りました!! ▶ 📅 過去7日間実績は、${stats.last7Days}日で${calcTime(stats.last7DaysTime)} 📆 過去28日間は、${stats.last28Days}日で${calcTime(stats.last28DaysTime)} この配信がお役に立ったなら、高評価をお願いします👍 また集中したい時は、ぜひ配信にお越しください。`;
     } else {
       logger.error(`flagが不正です - ${flag}`);
     }

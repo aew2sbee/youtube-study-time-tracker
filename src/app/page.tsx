@@ -82,7 +82,7 @@ export default function Home() {
               <div
                 key={index}
                 className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                  index === currentPage ? 'bg-gray-400' : 'bg-black'
+                  index === currentPage ? 'bg-gray-200' : 'bg-gray-400'
                 }`}
               />
             ))}
