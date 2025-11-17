@@ -52,7 +52,7 @@ import { useState } from 'react'
 
 export default function Counter() {
   const [count, setCount] = useState(0)
-  
+
   return (
     <button onClick={() => setCount(count + 1)}>
       Count: {count}
@@ -78,7 +78,7 @@ export default function Counter() {
 // app/blog/[slug]/page.tsx
 export async function generateStaticParams() {
   const posts = await getPosts()
-  
+
   return posts.map((post) => ({
     slug: post.slug,
   }))
@@ -170,7 +170,7 @@ async function getData() {
   const res = await fetch('https://api.example.com/data', {
     next: { revalidate: 60 } // 60秒キャッシュ
   })
-  
+
   if (!res.ok) throw new Error('Failed to fetch')
   return res.json()
 }
@@ -321,10 +321,10 @@ const publicKey = process.env.NEXT_PUBLIC_API_KEY
 
 export async function createPost(formData: FormData) {
   const title = formData.get('title')
-  
+
   // データベース操作
   await db.post.create({ data: { title } })
-  
+
   revalidatePath('/posts')
 }
 ```
@@ -351,7 +351,7 @@ export const metadata = {
 ```tsx
 export async function generateMetadata({ params }) {
   const product = await getProduct(params.id)
-  
+
   return {
     title: product.name,
     description: product.description,
@@ -387,3 +387,4 @@ Next.jsの開発で最も重要なポイント：
 1. Claude Code との会話は"日本語"で行うこと
 2. 生成する md ファイルは"日本語"で記載すること
 3. 生成するプログラムのコメントとログの内容は"日本語"で記載すること
+4. SEO対策は不要である。
