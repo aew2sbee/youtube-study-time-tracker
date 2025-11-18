@@ -1,7 +1,58 @@
-# Next.js ベストプラクティス
+# Claude Code 設定
 
-## 概要
-Next.jsの開発における最も有名で合理的なベストプラクティスをまとめたドキュメントです。
+## アプリコンセプト
+- コンセプト: [README](README.md)を参照すること
+
+## 技術選定
+
+- フレームワーク・ライブラリ
+  - Next.js(App Router)
+  - React
+  - TypeScript
+  - Google APIs
+- データベース・ORM
+  - Supabase
+  - Drizzle ORM
+  - postgres
+- UI・スタイリング
+  - Tailwind CSS
+  - Framer Motion
+  - Lucide React
+
+## 実装ルール
+- SEO対応は不要
+- "サーバー側"でデータ取得・加工・変換処理を行う
+- "クライアント側"でデータ表示だけを行う
+- 画像は、`next/image`コンポーネントで最適化(自動的な画像リサイズ、遅延読み込み)を行う
+- 静的サイトは、`SSG(Static Site Generation)`で生成する
+- YouTube Data APIのquota（割り当て）の使用を最小限にする
+- 関数はアロー関数で行うこと
+- JSDocを必ず記載すること
+
+---
+
+## 📋 Next.js 実装ルール（最優先）
+
+### 基本原則
+
+1. **サーバーコンポーネント優先**
+   - 動的に更新する必要がある画面（チャットなど）以外は、データ取得はなるべくサーバーコンポーネントに寄せる
+   - クライアント側で動作する必然性（状態管理・ブラウザAPI利用・重いUIライブラリ等）がない限り `"use client"` は利用しない
+
+2. **責務の分離**
+   - サーバーコンポーネントからのデータ取得は、原則 `loaders` などに切り出したサーバー処理を使い責務を分離する
+   - サーバー側で動作することを期待する処理には `import "server-only"` を書き、誤ってクライアントから参照されないようにする
+
+3. **サーバーアクションの適切な使用**
+   - サーバーアクション（`"use server"`処理）は、データ更新やファイルアップロードなど**副作用を伴う操作のためだけ**に使う
+   - あわせて `revalidatePath` や `revalidateTag` などの再検証処理までを1セットで行う
+
+4. **クライアント側データ取得の制限**
+   - クライアント側でのデータ取得は例外として、以下に限って許容する：
+     - リアルタイム通信
+     - 高頻度ポーリング
+     - ユーザー操作に即応する検索
+     - オフライン最適化（React Query など）
 
 ---
 
@@ -17,16 +68,41 @@ Next.js 13以降で導入された新しいルーティングシステム。従�
 - Server ComponentsとClient Componentsの統合
 - ストリーミングとSuspenseのネイティブサポート
 
-### ディレクトリ構造
+### 推奨ディレクトリ構造
 ```
-app/
-├── layout.tsx          # ルートレイアウト
-├── page.tsx            # トップページ
-├── loading.tsx         # ローディング状態
-├── error.tsx           # エラーハンドリング
-└── dashboard/
-    ├── layout.tsx      # ダッシュボードレイアウト
-    └── page.tsx        # ダッシュボードページ
+src/
+├── app/                    # App Router（URL構造に対応）
+│   ├── layout.tsx          # ルートレイアウト
+│   ├── page.tsx            # トップページ
+│   ├── loading.tsx         # ローディング状態
+│   ├── error.tsx           # エラーハンドリング
+│   ├── api/                # APIエンドポイント
+│   │   └── users/
+│   │       └── route.ts
+│   └── dashboard/
+│       ├── layout.tsx      # ダッシュボードレイアウト
+│       └── page.tsx        # ダッシュボードページ
+├── client/                 # クライアント側のコード
+│   ├── components/         # Reactコンポーネント
+│   │   ├── ui/             # 再利用可能なUIコンポーネント
+│   │   └── features/       # 機能固有のコンポーネント
+│   └── lib/                # クライアントで動作するヘルパー
+│       └── utils.ts
+├── server/                 # サーバー側のコード
+│   ├── loaders/            # データ取得処理（"use server"不要）
+│   │   └── userLoader.ts
+│   ├── actions/            # サーバーアクション（"use server"）
+│   │   └── userActions.ts
+│   ├── usecases/           # ビジネスロジック統合層
+│   │   └── userUsecase.ts
+│   ├── repositories/       # データベースアクセス層
+│   │   └── userRepository.ts
+│   ├── lib/                # データ加工・変換処理
+│   │   └── dataTransform.ts
+│   └── auth/               # 認証関連処理
+│       └── session.ts
+└── types/                  # 型定義
+    └── user.ts
 ```
 
 ---
@@ -44,13 +120,80 @@ app/
 - セキュアなAPIキーの使用
 - SEO対策に有利
 
-### Client Componentsが必要な場合
+### Server-Only パッケージの使用（推奨）
+
+サーバー専用のコードが誤ってクライアントにバンドルされるのを防ぎます：
+
+```bash
+npm install server-only
+```
+
 ```tsx
+// server/loaders/userLoader.ts
+import "server-only"
+
+// このファイルはサーバーでのみ実行可能
+export const getUserData = async (userId: string) => {
+  const apiKey = process.env.SECRET_API_KEY // 安全
+  // データ取得処理
+}
+```
+
+クライアント側から誤って import するとビルドエラーになります。
+
+### Loaders パターン（データ取得）
+
+サーバーコンポーネントでのデータ取得は `loaders` に分離します：
+
+```tsx
+// server/loaders/userLoader.ts
+import "server-only"
+import { getUserByChannelId } from "@/server/repositories/userRepository"
+
+export const loadUserProfile = async (channelId: string) => {
+  const user = await getUserByChannelId(channelId)
+
+  if (!user) {
+    throw new Error("ユーザーが見つかりません")
+  }
+
+  return {
+    name: user.name,
+    channelId: user.channelId,
+    profileImageUrl: user.profileImageUrl,
+  }
+}
+```
+
+```tsx
+// app/users/[channelId]/page.tsx
+import { loadUserProfile } from "@/server/loaders/userLoader"
+
+const UserProfilePage = async ({ params }: { params: { channelId: string } }) => {
+  const user = await loadUserProfile(params.channelId)
+
+  return (
+    <div>
+      <h1>{user.name}</h1>
+      <img src={user.profileImageUrl} alt={user.name} />
+    </div>
+  )
+}
+
+export default UserProfilePage
+```
+
+### Client Componentsが必要な場合
+
+以下の場合**のみ** `'use client'` を使用：
+
+```tsx
+// client/components/Counter.tsx
 'use client'
 
 import { useState } from 'react'
 
-export default function Counter() {
+export const Counter = () => {
   const [count, setCount] = useState(0)
 
   return (
@@ -61,34 +204,16 @@ export default function Counter() {
 }
 ```
 
-以下の場合にのみ`'use client'`を使用：
+**Client Componentsの使用条件**:
 - `useState`, `useEffect`などのReact Hooks使用時
 - ブラウザAPIの使用時（`window`, `localStorage`など）
 - イベントハンドラー（`onClick`, `onChange`など）
 - カスタムフックの使用時
+- リアルタイム通信（WebSocket など）
+- 高頻度ポーリング
 
 ---
 
-## 3. レンダリング戦略
-
-### SSG (Static Site Generation)
-**最適な用途**: ブログ、マーケティングサイト、ドキュメント
-
-```tsx
-// app/blog/[slug]/page.tsx
-export async function generateStaticParams() {
-  const posts = await getPosts()
-
-  return posts.map((post) => ({
-    slug: post.slug,
-  }))
-}
-
-export default async function BlogPost({ params }) {
-  const post = await getPost(params.slug)
-  return <article>{post.content}</article>
-}
-```
 
 ### SSR (Server-Side Rendering)
 **最適な用途**: ユーザー固有のダッシュボード、リアルタイムデータ
@@ -97,10 +222,12 @@ export default async function BlogPost({ params }) {
 // app/dashboard/page.tsx
 export const dynamic = 'force-dynamic'
 
-export default async function Dashboard() {
+const Dashboard = async () => {
   const data = await fetchUserData()
   return <div>{data}</div>
 }
+
+export default Dashboard
 ```
 
 ### ISR (Incremental Static Regeneration)
@@ -109,10 +236,12 @@ export default async function Dashboard() {
 ```tsx
 export const revalidate = 3600 // 1時間ごとに再生成
 
-export default async function ProductPage({ params }) {
+const ProductPage = async ({ params }: { params: { id: string } }) => {
   const product = await getProduct(params.id)
   return <div>{product.name}</div>
 }
+
+export default ProductPage
 ```
 
 ---
@@ -125,7 +254,7 @@ export default async function ProductPage({ params }) {
 ```tsx
 import Image from 'next/image'
 
-export default function Hero() {
+const Hero = () => {
   return (
     <Image
       src="/hero.jpg"
@@ -137,6 +266,8 @@ export default function Hero() {
     />
   )
 }
+
+export default Hero
 ```
 
 ### 利点
@@ -151,46 +282,127 @@ import { Inter } from 'next/font/google'
 
 const inter = Inter({ subsets: ['latin'] })
 
-export default function RootLayout({ children }) {
+const RootLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <html lang="ja" className={inter.className}>
       <body>{children}</body>
     </html>
   )
 }
+
+export default RootLayout
 ```
 
 ---
 
 ## 5. データフェッチングパターン
 
-### Server Componentsでの直接フェッチ
+### Loaders によるデータ取得（推奨）
+
+**原則**: サーバーコンポーネントでのデータ取得は `loaders` に分離します。
+
 ```tsx
-async function getData() {
+// server/loaders/productLoader.ts
+import "server-only"
+import { getProductById } from "@/server/repositories/productRepository"
+
+/**
+ * 商品データを取得する
+ */
+export const loadProduct = async (productId: string) => {
+  const product = await getProductById(productId)
+
+  if (!product) {
+    throw new Error("商品が見つかりません")
+  }
+
+  return {
+    id: product.id,
+    name: product.name,
+    price: product.price,
+    imageUrl: product.imageUrl,
+  }
+}
+```
+
+```tsx
+// app/products/[id]/page.tsx
+import { loadProduct } from "@/server/loaders/productLoader"
+
+const ProductPage = async ({ params }: { params: { id: string } }) => {
+  const product = await loadProduct(params.id)
+
+  return (
+    <div>
+      <h1>{product.name}</h1>
+      <p>¥{product.price}</p>
+    </div>
+  )
+}
+
+export default ProductPage
+```
+
+### 外部APIフェッチの場合
+
+```tsx
+// server/loaders/externalDataLoader.ts
+import "server-only"
+
+export const loadExternalData = async () => {
   const res = await fetch('https://api.example.com/data', {
     next: { revalidate: 60 } // 60秒キャッシュ
   })
 
-  if (!res.ok) throw new Error('Failed to fetch')
-  return res.json()
-}
+  if (!res.ok) throw new Error('データ取得に失敗しました')
 
-export default async function Page() {
-  const data = await getData()
-  return <div>{data.title}</div>
+  return res.json()
 }
 ```
 
 ### キャッシング戦略
+
 ```tsx
-// キャッシュなし
+// キャッシュなし（常に最新データ）
 fetch(url, { cache: 'no-store' })
 
-// 時間ベースの再検証
+// 時間ベースの再検証（60分ごと）
 fetch(url, { next: { revalidate: 3600 } })
 
-// タグベースの再検証
+// タグベースの再検証（revalidateTagで一括更新）
 fetch(url, { next: { tags: ['products'] } })
+```
+
+### クライアント側データ取得（例外的）
+
+**以下の場合のみ許容**:
+- リアルタイム通信（WebSocket など）
+- 高頻度ポーリング
+- ユーザー操作に即応する検索
+- オフライン最適化（React Query など）
+
+```tsx
+// client/components/RealtimeChat.tsx
+'use client'
+
+import { useEffect, useState } from 'react'
+
+export const RealtimeChat = () => {
+  const [messages, setMessages] = useState([])
+
+  useEffect(() => {
+    // WebSocket接続（リアルタイム通信）
+    const ws = new WebSocket('wss://example.com/chat')
+
+    ws.onmessage = (event) => {
+      setMessages(prev => [...prev, JSON.parse(event.data)])
+    }
+
+    return () => ws.close()
+  }, [])
+
+  return <div>{/* チャット表示 */}</div>
+}
 ```
 
 ---
@@ -220,13 +432,76 @@ app/
 
 ---
 
-## 7. コロケーション（Colocation）
+## 7. コロケーション（Colocation）とディレクトリ構成
 
-**推奨度**: ⭐⭐⭐⭐
+**推奨度**: ⭐⭐⭐⭐⭐
 
-関連するファイルを近くに配置する原則。
+関連するファイルを適切に配置し、責務を明確に分離する原則。
 
-### ディレクトリ構造例
+### 推奨ディレクトリ構成（詳細版）
+
+```
+src/
+├── app/                      # App Router（URL構造）
+│   ├── layout.tsx
+│   ├── page.tsx
+│   ├── api/                  # APIエンドポイント
+│   │   └── users/
+│   │       └── route.ts
+│   └── dashboard/
+│       ├── layout.tsx
+│       └── page.tsx
+│
+├── client/                   # クライアント側コード
+│   ├── components/           # Reactコンポーネント
+│   │   ├── ui/               # 再利用可能なUIコンポーネント
+│   │   │   ├── Button.tsx
+│   │   │   └── Input.tsx
+│   │   └── features/         # 機能固有のコンポーネント
+│   │       └── UserProfile.tsx
+│   └── lib/                  # クライアントで動作するヘルパー
+│       ├── utils.ts
+│       └── formatters.ts
+│
+├── server/                   # サーバー側コード
+│   ├── loaders/              # データ取得処理
+│   │   └── userLoader.ts
+│   ├── actions/              # サーバーアクション（副作用）
+│   │   └── userActions.ts
+│   ├── usecases/             # ビジネスロジック統合層
+│   │   └── userUsecase.ts
+│   ├── repositories/         # データベースアクセス層
+│   │   ├── userRepository.ts
+│   │   └── postRepository.ts
+│   ├── lib/                  # データ加工・変換処理
+│   │   ├── dataTransform.ts
+│   │   └── validators.ts
+│   └── auth/                 # 認証関連処理
+│       └── session.ts
+│
+└── types/                    # 型定義（共通）
+    ├── user.ts
+    └── post.ts
+```
+
+### 各ディレクトリの責務
+
+| ディレクトリ | 責務 | "use client" | "server-only" |
+|------------|------|-------------|---------------|
+| `app/` | ルーティング・APIエンドポイント | 不要（Server Component） | - |
+| `client/components/` | Reactコンポーネント | 必要な場合のみ | ❌ |
+| `client/lib/` | クライアントヘルパー | 不要 | ❌ |
+| `server/loaders/` | データ取得処理 | ❌ | ✅ 推奨 |
+| `server/actions/` | 副作用処理（更新等） | ❌（'use server'） | ✅ 推奨 |
+| `server/usecases/` | ビジネスロジック | ❌ | ✅ 推奨 |
+| `server/repositories/` | DB操作 | ❌ | ✅ 推奨 |
+| `server/lib/` | サーバーヘルパー | ❌ | ✅ 推奨 |
+| `types/` | 型定義 | 不要 | - |
+
+### プライベートフォルダ（`_` プレフィックス）
+
+`_`で始まるフォルダはルーティングから除外されます：
+
 ```
 app/
 └── dashboard/
@@ -238,9 +513,6 @@ app/
     ├── layout.tsx
     └── page.tsx
 ```
-
-### プライベートフォルダ
-`_`で始まるフォルダはルーティングから除外されます。
 
 ---
 
@@ -260,7 +532,7 @@ const DynamicComponent = dynamic(() => import('./HeavyComponent'), {
 ```tsx
 import { Suspense } from 'react'
 
-export default function Page() {
+const Page = () => {
   return (
     <div>
       <h1>My Page</h1>
@@ -270,6 +542,8 @@ export default function Page() {
     </div>
   )
 }
+
+export default Page
 ```
 
 ---
@@ -285,9 +559,11 @@ interface PageProps {
   searchParams: { [key: string]: string | string[] | undefined }
 }
 
-export default async function Page({ params, searchParams }: PageProps) {
+const Page = async ({ params, searchParams }: PageProps) => {
   // 型安全なコード
 }
+
+export default Page
 ```
 
 ---
@@ -312,21 +588,99 @@ const publicKey = process.env.NEXT_PUBLIC_API_KEY
 
 ---
 
-## 11. セキュリティベストプラクティス
+## 11. セキュリティベストプラクティスとServer Actions
 
-### Server Actionsの使用
+### Server Actions の適切な使用
+
+**重要**: Server Actionsは**副作用を伴う操作（データ更新・ファイルアップロード等）専用**です。
+
 ```tsx
-// app/actions.ts
+// server/actions/postActions.ts
 'use server'
 
-export async function createPost(formData: FormData) {
-  const title = formData.get('title')
+import { revalidatePath, revalidateTag } from 'next/cache'
+import { createPostInDb } from '@/server/repositories/postRepository'
 
-  // データベース操作
-  await db.post.create({ data: { title } })
+/**
+ * 投稿を作成し、キャッシュを再検証する
+ */
+export const createPostAction = async (formData: FormData) => {
+  const title = formData.get('title') as string
+  const content = formData.get('content') as string
 
-  revalidatePath('/posts')
+  // バリデーション
+  if (!title || title.length < 1) {
+    return { success: false, error: 'タイトルは必須です' }
+  }
+
+  try {
+    // データベース操作
+    const post = await createPostInDb({ title, content })
+
+    // キャッシュ再検証（必須！）
+    revalidatePath('/posts')
+    revalidateTag('posts-list')
+
+    return { success: true, post }
+  } catch (error) {
+    return { success: false, error: '投稿の作成に失敗しました' }
+  }
 }
+```
+
+### Server Actions の使用ルール
+
+1. **副作用のみ**: データ取得は loader を使用し、Server Actions は更新・削除・作成のみに使用
+2. **再検証は必須**: `revalidatePath` または `revalidateTag` を必ずセットで実行
+3. **エラーハンドリング**: try-catch でエラーを適切に処理し、クライアントに返す
+4. **バリデーション**: サーバー側でも必ず入力値を検証
+
+### Client Component での使用例
+
+```tsx
+// client/components/PostForm.tsx
+'use client'
+
+import { createPostAction } from '@/server/actions/postActions'
+import { useState } from 'react'
+
+export const PostForm = () => {
+  const [message, setMessage] = useState('')
+
+  const handleSubmit = async (formData: FormData) => {
+    const result = await createPostAction(formData)
+
+    if (result.success) {
+      setMessage('投稿を作成しました')
+    } else {
+      setMessage(result.error || '不明なエラー')
+    }
+  }
+
+  return (
+    <form action={handleSubmit}>
+      <input name="title" required />
+      <textarea name="content" required />
+      <button type="submit">投稿</button>
+      {message && <p>{message}</p>}
+    </form>
+  )
+}
+```
+
+### キャッシュ再検証の使い分け
+
+```tsx
+// パスベースの再検証（特定のページ）
+revalidatePath('/posts')
+revalidatePath('/posts/[id]', 'page')
+
+// タグベースの再検証（複数ページに影響）
+revalidateTag('posts-list')
+
+// 両方を組み合わせることも可能
+revalidatePath('/dashboard')
+revalidateTag('user-data')
 ```
 
 ### CSRFトークン不要
@@ -349,7 +703,7 @@ export const metadata = {
 
 ### 動的メタデータ
 ```tsx
-export async function generateMetadata({ params }) {
+export const generateMetadata = async ({ params }: { params: { id: string } }) => {
   const product = await getProduct(params.id)
 
   return {
@@ -363,29 +717,241 @@ export async function generateMetadata({ params }) {
 
 ## まとめ
 
-Next.jsの開発で最も重要なポイント：
+### 最も重要な実装ルール（必須）
 
-1. **App Router**を使用する
-2. **Server Components First**の原則を守る
-3. 適切な**レンダリング戦略**を選択する
-4. **next/image**と**next/font**で最適化する
-5. **TypeScript**を活用する
-6. **コロケーション**で保守性を向上させる
+1. **サーバーコンポーネント優先**
+   - デフォルトでServer Componentsを使用
+   - `"use client"`は最小限に（状態管理・ブラウザAPI・イベントハンドラーのみ）
 
-これらのベストプラクティスに従うことで、高性能でメンテナンスしやすいNext.jsアプリケーションを構築できます。
+2. **責務の明確な分離**
+   - データ取得 → `server/loaders/`（"use server"不要）
+   - データ更新 → `server/actions/`（"use server"必須）
+   - ビジネスロジック → `server/usecases/`
+   - DB操作 → `server/repositories/`
+   - UI → `client/components/`
+
+3. **server-onlyの活用**
+   - サーバー専用コードには必ず `import "server-only"` を追加
+   - クライアントへの誤バンドルを防止
+
+4. **Server Actionsの適切な使用**
+   - 副作用（データ更新・ファイルアップロード）専用
+   - `revalidatePath` または `revalidateTag` を必ずセットで実行
+
+5. **クライアント側データ取得の制限**
+   - 原則サーバー側で取得
+   - 例外：リアルタイム通信・高頻度ポーリング・即応検索のみ
+
+### 推奨ディレクトリ構成
+
+```
+src/
+├── app/          # App Router（URL構造）
+├── client/       # クライアント側コード
+│   ├── components/
+│   └── lib/
+├── server/       # サーバー側コード
+│   ├── loaders/      # データ取得
+│   ├── actions/      # データ更新（"use server"）
+│   ├── usecases/     # ビジネスロジック
+│   ├── repositories/ # DB操作
+│   └── lib/          # ヘルパー
+└── types/        # 型定義
+```
+
+### その他の重要なポイント
+
+- **App Router**を使用する
+- 適切な**レンダリング戦略**を選択する（SSG/SSR/ISR）
+- **next/image**と**next/font**で最適化する
+- **TypeScript**を活用する
+- **アロー関数**で記述する（プロジェクトルール）
+
+これらのベストプラクティスに従うことで、高性能でメンテナンスしやすく、セキュアなNext.jsアプリケーションを構築できます。
 
 ---
 
-**参考リンク**
-- [Next.js公式ドキュメント](https://nextjs.org/docs)
-- [App Router](https://nextjs.org/docs/app)
-- [React Server Components](https://nextjs.org/docs/app/building-your-application/rendering/server-components)
+## 13. レイヤー別実装例（完全版）
 
+### データフロー全体像
+
+```
+User Action
+    ↓
+Client Component ('use client')
+    ↓
+Server Action ('use server') ← 副作用処理
+    ↓
+Usecase (ビジネスロジック統合)
+    ↓
+Repository (DB操作)
+    ↓
+Database
+    ↓
+Loader (データ取得) ← 副作用なし
+    ↓
+Server Component
+    ↓
+Client Component (表示)
+```
+
+### 実装例：ユーザー登録フロー
+
+#### 1. 型定義（`types/user.ts`）
+```tsx
+export type User = {
+  id: string
+  name: string
+  email: string
+  createdAt: Date
+}
+
+export type CreateUserInput = {
+  name: string
+  email: string
+}
+```
+
+#### 2. Repository層（`server/repositories/userRepository.ts`）
+```tsx
+import "server-only"
+import { db } from "@/db"
+import { users } from "@/db/schema"
+import { eq } from "drizzle-orm"
+import type { CreateUserInput, User } from "@/types/user"
+
+export const createUser = async (input: CreateUserInput): Promise<User> => {
+  const [newUser] = await db.insert(users).values(input).returning()
+  return newUser
+}
+
+export const getUserById = async (id: string): Promise<User | null> => {
+  const [user] = await db.select().from(users).where(eq(users.id, id))
+  return user || null
+}
+```
+
+#### 3. Usecase層（`server/usecases/userUsecase.ts`）
+```tsx
+import "server-only"
+import { createUser, getUserById } from "@/server/repositories/userRepository"
+import type { CreateUserInput } from "@/types/user"
+
+export const registerUser = async (input: CreateUserInput) => {
+  // バリデーション
+  if (!input.email.includes('@')) {
+    throw new Error('有効なメールアドレスを入力してください')
+  }
+
+  // ビジネスロジック
+  const user = await createUser(input)
+
+  // 通知などの追加処理
+  // await sendWelcomeEmail(user.email)
+
+  return user
+}
+```
+
+#### 4. Server Action（`server/actions/userActions.ts`）
+```tsx
+'use server'
+
+import { revalidatePath } from 'next/cache'
+import { registerUser } from "@/server/usecases/userUsecase"
+
+export const registerUserAction = async (formData: FormData) => {
+  const name = formData.get('name') as string
+  const email = formData.get('email') as string
+
+  try {
+    const user = await registerUser({ name, email })
+
+    // キャッシュ再検証
+    revalidatePath('/users')
+
+    return { success: true, user }
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : '不明なエラー'
+    }
+  }
+}
+```
+
+#### 5. Loader（`server/loaders/userLoader.ts`）
+```tsx
+import "server-only"
+import { getUserById } from "@/server/repositories/userRepository"
+
+export const loadUser = async (userId: string) => {
+  const user = await getUserById(userId)
+
+  if (!user) {
+    throw new Error('ユーザーが見つかりません')
+  }
+
+  return {
+    id: user.id,
+    name: user.name,
+    email: user.email,
+  }
+}
+```
+
+#### 6. Client Component（`client/components/UserRegistrationForm.tsx`）
+```tsx
+'use client'
+
+import { registerUserAction } from "@/server/actions/userActions"
+import { useState } from 'react'
+
+export const UserRegistrationForm = () => {
+  const [message, setMessage] = useState('')
+
+  const handleSubmit = async (formData: FormData) => {
+    const result = await registerUserAction(formData)
+
+    if (result.success) {
+      setMessage(`登録完了: ${result.user.name}`)
+    } else {
+      setMessage(`エラー: ${result.error}`)
+    }
+  }
+
+  return (
+    <form action={handleSubmit}>
+      <input name="name" placeholder="名前" required />
+      <input name="email" type="email" placeholder="メール" required />
+      <button type="submit">登録</button>
+      {message && <p>{message}</p>}
+    </form>
+  )
+}
+```
+
+#### 7. Server Component（`app/users/[id]/page.tsx`）
+```tsx
+import { loadUser } from "@/server/loaders/userLoader"
+
+// アロー関数で定義（プロジェクトルール）
+const UserPage = async ({ params }: { params: { id: string } }) => {
+  const user = await loadUser(params.id)
+
+  return (
+    <div>
+      <h1>{user.name}</h1>
+      <p>{user.email}</p>
+    </div>
+  )
+}
+
+export default UserPage
+```
 
 ## Claude Code への指示
 
 1. Claude Code との会話は"日本語"で行うこと
 2. 生成する md ファイルは"日本語"で記載すること
 3. 生成するプログラムのコメントとログの内容は"日本語"で記載すること
-4. SEO対策は不要である。
-5. 関数はアロー関数で行うこと
