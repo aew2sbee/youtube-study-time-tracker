@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { User } from '@/types/users';
 import { logger } from '@/utils/logger';
-import { saveLog } from '@/db/study';
+import { saveLog } from '@/server/repositories/studyRepository';
 
 export async function POST(request: NextRequest) {
   try {

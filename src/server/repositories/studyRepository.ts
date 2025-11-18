@@ -1,9 +1,9 @@
 import { logger } from '@/utils/logger';
-import { db } from '@/db';
-import { study } from '@/db/schema';
+import { db } from '@/server/db';
+import { study } from '@/server/db/schema';
 import { and, eq } from 'drizzle-orm';
 import { User } from '@/types/users';
-import { getUserByChannelId, insertUser } from './user';
+import { getUserByChannelId, insertUser } from './userRepository';
 
 export type StudyRow = typeof study.$inferSelect;
 export type InsertStudyRow = typeof study.$inferInsert;

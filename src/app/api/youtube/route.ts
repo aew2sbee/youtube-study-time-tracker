@@ -7,7 +7,7 @@ import { isCategoryMessage, isEndMessage, isStartMessage, REFRESH_MESSAGE, remov
 import { logger } from '@/utils/logger';
 import { getOAuth2Client } from '@/utils/googleClient';
 import { parameter } from '@/config/system';
-import { getStudyTimeStatsByChannelId } from '@/db/study';
+import { getStudyTimeStatsByChannelId } from '@/server/repositories/studyRepository';
 
 // 公式ドキュメント：https://developers.google.com/youtube/v3/live/docs/liveChatMessages/list?hl=ja
 
