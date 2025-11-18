@@ -14,7 +14,10 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: 'Study Time Tracker',
-  description: 'Study Time Tracker by YouTube Live Chat',
+  robots: {
+    index: false,
+    follow: false,
+  },
 };
 
 export default function RootLayout({
