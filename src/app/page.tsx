@@ -3,11 +3,11 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { parameter } from '@/config/system';
-import FocusTimeTracker from '@/components/FocusTimeTracker';
-import LoadingSpinner from '@/components/LoadingSpinner';
-import ErrorMessage from '@/components/ErrorMessage';
+import FocusTimeTracker from '@/client/components/FocusTimeTracker';
+import LoadingSpinner from '@/client/components/LoadingSpinner';
+import ErrorMessage from '@/client/components/ErrorMessage';
 import { useUsers } from '@/hooks/useUsers';
-import HowToJoin from '@/components/HowToJoin';
+import HowToJoin from '@/client/components/HowToJoin';
 
 
 export default function Home() {
