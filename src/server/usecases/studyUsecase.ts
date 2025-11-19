@@ -1,0 +1,93 @@
+import { User } from '@/types/users';
+import { youtube_v3 } from 'googleapis';
+import { calcStudyTime, calcTime } from '@/lib/calcTime';
+import { logger } from '@/server/lib/logger';
+import { postYouTubeComment, LIVE_CHAT_ID } from '@/server/lib/youtubeHelper';
+import { START_MESSAGE, removeMentionPrefix } from '@/lib/liveChatMessage';
+
+/**
+ * 学習開始のビジネスロジック
+ * 新規ユーザーの学習開始を処理し、YouTubeにコメントを投稿する
+ * @param message - YouTubeライブチャットメッセージ
+ * @returns 開始されたユーザー情報
+ */
+export const startStudy = async (
+  message: youtube_v3.Schema$LiveChatMessage
+): Promise<User> => {
+  // ユーザーオブジェクトの作成
+  const startUser: User = {
+    channelId: message.authorDetails?.channelId || '',
+    displayName: removeMentionPrefix(message.authorDetails?.displayName || ''),
+    isChatSponsor: message.authorDetails?.isChatSponsor || false,
+    timeSec: 0,
+    profileImageUrl: message.authorDetails?.profileImageUrl || '',
+    updateTime: new Date(message.snippet?.publishedAt || ''),
+    isStudying: true,
+    refreshInterval: 0,
+    category: '',
+  };
+
+  logger.info(`startStudy - ${startUser.displayName} ${calcTime(startUser.timeSec)}`);
+
+  // YouTubeにコメントを投稿
+  try {
+    const commentMessage = `@${startUser.displayName}: ${START_MESSAGE}`;
+    await postYouTubeComment(LIVE_CHAT_ID, commentMessage, startUser.displayName);
+  } catch (error) {
+    logger.error(`${startUser.displayName}の開始コメント投稿に失敗しました - ${error}`);
+    // コメント投稿失敗してもユーザー作成は継続
+  }
+
+  return startUser;
+};
+
+/**
+ * 学習再開のビジネスロジック
+ * 既存ユーザーの学習再開を処理し、YouTubeにコメントを投稿する
+ * @param user - 既存のユーザー情報
+ * @param startTime - 再開時刻
+ * @returns 再開されたユーザー情報
+ */
+export const restartStudy = async (
+  user: User,
+  startTime: Date
+): Promise<User> => {
+  // ユーザーオブジェクトの更新
+  const restartUser: User = {
+    ...user,
+    isStudying: true,
+    updateTime: startTime,
+    refreshInterval: 0,
+  };
+
+  logger.info(`restartStudy - ${restartUser.displayName} ${calcTime(user.timeSec)} => ${calcTime(restartUser.timeSec)}`);
+
+  // YouTubeにコメントを投稿
+  try {
+    const commentMessage = `@${restartUser.displayName}: ${START_MESSAGE}`;
+    await postYouTubeComment(LIVE_CHAT_ID, commentMessage, restartUser.displayName);
+  } catch (error) {
+    logger.error(`${restartUser.displayName}の再開コメント投稿に失敗しました - ${error}`);
+    // コメント投稿失敗してもユーザー更新は継続
+  }
+
+  return restartUser;
+};
+
+/**
+ * 学習時間を更新する
+ * @param user - 既存のユーザー情報
+ * @param currentTime - 現在時刻
+ * @returns 更新されたユーザー情報
+ */
+export const updateStudyTime = (user: User, currentTime: Date): User => {
+  const updatedUser: User = {
+    ...user,
+    timeSec: user.timeSec + calcStudyTime(user.updateTime, currentTime),
+    updateTime: currentTime,
+    refreshInterval: user.refreshInterval + calcStudyTime(user.updateTime, currentTime),
+  };
+
+  logger.info(`updateStudyTime - ${updatedUser.displayName} ${calcTime(user.timeSec)} => ${calcTime(updatedUser.timeSec)}`);
+  return updatedUser;
+};

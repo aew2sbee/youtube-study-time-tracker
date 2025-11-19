@@ -76,12 +76,10 @@ await initYouTubeAPI();
 
 /**
  * YouTubeライブチャットにコメントを投稿する
- * @param liveChatId - Live Chat ID
  * @param message - 投稿するメッセージ
  * @param userName - ユーザー名（ログ用）
  */
 export const postYouTubeComment = async (
-  liveChatId: string,
   message: string,
   userName: string
 ): Promise<void> => {
@@ -90,7 +88,7 @@ export const postYouTubeComment = async (
     return;
   }
 
-  if (!liveChatId) {
+  if (!LIVE_CHAT_ID) {
     logger.error('Live Chat IDが設定されていません');
     return;
   }
@@ -107,7 +105,7 @@ export const postYouTubeComment = async (
       part: ['snippet'],
       requestBody: {
         snippet: {
-          liveChatId: liveChatId,
+          liveChatId: LIVE_CHAT_ID,
           type: 'textMessageEvent',
           textMessageDetails: {
             messageText: message,
