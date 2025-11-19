@@ -2,7 +2,7 @@
 
 import { User } from '@/types/users';
 import { youtube_v3 } from 'googleapis';
-import { startStudy, restartStudy } from '@/server/usecases/studyUsecase';
+import { startStudy, restartStudy, endStudy } from '@/server/usecases/studyUsecase';
 import { logger } from '@/server/lib/logger';
 
 /**
@@ -47,6 +47,30 @@ export const restartStudyAction = async (
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : '不明なエラー';
     logger.error(`学習再開アクションが失敗しました - ${errorMessage}`);
+    return { success: false, error: errorMessage };
+  }
+};
+
+/**
+ * 学習終了のServer Action
+ * クライアントから呼び出され、既存ユーザーの学習終了を処理する
+ * @param user - 既存のユーザー情報
+ * @param endTime - 終了時刻
+ * @returns 終了されたユーザー情報、またはエラー情報
+ */
+export const endStudyAction = async (
+  user: User,
+  endTime: Date
+): Promise<{ success: true; user: User } | { success: false; error: string }> => {
+  try {
+    logger.info(`${user.displayName}の学習終了アクションが呼び出されました`);
+
+    const stoppedUser = await endStudy(user, endTime);
+
+    return { success: true, user: stoppedUser };
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : '不明なエラー';
+    logger.error(`学習終了アクションが失敗しました - ${errorMessage}`);
     return { success: false, error: errorMessage };
   }
 };

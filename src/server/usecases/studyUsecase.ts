@@ -4,8 +4,8 @@ import { calcStudyTime, calcTime } from '@/lib/calcTime';
 import { logger } from '@/server/lib/logger';
 import { postYouTubeComment, LIVE_CHAT_ID } from '@/server/lib/youtubeHelper';
 import { START_MESSAGE, removeMentionPrefix } from '@/lib/liveChatMessage';
-import { getStudyDaysByChannelId } from '../repositories/studyRepository';
-import { getStartMessageByDays } from '../lib/messages';
+import { getStudyDaysByChannelId, saveLog } from '../repositories/studyRepository';
+import { getStartMessageByDays, END_MESSAGE } from '../lib/messages';
 
 /**
  * 学習開始のビジネスロジック
@@ -95,4 +95,46 @@ export const updateStudyTime = (user: User, currentTime: Date): User => {
 
   logger.info(`updateStudyTime - ${updatedUser.displayName} ${calcTime(user.timeSec)} => ${calcTime(updatedUser.timeSec)}`);
   return updatedUser;
+};
+
+/**
+ * 学習終了のビジネスロジック
+ * 既存ユーザーの学習終了を処理し、DB保存とYouTubeコメント投稿を行う
+ * @param user - 既存のユーザー情報
+ * @param endTime - 終了時刻
+ * @returns 終了されたユーザー情報
+ */
+export const endStudy = async (
+  user: User,
+  endTime: Date
+): Promise<User> => {
+  // 学習時間の最終計算
+  const stopUser: User = {
+    ...user,
+    timeSec: user.timeSec + calcStudyTime(user.updateTime, endTime),
+    isStudying: false,
+    updateTime: endTime,
+  };
+
+  logger.info(`endStudy - ${stopUser.displayName} ${calcTime(user.timeSec)} => ${calcTime(stopUser.timeSec)}`);
+
+  // DB保存
+  try {
+    await saveLog(stopUser);
+    logger.info(`${stopUser.displayName}の学習記録をDBに保存しました`);
+  } catch (error) {
+    logger.error(`${stopUser.displayName}のDB保存に失敗しました - ${error}`);
+    // DB保存失敗してもコメント投稿は継続
+  }
+
+  // YouTubeにコメントを投稿
+  try {
+    const commentMessage = `@${stopUser.displayName}さん ${END_MESSAGE}`;
+    await postYouTubeComment(commentMessage, stopUser.displayName);
+  } catch (error) {
+    logger.error(`${stopUser.displayName}の終了コメント投稿に失敗しました - ${error}`);
+    // コメント投稿失敗してもユーザー更新は継続
+  }
+
+  return stopUser;
 };

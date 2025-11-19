@@ -8,4 +8,10 @@ export interface User {
   isStudying: boolean;
   refreshInterval: number;
   category: string;
+  totalDays: number;
+  totalSec: number;
+  last7Days: number;
+  last7DaysSec: number;
+  last28Days: number;
+  last28DaysSec: number;
 }
