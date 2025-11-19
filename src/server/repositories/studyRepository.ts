@@ -81,6 +81,31 @@ export const hasSameVideoData = async (userId: number, user: User) => {
   }
 };
 
+/**
+ * userIdから参加日数を取得する
+ * @param userId - ユーザーID
+ * @returns 参加日数
+ */
+export const getStudyDaysByUserId = async (userId: number): Promise<number> => {
+  const rows = await db
+    .select({ timestamp: study.timestamp })
+    .from(study)
+    .where(eq(study.userId, userId));
+
+  return new Set(rows.map(r => r.timestamp.toISOString().split('T')[0])).size;
+};
+
+/**
+ * channelIdから参加日数を取得する
+ * @param channelId - チャンネルID
+ * @returns 参加日数（ユーザーが見つからない場合は0）
+ */
+export const getStudyDaysByChannelId = async (channelId: string): Promise<number> => {
+  const user = await getUserByChannelId(channelId);
+  if (!user) return 0;
+  return await getStudyDaysByUserId(user.id);
+};
+
 export const getStudyTimeStatsByChannelId = async (channelId: string) => {
   const user = await getUserByChannelId(channelId);
   if (!user) {

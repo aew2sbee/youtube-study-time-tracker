@@ -4,6 +4,8 @@ import { calcStudyTime, calcTime } from '@/lib/calcTime';
 import { logger } from '@/server/lib/logger';
 import { postYouTubeComment, LIVE_CHAT_ID } from '@/server/lib/youtubeHelper';
 import { START_MESSAGE, removeMentionPrefix } from '@/lib/liveChatMessage';
+import { getStudyDaysByChannelId } from '../repositories/studyRepository';
+import { getStartMessageByDays } from '../lib/messages';
 
 /**
  * 学習開始のビジネスロジック
@@ -31,8 +33,11 @@ export const startStudy = async (
 
   // YouTubeにコメントを投稿
   try {
-    const commentMessage = `@${startUser.displayName}: ${START_MESSAGE}`;
-    await postYouTubeComment(LIVE_CHAT_ID, commentMessage, startUser.displayName);
+    // ユーザーの参加日数を取得
+    const studyDays = await getStudyDaysByChannelId(startUser.channelId);
+    const startMessage = getStartMessageByDays(studyDays);
+    const commentMessage = `@${startUser.displayName}さん ${startMessage}`;
+    await postYouTubeComment(commentMessage, startUser.displayName);
   } catch (error) {
     logger.error(`${startUser.displayName}の開始コメント投稿に失敗しました - ${error}`);
     // コメント投稿失敗してもユーザー作成は継続

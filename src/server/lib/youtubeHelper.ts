@@ -5,6 +5,11 @@ import { parameter } from '@/config/system';
 const OAUTH_CALLBACK_URL = 'http://localhost:3000/api/oauth/callback';
 
 /**
+ * Build時に初期化されるVIDEO_ID
+ */
+export let VIDEO_ID = process.env.VIDEO_ID!.trim();
+
+/**
  * Build時に初期化されるLIVE_CHAT_ID
  */
 export let LIVE_CHAT_ID = '';
@@ -39,7 +44,7 @@ const initYouTubeAPI = async (): Promise<void> => {
     // LIVE_CHAT_IDの取得
     const response = await YOUTUBE.videos.list({
       part: ['liveStreamingDetails'],
-      id: [process.env.VIDEO_ID!.trim()]
+      id: [VIDEO_ID]
     });
 
     const video = response.data.items?.[0];
