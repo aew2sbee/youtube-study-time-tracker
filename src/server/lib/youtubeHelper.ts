@@ -5,29 +5,20 @@ import { parameter } from '@/config/system';
 const OAUTH_CALLBACK_URL = 'http://localhost:3000/api/oauth/callback';
 
 /**
- * Build時に初期化されるVIDEO_ID
- */
-export let VIDEO_ID = process.env.VIDEO_ID!.trim();
-
-/**
- * Build時に初期化されるLIVE_CHAT_ID
- */
-export let LIVE_CHAT_ID = '';
-
-/**
- * Build時に初期化されるYouTube APIクライアント（API KEY認証）
- */
+ * Build時に初期化される
+ * - ライブ配信のビデオID
+ * - ライブ配信のチャットID
+ * - YouTube APIクライアント（API KEY認証）
+ * - OAuth2クライアント
+ * - YouTube APIクライアント（OAuth認証）
+ * - nextPageToken
+*/
+export let VIDEO_ID: string | null = process.env.VIDEO_ID!.trim() || null;
+export let LIVE_CHAT_ID: string | null = null;
 export let YOUTUBE: ReturnType<typeof google.youtube> | null = null;
-
-/**
- * Build時に初期化されるOAuth2クライアント
- */
 export let oauth2Client: InstanceType<typeof google.auth.OAuth2> | null = null;
-
-/**
- * Build時に初期化されるYouTube APIクライアント（OAuth認証）
- */
 export let youtubeWithOAuth: ReturnType<typeof google.youtube> | null = null;
+export let nextPageToken: string | null = null;
 
 /**
  * YouTube API初期化関数
