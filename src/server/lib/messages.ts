@@ -9,6 +9,9 @@ export const REFRESH_MESSAGE =
 export const START_MESSAGE =
   '本日もよろしくお願いします。計測を終了される場合は「end」とコメントしてくださいね';
 
+export const RESTART_MESSAGE =
+  'おかえりなさい! 引き続きよろしくお願いいたします。計測を終了される場合は「end」とコメントしてくださいね';
+
 export const END_MESSAGE =
   'お疲れ様でした！本日の学習時間を記録しました。またのご参加をお待ちしています😊';
 /**
@@ -16,16 +19,18 @@ export const END_MESSAGE =
  * @param days - 参加日数
  * @returns 開始メッセージ
  */
-export const getStartMessageByUser = (days: number): string => {
+export const getStartMessageByUser = (displayName: string, days: number): string => {
+  let message = '';
   if (days === 0) {
-    return '初参加ですね！🔰よろしくお願いします🙇' + START_MESSAGE;
+    message = '初参加ですね！🔰よろしくお願いします🙇' + START_MESSAGE;
   } else if (days < 7) {
-    return `${days}日目の参加ですね！継続は力なり💪` + START_MESSAGE;
+    message = `${days}日目の参加ですね！継続は力なり💪` + START_MESSAGE;
   } else if (days < 30) {
-    return `${days}日目！素晴らしい継続力ですね🦾` + START_MESSAGE;
+    message = `${days}日目！素晴らしい継続力ですね🦾` + START_MESSAGE;
   } else {
-    return `なんと${days}日目！継続の達人ですね🏆` + START_MESSAGE;
+    message = `なんと${days}日目！継続の達人ですね🏆` + START_MESSAGE;
   }
+  return `@${displayName}さん ${message}`
 };
 
 /**
@@ -70,9 +75,9 @@ export const isAllowMessage = (messageText: string): boolean => {
  */
 export const getEndMessageByUser = (user: User): string => {
   return `@${user.displayName}さん お疲れ様でした🌟` +
-  `今日は${calcTime(user.timeSec)}集中しました!!` +
-  `これまでに合計${user.totalDays}日間集中してなんと${calcTime(user.totalSec)}も頑張りました!!` +
-  `📅 過去7日間実績は、${user.last7Days}日で${calcTime(user.last7DaysSec)}` +
-  `📆 過去28日間は、${user.last28Days}日で${calcTime(user.last28DaysSec)}` +
-  `この配信がお役に立ったなら高評価👍をお願いします。また集中したい時はぜひ配信にお越しください`;
+  `今日は${calcTime(user.timeSec)}集中しました!!`
+  // `これまでに合計${user.totalDays}日間集中してなんと${calcTime(user.totalSec)}も頑張りました!!` +
+  // `📅 過去7日間実績は、${user.last7Days}日で${calcTime(user.last7DaysSec)}` +
+  // `📆 過去28日間は、${user.last28Days}日で${calcTime(user.last28DaysSec)}` +
+  // `この配信がお役に立ったなら高評価👍をお願いします。また集中したい時はぜひ配信にお越しください`;
 };

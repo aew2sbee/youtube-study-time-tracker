@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getAllActiveUsers } from '@/server/lib/userStore';
+import { getAllActiveUsers } from '@/server/lib/storeUser';
 import { logger } from '@/server/lib/logger';
 
 /**

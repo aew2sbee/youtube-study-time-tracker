@@ -2,6 +2,7 @@ import { google, youtube_v3 } from 'googleapis';
 import { logger } from '@/server/lib/logger';
 import { parameter } from '@/config/system';
 import { isAllowMessage } from './messages';
+import { LiveChatMessage } from '@/types/youtube';
 
 const OAUTH_CALLBACK_URL = 'http://localhost:3000/api/oauth/callback';
 
@@ -13,7 +14,7 @@ const OAUTH_CALLBACK_URL = 'http://localhost:3000/api/oauth/callback';
  * - OAuth2クライアント
  * - YouTube APIクライアント（OAuth認証）
  * - nextPageToken
-*/
+ */
 export const videoId: string = process.env.VIDEO_ID!.trim();
 export let liveChatId: string = '';
 export let nextPageToken: string = '';
@@ -36,13 +37,13 @@ const initYouTubeAPI = async (): Promise<void> => {
     // YouTube APIクライアントの初期化（API KEY認証）
     youtube = google.youtube({
       version: 'v3',
-      auth: process.env.YOUTUBE_API_KEY
+      auth: process.env.YOUTUBE_API_KEY,
     });
 
     // liveChatIdの取得
     const response = await youtube.videos.list({
       part: ['liveStreamingDetails'],
-      id: [videoId]
+      id: [videoId],
     });
 
     const video = response.data.items?.[0];
@@ -74,16 +75,12 @@ const initYouTubeAPI = async (): Promise<void> => {
   }
 };
 
-
 /**
  * YouTubeライブチャットにコメントを投稿する
  * @param message - 投稿するメッセージ
  * @param userName - ユーザー名（ログ用）
  */
-export const postYouTubeComment = async (
-  message: string,
-  userName: string
-): Promise<void> => {
+export const postYouTubeComment = async (message: string, userName: string): Promise<void> => {
   if (!parameter.IS_COMMENT_ENABLED) {
     logger.info('コメント投稿は無効化されています');
     return;
@@ -123,10 +120,10 @@ export const postYouTubeComment = async (
 };
 
 /**
- * YouTubeライブチャットメッセージを取得する
- * @returns ライブチャットメッセージ一覧（start/end/categoryメッセージのみ）
+ * YouTubeライブチャットメッセージを取得する（元のメッセージ含む）
+ * @returns 元のメッセージと変換後のメッセージのペア
  */
-export const getLiveChatMessages = async (): Promise<youtube_v3.Schema$LiveChatMessage[]> => {
+export const getLiveChatMessages = async (): Promise<LiveChatMessage[]> => {
   if (!liveChatId) {
     logger.warn('liveChatIdが設定されていません');
     return [];
@@ -145,14 +142,22 @@ export const getLiveChatMessages = async (): Promise<youtube_v3.Schema$LiveChatM
       maxResults: 200,
     });
 
-    const messages: youtube_v3.Schema$LiveChatMessage[] =
-      liveChatMessages.data.items?.filter((item) => isAllowMessage(item.snippet?.displayMessage || '')) || [];
-
     // nextPageTokenを更新
     nextPageToken = liveChatMessages.data.nextPageToken || '';
 
-    logger.info(`getLiveChatMessages: ${messages.length}件のメッセージを取得しました`);
-    return messages;
+    const messages: youtube_v3.Schema$LiveChatMessage[] =
+      liveChatMessages.data.items?.filter((item) => isAllowMessage(item.snippet?.displayMessage || '')) || [];
+
+    const result: LiveChatMessage[] = messages.map((item) => ({
+      channelId: item.authorDetails?.channelId || '',
+      displayName: removeMentionPrefix(item.authorDetails?.displayName || ''),
+      profileImageUrl: item.authorDetails?.profileImageUrl || '',
+      displayMessage: item.snippet?.displayMessage || '',
+      isChatSponsor: item.authorDetails?.isChatSponsor || false
+    }));
+
+    logger.info(`${messages.length}件のメッセージを取得しました`);
+    return result;
   } catch (error) {
     logger.error(`ライブチャットメッセージの取得に失敗しました - ${error}`);
     return [];
@@ -166,7 +171,7 @@ export const getLiveChatMessages = async (): Promise<youtube_v3.Schema$LiveChatM
  * @example
  * removeMentionPrefix('@username') // => 'username'
  */
-export const removeMentionPrefix = (displayName: string): string =>
+const removeMentionPrefix = (displayName: string): string =>
   displayName.startsWith('@') ? displayName.slice(1) : displayName;
 
 // Build時に初期化を実行

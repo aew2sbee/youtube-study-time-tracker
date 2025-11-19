@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
-import { onUsersUpdate, getAllUsers } from '@/server/lib/userStore';
+import { onUsersUpdate } from '@/server/lib/storeUser';
 import { logger } from '@/server/lib/logger';
+import { User } from '@/types/users';
 
 /**
  * SSEエンドポイント
@@ -16,7 +17,7 @@ export async function GET() {
       logger.info('SSE接続を開始しました');
 
       // 初回データを送信
-      const initialUsers = getAllUsers();
+      const initialUsers: User[] = [];
       const initialData = `data: ${JSON.stringify({ users: initialUsers })}\n\n`;
       controller.enqueue(encoder.encode(initialData));
 
@@ -58,7 +59,7 @@ export async function GET() {
     headers: {
       'Content-Type': 'text/event-stream',
       'Cache-Control': 'no-cache, no-transform',
-      'Connection': 'keep-alive',
+      Connection: 'keep-alive',
       'X-Accel-Buffering': 'no', // Nginxのバッファリング無効化
     },
   });

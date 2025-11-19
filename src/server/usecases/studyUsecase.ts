@@ -1,12 +1,12 @@
 import { User } from '@/types/users';
-import { youtube_v3 } from 'googleapis';
-import { calcStudyTime, calcTime } from '@/lib/calcTime';
+import { calcStudyTime } from '@/lib/calcTime';
 import { logger } from '@/server/lib/logger';
-import { postYouTubeComment } from '@/server/lib/youtubeHelper';
-import { START_MESSAGE, removeMentionPrefix } from '@/lib/liveChatMessage';
+import { REFRESH_MESSAGE, RESTART_MESSAGE } from '@/server/lib/messages';
 import { getStudyDaysByChannelId, saveLog } from '../repositories/studyRepository';
 import { getStartMessageByUser, getEndMessageByUser } from '../lib/messages';
-import { setUser } from '@/server/lib/userStore';
+import { setUser } from '@/server/lib/storeUser';
+import { LiveChatMessage } from '@/types/youtube';
+import { pushQueue } from '../lib/storePost';
 
 /**
  * 学習開始のビジネスロジック
@@ -14,46 +14,27 @@ import { setUser } from '@/server/lib/userStore';
  * @param message - YouTubeライブチャットメッセージ
  * @returns 開始されたユーザー情報
  */
-export const startStudy = async (
-  message: youtube_v3.Schema$LiveChatMessage
-): Promise<User> => {
+export const startStudy = async (message: LiveChatMessage, now: Date): Promise<void> => {
   // ユーザーオブジェクトの作成
   const startUser: User = {
-    channelId: message.authorDetails?.channelId || '',
-    displayName: removeMentionPrefix(message.authorDetails?.displayName || ''),
-    isChatSponsor: message.authorDetails?.isChatSponsor || false,
+    channelId: message.channelId,
+    displayName: message.displayName,
+    profileImageUrl: message.profileImageUrl,
+    isChatSponsor: message.isChatSponsor || false,
     timeSec: 0,
-    profileImageUrl: message.authorDetails?.profileImageUrl || '',
-    updateTime: new Date(message.snippet?.publishedAt || ''),
+    updateTime: now,
     isStudying: true,
     refreshInterval: 0,
     category: '',
-    totalDays: 0,
-    totalSec: 0,
-    last7Days: 0,
-    last7DaysSec: 0,
-    last28Days: 0,
-    last28DaysSec: 0,
   };
 
-  logger.info(`startStudy - ${startUser.displayName} ${calcTime(startUser.timeSec)}`);
+  const studyDays = await getStudyDaysByChannelId(startUser.channelId);
+  const startMessage = getStartMessageByUser(startUser.displayName, studyDays);
 
-  // YouTubeにコメントを投稿
-  try {
-    // ユーザーの参加日数を取得
-    const studyDays = await getStudyDaysByChannelId(startUser.channelId);
-    const startMessage = getStartMessageByUser(studyDays);
-    const commentMessage = `@${startUser.displayName}さん ${startMessage}`;
-    await postYouTubeComment(commentMessage, startUser.displayName);
-  } catch (error) {
-    logger.error(`${startUser.displayName}の開始コメント投稿に失敗しました - ${error}`);
-    // コメント投稿失敗してもユーザー作成は継続
-  }
-
+  // キューに追加
+  pushQueue(startUser.displayName, startMessage);
   // メモリストアに保存
   setUser(startUser);
-
-  return startUser;
 };
 
 /**
@@ -63,10 +44,7 @@ export const startStudy = async (
  * @param startTime - 再開時刻
  * @returns 再開されたユーザー情報
  */
-export const restartStudy = async (
-  user: User,
-  startTime: Date
-): Promise<User> => {
+export const restartStudy = async (user: User, startTime: Date): Promise<void> => {
   // ユーザーオブジェクトの更新
   const restartUser: User = {
     ...user,
@@ -75,21 +53,11 @@ export const restartStudy = async (
     refreshInterval: 0,
   };
 
-  logger.info(`restartStudy - ${restartUser.displayName} ${calcTime(user.timeSec)} => ${calcTime(restartUser.timeSec)}`);
-
-  // YouTubeにコメントを投稿
-  try {
-    const commentMessage = `@${restartUser.displayName}: ${START_MESSAGE}`;
-    await postYouTubeComment(commentMessage, restartUser.displayName);
-  } catch (error) {
-    logger.error(`${restartUser.displayName}の再開コメント投稿に失敗しました - ${error}`);
-    // コメント投稿失敗してもユーザー更新は継続
-  }
-
+  const restartMessage = `@${restartUser.displayName}さん ${RESTART_MESSAGE}`;
+  // キューに追加
+  pushQueue(restartUser.displayName, restartMessage);
   // メモリストアに保存
   setUser(restartUser);
-
-  return restartUser;
 };
 
 /**
@@ -98,7 +66,7 @@ export const restartStudy = async (
  * @param currentTime - 現在時刻
  * @returns 更新されたユーザー情報
  */
-export const updateStudyTime = (user: User, currentTime: Date): User => {
+export const updateTime = async (user: User, currentTime: Date): Promise<void> => {
   const updatedUser: User = {
     ...user,
     timeSec: user.timeSec + calcStudyTime(user.updateTime, currentTime),
@@ -106,34 +74,10 @@ export const updateStudyTime = (user: User, currentTime: Date): User => {
     refreshInterval: user.refreshInterval + calcStudyTime(user.updateTime, currentTime),
   };
 
-  logger.info(`updateStudyTime - ${updatedUser.displayName} ${calcTime(user.timeSec)} => ${calcTime(updatedUser.timeSec)}`);
-
   // メモリストアに保存
   setUser(updatedUser);
-
-  return updatedUser;
 };
 
-/**
- * カテゴリー更新のビジネスロジック
- * 既存ユーザーのカテゴリーを更新する
- * @param user - 既存のユーザー情報
- * @param category - 新しいカテゴリー
- * @returns 更新されたユーザー情報
- */
-export const updateCategory = (user: User, category: string): User => {
-  const updatedUser: User = {
-    ...user,
-    category,
-  };
-
-  logger.info(`updateCategory - ${updatedUser.displayName} category: ${updatedUser.category}`);
-
-  // メモリストアに保存
-  setUser(updatedUser);
-
-  return updatedUser;
-};
 
 /**
  * 学習終了のビジネスロジック
@@ -142,10 +86,7 @@ export const updateCategory = (user: User, category: string): User => {
  * @param endTime - 終了時刻
  * @returns 終了されたユーザー情報
  */
-export const endStudy = async (
-  user: User,
-  endTime: Date
-): Promise<User> => {
+export const endStudy = async (user: User, endTime: Date): Promise<void> => {
   // 学習時間の最終計算
   const stopUser: User = {
     ...user,
@@ -153,8 +94,6 @@ export const endStudy = async (
     isStudying: false,
     updateTime: endTime,
   };
-
-  logger.info(`endStudy - ${stopUser.displayName} ${calcTime(user.timeSec)} => ${calcTime(stopUser.timeSec)}`);
 
   // DB保存
   try {
@@ -165,17 +104,42 @@ export const endStudy = async (
     // DB保存失敗してもコメント投稿は継続
   }
 
-  // YouTubeにコメントを投稿
-  try {
-    const commentMessage = getEndMessageByUser(stopUser)
-    await postYouTubeComment(commentMessage, stopUser.displayName);
-  } catch (error) {
-    logger.error(`${stopUser.displayName}の終了コメント投稿に失敗しました - ${error}`);
-    // コメント投稿失敗してもユーザー更新は継続
-  }
-
+  const commentMessage = getEndMessageByUser(stopUser);
+  // キューに追加
+  pushQueue(stopUser.displayName, commentMessage);
   // メモリストアに保存（isStudying: false状態で保持）
   setUser(stopUser);
-
-  return stopUser;
 };
+
+/**
+ * リフレッシュ間隔をリセットする
+ * @param user - 既存のユーザー情報
+ */
+export const resetRefresh = async (user: User): Promise<void> => {
+  const refreshUser: User = {
+    ...user,
+    refreshInterval: 0,
+  };
+  // キューに追加
+  pushQueue(refreshUser.displayName, REFRESH_MESSAGE);
+  // メモリストアに保存
+  setUser(refreshUser);
+};
+
+/**
+ * カテゴリー更新のビジネスロジック
+ * 既存ユーザーのカテゴリーを更新する
+ * @param user - 既存のユーザー情報
+ * @param category - 新しいカテゴリー
+ * @returns 更新されたユーザー情報
+ */
+export const updateCategory = async (user: User, category: string): Promise<void> => {
+  const updatedUser: User = {
+    ...user,
+    category,
+  };
+
+  // メモリストアに保存
+  setUser(updatedUser);
+};
+

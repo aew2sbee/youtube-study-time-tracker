@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { User } from '@/types/users';
 import { youtube_v3 } from 'googleapis';
 import { calcTime, convertHHMMSS } from '@/lib/calcTime';
-import { isCategoryMessage, isEndMessage, isStartMessage, REFRESH_MESSAGE, START_MESSAGE } from '@/lib/liveChatMessage';
+import { isCategoryMessage, isEndMessage, isStartMessage, REFRESH_MESSAGE, START_MESSAGE } from '@/server/lib/messages';
 import { logger } from '@/server/lib/logger';
 import { liveChatId, youtube, youtubeWithOAuth } from '@/server/lib/youtubeHelper';
 import { parameter } from '@/config/system';

@@ -1,7 +1,7 @@
 # Claude Code 設定
 
 ## アプリコンセプト
-- コンセプト: [README](README.md)を参照すること
+- [README](README.md)を参照すること
 
 ## 技術選定
 
@@ -29,44 +29,67 @@
 - YouTube Data APIのquota（割り当て）の使用を最小限にする
 - 関数はアロー関数で行うこと
 - JSDocを必ず記載すること
-- `VIDEO_ID`, `LIVE_CHAT_ID`が未定義or無効な値でもErrorで落ちない
+- `LIVE_CHAT_ID`は、build時に初期化されるグローバル定数で`src/server/lib/constants.ts`で管理する
 
 ## ディレクトリ構造
 ```bash
+./
+├── instrumentation.ts  # Next.js Instrumentation Hook（サーバー起動時の初期化処理）
 src/
 ├── app/          # App Router（URL構造）
 ├── client/       # クライアント側コード
 │   ├── components/
-│   └── lib/      # クライアント専用ヘルパー
+│   ├── hooks/        # カスタムフック
+│   └── lib/          # クライアント専用ヘルパー
 ├── server/       # サーバー側コード
-│   ├── loaders/      # データ取得
-│   ├── actions/      # データ更新（"use server"）
 │   ├── usecases/     # ビジネスロジック
 │   ├── repositories/ # DB操作
 │   ├── db/           # DBスキーマ・接続
 │   └── lib/          # サーバー専用ヘルパー
+│       ├── userStore.ts       # ユーザー状態管理（メモリストア + SSE通知）
+│       ├── processorMessage.ts # メッセージ処理
+│       ├── processorTime.ts   # 時間更新処理
+│       └── youtubeHelper.ts   # YouTube API ヘルパー
 └── types/        # 型定義
 ```
 
 ## データフロー
+
+### バックグラウンド処理（サーバー側）
 ```bash
-User Action
+instrumentation.ts (Next.js起動時に自動実行)
+    ├─ メッセージポーリング（API_POLLING_INTERVAL毎）
+    │   ├─ YouTube Live Chat API (getLiveChatMessages)
+    │   ├─ setUserByMessage (メッセージ判定・処理)
+    │   ├─ Usecase (startStudy/restartStudy/endStudy/updateCategory)
+    │   └─ UserStore (メモリ管理: Map<channelId, User>)
+    │       └─ SSE通知 (EventEmitter)
+    │
+    └─ 時間更新処理（API_POLLING_INTERVAL毎）
+        ├─ updateAllUsersTime
+        ├─ UserStore (時間・リフレッシュ間隔を更新)
+        │   └─ SSE通知 (EventEmitter)
+        └─ リフレッシュ通知（1時間ごと）→ YouTube API
+```
+
+### クライアント表示（SSE）
+```bash
+Client Component (useUserStream)
+    ↓ SSE接続
+GET /api/users/stream
+    ↓ リアルタイムプッシュ
+UserStore (EventEmitter経由)
     ↓
-Client Component ('use client')
+表示（時間計測・ページネーション）
+```
+
+### DB保存（学習終了時のみ）
+```bash
+endStudy (Usecase)
     ↓
-Server Action ('use server') ← 副作用処理
+Repository (saveLog)
     ↓
-Usecase (ビジネスロジック統合)
-    ↓
-Repository (DB操作)
-    ↓
-Database
-    ↓
-Loader (データ取得) ← 副作用なし
-    ↓
-Server Component
-    ↓
-Client Component (表示)
+Database (Supabase)
 ```
 
 ## Claude Code への指示

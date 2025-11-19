@@ -18,6 +18,15 @@ const userStoreEmitter = new EventEmitter();
 // メモリリーク防止のためリスナー数上限を設定
 userStoreEmitter.setMaxListeners(100);
 
+
+/**
+ * ユーザー更新イベントを発行（SSE通知用）
+ */
+export const emitUsersUpdate = async (): Promise<void> => {
+  const users = getAllUsers();
+  userStoreEmitter.emit('usersUpdate', users);
+};
+
 /**
  * ユーザーを取得
  * @param channelId - チャンネルID
@@ -32,9 +41,6 @@ export const getUser = (channelId: string): User | undefined => userStore.get(ch
 export const setUser = (user: User): void => {
   userStore.set(user.channelId, user);
   logger.info(`UserStore: ${user.displayName}の状態を更新しました`);
-
-  // SSEクライアントに更新を通知
-  emitUsersUpdate();
 };
 
 /**
@@ -64,14 +70,6 @@ export const getAllUsers = (): User[] => {
  */
 export const getUserStoreSize = (): number => {
   return userStore.size;
-};
-
-/**
- * ユーザー更新イベントを発行（SSE通知用）
- */
-const emitUsersUpdate = (): void => {
-  const users = getAllUsers();
-  userStoreEmitter.emit('usersUpdate', users);
 };
 
 /**
