@@ -161,13 +161,13 @@ export const getLiveChatMessages = async (): Promise<youtube_v3.Schema$LiveChatM
 
 /**
  * メッセージの先頭に付与されている@を削除します。
- * @param {string} message - 処理するメッセージテキスト
+ * @param {string} displayName - 処理するメッセージテキスト
  * @returns {string} @が削除されたメッセージ
  * @example
  * removeMentionPrefix('@username') // => 'username'
  */
-export const removeMentionPrefix = (message: string): string =>
-  message.startsWith('@') ? message.slice(1) : message;
+export const removeMentionPrefix = (displayName: string): string =>
+  displayName.startsWith('@') ? displayName.slice(1) : displayName;
 
 // Build時に初期化を実行
 await initYouTubeAPI();
