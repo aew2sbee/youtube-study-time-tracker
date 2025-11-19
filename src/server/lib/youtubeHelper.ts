@@ -1,6 +1,7 @@
-import { google } from 'googleapis';
+import { google, youtube_v3 } from 'googleapis';
 import { logger } from '@/server/lib/logger';
 import { parameter } from '@/config/system';
+import { isAllowMessage } from './messages';
 
 const OAUTH_CALLBACK_URL = 'http://localhost:3000/api/oauth/callback';
 
@@ -13,38 +14,44 @@ const OAUTH_CALLBACK_URL = 'http://localhost:3000/api/oauth/callback';
  * - YouTube APIクライアント（OAuth認証）
  * - nextPageToken
 */
-export let VIDEO_ID: string | null = process.env.VIDEO_ID!.trim() || null;
-export let LIVE_CHAT_ID: string | null = null;
-export let YOUTUBE: ReturnType<typeof google.youtube> | null = null;
+export const videoId: string | null = process.env.VIDEO_ID!.trim() || null;
+export let liveChatId: string | null = null;
+export let youtube: ReturnType<typeof google.youtube> | null = null;
 export let oauth2Client: InstanceType<typeof google.auth.OAuth2> | null = null;
 export let youtubeWithOAuth: ReturnType<typeof google.youtube> | null = null;
 export let nextPageToken: string | null = null;
 
 /**
  * YouTube API初期化関数
- * build時にVIDEO_IDからLIVE_CHAT_IDを取得し、OAuth2クライアントを初期化する
+ * build時にVIDEO_IDからliveChatIdを取得し、OAuth2クライアントを初期化する
  */
 const initYouTubeAPI = async (): Promise<void> => {
   try {
+    // VIDEO_IDのチェック
+    if (!videoId) {
+      logger.error('VIDEO_IDが設定されていません。環境変数 VIDEO_ID を確認してください。');
+      return;
+    }
+
     // YouTube APIクライアントの初期化（API KEY認証）
-    YOUTUBE = google.youtube({
+    youtube = google.youtube({
       version: 'v3',
       auth: process.env.YOUTUBE_API_KEY
     });
 
-    // LIVE_CHAT_IDの取得
-    const response = await YOUTUBE.videos.list({
+    // liveChatIdの取得
+    const response = await youtube.videos.list({
       part: ['liveStreamingDetails'],
-      id: [VIDEO_ID]
+      id: [videoId]
     });
 
     const video = response.data.items?.[0];
-    LIVE_CHAT_ID = video?.liveStreamingDetails?.activeLiveChatId || '';
+    liveChatId = video?.liveStreamingDetails?.activeLiveChatId || '';
 
-    if (!LIVE_CHAT_ID) {
-      logger.error('LIVE_CHAT_IDが取得できませんでした。環境変数 VIDEO_ID の設定や配信中かを確認してください。');
+    if (!liveChatId) {
+      logger.error('liveChatIdが取得できませんでした。環境変数 VIDEO_ID の設定や配信中かを確認してください。');
     } else {
-      logger.info(`LIVE_CHAT_ID - ${LIVE_CHAT_ID}`);
+      logger.info(`liveChatId - ${liveChatId}`);
     }
 
     // OAuth2クライアントの初期化
@@ -82,7 +89,7 @@ export const postYouTubeComment = async (
     return;
   }
 
-  if (!LIVE_CHAT_ID) {
+  if (!liveChatId) {
     logger.error('Live Chat IDが設定されていません');
     return;
   }
@@ -99,7 +106,7 @@ export const postYouTubeComment = async (
       part: ['snippet'],
       requestBody: {
         snippet: {
-          liveChatId: LIVE_CHAT_ID,
+          liveChatId: liveChatId,
           type: 'textMessageEvent',
           textMessageDetails: {
             messageText: message,
@@ -116,6 +123,43 @@ export const postYouTubeComment = async (
 };
 
 /**
+ * YouTubeライブチャットメッセージを取得する
+ * @returns ライブチャットメッセージ一覧（start/end/categoryメッセージのみ）
+ */
+export const getLiveChatMessages = async (): Promise<youtube_v3.Schema$LiveChatMessage[]> => {
+  if (!liveChatId) {
+    logger.warn('liveChatIdが設定されていません');
+    return [];
+  }
+
+  if (!youtube) {
+    logger.error('YouTube APIクライアントが初期化されていません');
+    return [];
+  }
+
+  try {
+    const liveChatMessages = await youtube.liveChatMessages.list({
+      liveChatId: liveChatId,
+      part: ['snippet', 'authorDetails'],
+      pageToken: nextPageToken || undefined,
+      maxResults: 50,
+    });
+
+    const messages: youtube_v3.Schema$LiveChatMessage[] =
+      liveChatMessages.data.items?.filter((item) => isAllowMessage(item.snippet?.displayMessage || '')) || [];
+
+    // nextPageTokenを更新
+    nextPageToken = liveChatMessages.data.nextPageToken || null;
+
+    logger.info(`getLiveChatMessages: ${messages.length}件のメッセージを取得しました`);
+    return messages;
+  } catch (error) {
+    logger.error(`ライブチャットメッセージの取得に失敗しました - ${error}`);
+    return [];
+  }
+};
+
+/**
  * メッセージの先頭に付与されている@を削除します。
  * @param {string} message - 処理するメッセージテキスト
  * @returns {string} @が削除されたメッセージ
@@ -124,32 +168,6 @@ export const postYouTubeComment = async (
  */
 export const removeMentionPrefix = (message: string): string =>
   message.startsWith('@') ? message.slice(1) : message;
-
-/**
- * 指定されたメッセージが学習開始メッセージかどうかを判定します。
- * @param {string} messageText - 判定するメッセージテキスト
- * @returns {boolean} 学習開始メッセージの場合はtrue
- */
-export const isStartMessage = (messageText: string): boolean =>
-  messageText.toLowerCase().trim() === parameter.START_STUDY_KEYWORDS;
-
-/**
- * 指定されたメッセージが学習終了メッセージかどうかを判定します。
- * @param {string} messageText - 判定するメッセージテキスト
- * @returns {boolean} 学習終了メッセージの場合はtrue
- */
-export const isEndMessage = (messageText: string): boolean =>
-  messageText.toLowerCase().trim() === parameter.END_STUDY_KEYWORDS;
-
-/**
- * 指定されたメッセージがカテゴリーメッセージ（作業、勉強、読書）かどうかを判定します。
- * @param {string} messageText - 判定するメッセージテキスト
- * @returns {boolean} カテゴリーメッセージの場合はtrue
- */
-export const isCategoryMessage = (messageText: string): boolean => {
-  const trimmedMessage = messageText.trim();
-  return (parameter.ALLOW_WORDS as readonly string[]).includes(trimmedMessage);
-};
 
 // Build時に初期化を実行
 await initYouTubeAPI();
