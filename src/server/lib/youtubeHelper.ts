@@ -142,7 +142,7 @@ export const getLiveChatMessages = async (): Promise<youtube_v3.Schema$LiveChatM
       liveChatId: liveChatId,
       part: ['snippet', 'authorDetails'],
       pageToken: nextPageToken || undefined,
-      maxResults: 50,
+      maxResults: 200,
     });
 
     const messages: youtube_v3.Schema$LiveChatMessage[] =
