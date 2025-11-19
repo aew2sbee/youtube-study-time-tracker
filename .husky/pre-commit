@@ -4,4 +4,7 @@
 echo "🔍 Running lint..."
 npm run lint || { echo "❌ Lint failed. Please fix the errors before committing."; exit 1; }
 
+echo "🔨 Running build..."
+npm run build || { echo "❌ Build failed. Please fix the errors before pushing."; exit 1; }
+
 echo "✅ Lint passed!"
