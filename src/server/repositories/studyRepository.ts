@@ -1,4 +1,4 @@
-import { logger } from '@/utils/logger';
+import { logger } from '@/server/lib/logger';
 import { db } from '@/server/db';
 import { study } from '@/server/db/schema';
 import { and, eq } from 'drizzle-orm';
@@ -11,28 +11,28 @@ export type InsertStudyRow = typeof study.$inferInsert;
 const VIDEO_ID = process.env.VIDEO_ID;
 
 export const saveLog = async (user: User) => {
-  logger.info(`savelog: ${user.name}`);
+  logger.info(`savelog: ${user.displayName}`);
   const existing = await getUserByChannelId(user.channelId);
   // 既存ユーザー
   if (existing) {
     const studyId = await hasSameVideoData(existing.id, user)
     if (studyId) {
-      logger.info(`savelog: 同じvideo_idのデータを更新します。${user.name}`);
+      logger.info(`savelog: 同じvideo_idのデータを更新します。${user.displayName}`);
       await updateStudy(studyId, user);
     } else {
-      logger.info(`savelog: 新しいデータを追加します。${user.name}`);
+      logger.info(`savelog: 新しいデータを追加します。${user.displayName}`);
       await insertStudy(existing.id, user);
     }
   } else {
     // 新規ユーザー登録
     const userRows = await insertUser(user);
     await insertStudy(userRows.id, user);
-    logger.info(`savelog: 新規ユーザーを追加しました。${user.name}`);
+    logger.info(`savelog: 新規ユーザーを追加しました。${user.displayName}`);
   }
 };
 
 export const insertStudy = async (userId: number, user: User) => {
-  logger.info(`insertStudy name=${user.name}`);
+  logger.info(`insertStudy name=${user.displayName}`);
   const res = await db
     .insert(study)
     .values({
@@ -59,7 +59,7 @@ export const updateStudy = async (studyId: number, user: User) => {
 
 export const hasSameVideoData = async (userId: number, user: User) => {
   if (!VIDEO_ID) {
-    logger.info(`videoIdが指定されていません。: ${user.name}`);
+    logger.info(`videoIdが指定されていません。: ${user.displayName}`);
     return null;
   }
 
@@ -74,10 +74,10 @@ export const hasSameVideoData = async (userId: number, user: User) => {
     );
   logger.info(`checkStudy count=${res.length}`);
   if (res.length > 0) {
-    logger.info(`同じvideo_idのデータを見つけました。: ${user.name} videoId=${VIDEO_ID}`);
+    logger.info(`同じvideo_idのデータを見つけました。: ${user.displayName} videoId=${VIDEO_ID}`);
     return res[0].id;
   } else {
-    logger.info(`同じvideo_idのデータはありませんでした。: ${user.name} videoId=${VIDEO_ID}`);
+    logger.info(`同じvideo_idのデータはありませんでした。: ${user.displayName} videoId=${VIDEO_ID}`);
     return null;
   }
 };

@@ -71,8 +71,6 @@ const initYouTubeAPI = async (): Promise<void> => {
   }
 };
 
-// Build時に初期化を実行
-await initYouTubeAPI();
 
 /**
  * YouTubeライブチャットにコメントを投稿する
@@ -120,3 +118,42 @@ export const postYouTubeComment = async (
     throw error;
   }
 };
+
+/**
+ * メッセージの先頭に付与されている@を削除します。
+ * @param {string} message - 処理するメッセージテキスト
+ * @returns {string} @が削除されたメッセージ
+ * @example
+ * removeMentionPrefix('@username') // => 'username'
+ */
+export const removeMentionPrefix = (message: string): string =>
+  message.startsWith('@') ? message.slice(1) : message;
+
+/**
+ * 指定されたメッセージが学習開始メッセージかどうかを判定します。
+ * @param {string} messageText - 判定するメッセージテキスト
+ * @returns {boolean} 学習開始メッセージの場合はtrue
+ */
+export const isStartMessage = (messageText: string): boolean =>
+  messageText.toLowerCase().trim() === parameter.START_STUDY_KEYWORDS;
+
+/**
+ * 指定されたメッセージが学習終了メッセージかどうかを判定します。
+ * @param {string} messageText - 判定するメッセージテキスト
+ * @returns {boolean} 学習終了メッセージの場合はtrue
+ */
+export const isEndMessage = (messageText: string): boolean =>
+  messageText.toLowerCase().trim() === parameter.END_STUDY_KEYWORDS;
+
+/**
+ * 指定されたメッセージがカテゴリーメッセージ（作業、勉強、読書）かどうかを判定します。
+ * @param {string} messageText - 判定するメッセージテキスト
+ * @returns {boolean} カテゴリーメッセージの場合はtrue
+ */
+export const isCategoryMessage = (messageText: string): boolean => {
+  const trimmedMessage = messageText.trim();
+  return (parameter.ALLOW_WORDS as readonly string[]).includes(trimmedMessage);
+};
+
+// Build時に初期化を実行
+await initYouTubeAPI();

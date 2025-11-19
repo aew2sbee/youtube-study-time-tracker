@@ -1,4 +1,4 @@
-import { logger } from '@/utils/logger';
+import { logger } from '@/server/lib/logger';
 import { db } from '@/server/db';
 import { users } from '@/server/db/schema';
 import { eq } from 'drizzle-orm';
@@ -9,8 +9,8 @@ export type UserRow = typeof users.$inferSelect;
 export type InsertUserRow = typeof users.$inferInsert;
 
 export const insertUser = async (user: User) => {
-  logger.info(`insertUser name=${user.name}`);
-  const res = await db.insert(users).values({ channelId: user.channelId, name: user.name }).returning();
+  logger.info(`insertUser name=${user.displayName}`);
+  const res = await db.insert(users).values({ channelId: user.channelId, name: user.displayName }).returning();
   logger.info(`insertUser new name=${res[0].name}`);
   return res[0];
 };
