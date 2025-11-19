@@ -1,12 +1,8 @@
-export interface YouTubeLiveChatMessage {
-  id: string;
+export interface LiveChatMessage {
   channelId: string;
-  authorDisplayName: string;
-  displayMessage: string;
-  publishedAt: string;
+  displayName: string;
   profileImageUrl: string;
+  displayMessage: string;
+  isChatSponsor:  boolean;
 }
 
-export interface LiveChatResponse {
-  messages: YouTubeLiveChatMessage[];
-}

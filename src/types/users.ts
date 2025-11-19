@@ -1,8 +1,9 @@
 export interface User {
   channelId: string;
-  name: string;
-  timeSec: number;
+  displayName: string;
+  isChatSponsor:  boolean;
   profileImageUrl: string;
+  timeSec: number;
   updateTime: Date;
   isStudying: boolean;
   refreshInterval: number;

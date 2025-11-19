@@ -1,27 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { YouTubeLiveChatMessage, LiveChatResponse } from '@/types/youtube';
 import { User } from '@/types/users';
-import { google } from 'googleapis';
+import { youtube_v3 } from 'googleapis';
 import { calcTime, convertHHMMSS } from '@/lib/calcTime';
-import { isCategoryMessage, isEndMessage, isStartMessage, REFRESH_MESSAGE, removeMentionPrefix, START_MESSAGE } from '@/lib/liveChatMessage';
-import { logger } from '@/utils/logger';
-import { getOAuth2Client } from '@/utils/googleClient';
+import { isCategoryMessage, isEndMessage, isStartMessage, REFRESH_MESSAGE, START_MESSAGE } from '@/server/lib/messages';
+import { logger } from '@/server/lib/logger';
+import { liveChatId, youtube, youtubeWithOAuth } from '@/server/lib/youtubeHelper';
 import { parameter } from '@/config/system';
-import { getStudyTimeStatsByChannelId } from '@/db/study';
+import { getStudyTimeStatsByChannelId } from '@/server/repositories/studyRepository';
 
 // 公式ドキュメント：https://developers.google.com/youtube/v3/live/docs/liveChatMessages/list?hl=ja
-
-// このコードブロックはビルド時（npm run build）に一度だけ実行され、指定されたチャンネルの現在のライブ配信のvideoIdとliveChatIdを取得します。
-const YOUTUBE = await google.youtube({ version: 'v3', auth: process.env.YOUTUBE_API_KEY });
-const response = await YOUTUBE.videos.list({ part: ['liveStreamingDetails'], id: [process.env.VIDEO_ID!.trim()] });
-const video = response.data.items?.[0];
-const LIVE_CHAT_ID = video?.liveStreamingDetails?.activeLiveChatId;
-if (!LIVE_CHAT_ID) logger.error('LIVE_CHAT_IDが取得できませんでした。環境変数 VIDEO_ID の設定や配信中かを確認してください。');
-logger.info(`liveChatId - ${LIVE_CHAT_ID}`);
-
-// OAuth2クライアントの設定（初期化時は削除）
-const oauth2Client = await getOAuth2Client();
-const youtubeWithOAuth = google.youtube({ version: 'v3', auth: oauth2Client });
 
 let nextPageToken: string | undefined;
 // レート制御用：次回フェッチ可能な時刻（ms）
@@ -43,19 +30,25 @@ async function processCommentQueue() {
   if (isProcessingQueue) return; // 既に処理中の場合はスキップ
   isProcessingQueue = true;
 
+  if (!youtubeWithOAuth) {
+    logger.error('OAuth2クライアントが初期化されていません');
+    isProcessingQueue = false;
+    return;
+  }
+
   try {
     while (commentQueue.length > 0) {
       const item = commentQueue.shift();
       if (!item) break;
 
       try {
-        logger.info(`Processing queued comment for: ${item.userName}`);
+        logger.info(`${item.userName}のキューからコメント投稿を処理中`);
 
         await youtubeWithOAuth.liveChatMessages.insert({
           part: ['snippet'],
           requestBody: {
             snippet: {
-              liveChatId: LIVE_CHAT_ID,
+              liveChatId: liveChatId,
               type: 'textMessageEvent',
               textMessageDetails: {
                 messageText: item.message,
@@ -64,9 +57,9 @@ async function processCommentQueue() {
           },
         });
 
-        logger.info(`Comment posted successfully: ${item.userName}`);
+        logger.info(`${item.userName}のコメント投稿に成功しました`);
       } catch (error) {
-        logger.error(`Error posting comment for ${item.userName} - ${error}`);
+        logger.error(`${item.userName}のコメント投稿に失敗しました - ${error}`);
       }
 
       // 次の投稿まで1秒待機（キューに残りがある場合のみ）
@@ -83,36 +76,33 @@ export async function GET() {
   try {
     logger.info(`nextPageToken - ${nextPageToken}`);
 
-    if (!LIVE_CHAT_ID) return NextResponse.json({ error: 'No live chat found' }, { status: 404 });
+    if (!liveChatId) return NextResponse.json({ error: 'No live chat found' }, { status: 404 });
+
+    if (!youtube) {
+      logger.error('YouTube APIクライアントが初期化されていません');
+      return NextResponse.json({ error: 'YouTube API client not initialized' }, { status: 500 });
+    }
 
     // レート制御：YouTubeの推奨間隔より早い呼び出しはキャッシュを返す
     const now = Date.now();
     if (0 < nextFetchAvailableAt && now < nextFetchAvailableAt) {
       logger.warn(`YouTube APIで指定されたミリ秒よりも短い間隔で呼び出されました - ${nextFetchAvailableAt - now} ms`);
-      return NextResponse.json({ messages: [] } as LiveChatResponse);
+      return NextResponse.json({ messages: [] });
     }
 
-    const liveChatMessages = await YOUTUBE.liveChatMessages.list({
-      liveChatId: LIVE_CHAT_ID,
+    const liveChatMessages = await youtube.liveChatMessages.list({
+      liveChatId: liveChatId,
       part: ['snippet', 'authorDetails'],
       pageToken: nextPageToken || undefined,
       maxResults: 200,
     });
 
-    const messages: YouTubeLiveChatMessage[] =
+    const messages: youtube_v3.Schema$LiveChatMessage[] =
       liveChatMessages.data.items
         ?.filter((item) => {
           const displayMessage = item.snippet?.displayMessage || '';
           return isStartMessage(displayMessage) || isEndMessage(displayMessage) || isCategoryMessage(displayMessage);
-        })
-        .map((item) => ({
-          id: item.id || '',
-          channelId: item.authorDetails?.channelId || '',
-          authorDisplayName: removeMentionPrefix(item.authorDetails?.displayName || ''),
-          displayMessage: item.snippet?.displayMessage || '',
-          publishedAt: item.snippet?.publishedAt || '',
-          profileImageUrl: item.authorDetails?.profileImageUrl || '',
-        })) || [];
+        }) || [];
 
     nextPageToken = liveChatMessages.data.nextPageToken || undefined;
 
@@ -122,17 +112,15 @@ export async function GET() {
 
     messages.forEach((message) => {
       logger.info(
-        `message received - ${convertHHMMSS(message.publishedAt)} ${message.authorDisplayName} ${
-          message.displayMessage
+        `message received - ${convertHHMMSS(message.snippet?.publishedAt || '')} ${message.authorDetails?.displayName} ${
+          message.snippet?.displayMessage
         }`,
       );
     });
 
-    const result: LiveChatResponse = { messages };
-
-    return NextResponse.json(result);
+    return NextResponse.json({ messages });
   } catch (error) {
-    logger.error(`Error fetching live chat messages - ${error}`);
+    logger.error(`ライブチャットメッセージの取得に失敗しました - ${error}`);
     return NextResponse.json({ error: 'Failed to fetch live chat messages' }, { status: 500 });
   }
 }
@@ -146,14 +134,14 @@ export async function POST(request: NextRequest) {
 
     // 開始
     if (flag === parameter.START_FLAG) {
-      message = `@${user.name}: ${START_MESSAGE}`;
+      message = `@${user.displayName}: ${START_MESSAGE}`;
       // リフレッシュ
     } else if (flag === parameter.REFRESH_FLAG) {
-      message = `@${user.name}: ${REFRESH_MESSAGE}`;
+      message = `@${user.displayName}: ${REFRESH_MESSAGE}`;
       // 停止
     } else if (flag === parameter.END_FLAG) {
       const stats = await getStudyTimeStatsByChannelId(user.channelId);
-      message = `@${user.name}さん お疲れ様でした👏 今日は${calcTime(user.timeSec)}集中しました!! これまでに合計${stats.totalDays}日間集中してなんと${calcTime(stats.totalTime)}も頑張りました!! ▶ 📅 過去7日間実績は、${stats.last7Days}日で${calcTime(stats.last7DaysTime)} 📆 過去28日間は、${stats.last28Days}日で${calcTime(stats.last28DaysTime)} この配信がお役に立ったなら、高評価をお願いします👍 また集中したい時は、ぜひ配信にお越しください。`;
+      message = `@${user.displayName}さん お疲れ様でした👏 今日は${calcTime(user.timeSec)}集中しました!! これまでに合計${stats.totalDays}日間集中してなんと${calcTime(stats.totalTime)}も頑張りました!! ▶ 📅 過去7日間実績は、${stats.last7Days}日で${calcTime(stats.last7DaysTime)} 📆 過去28日間は、${stats.last28Days}日で${calcTime(stats.last28DaysTime)} この配信がお役に立ったなら、高評価をお願いします👍 また集中したい時は、ぜひ配信にお越しください。`;
     } else {
       logger.error(`flagが不正です - ${flag}`);
     }
@@ -162,11 +150,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Message is required' }, { status: 400 });
     }
 
-    if (!LIVE_CHAT_ID) {
+    if (!liveChatId) {
       return NextResponse.json({ error: 'No live chat found' }, { status: 404 });
     }
 
-    logger.info(`Attempting to post comment: ${message}`);
+    logger.info(`コメント投稿を試行中: ${message}`);
 
     if (!parameter.IS_COMMENT_ENABLED) {
       logger.info('コメント投稿は無効化されています');
@@ -176,14 +164,14 @@ export async function POST(request: NextRequest) {
     // コメントをキューに追加
     commentQueue.push({
       message,
-      userName: user.name,
+      userName: user.displayName,
     });
 
-    logger.info(`Comment queued for ${user.name}. Queue length: ${commentQueue.length}`);
+    logger.info(`${user.displayName}のコメントをキューに追加しました。キューの長さ: ${commentQueue.length}`);
 
     // ワーカーを起動（既に動いている場合はスキップされる）
     processCommentQueue().catch((error) => {
-      logger.error(`Error in comment queue worker - ${error}`);
+      logger.error(`コメントキューワーカーでエラーが発生しました - ${error}`);
     });
 
     return NextResponse.json({
@@ -192,7 +180,7 @@ export async function POST(request: NextRequest) {
       queued: true,
     });
   } catch (error) {
-    logger.error(`Error posting comment - ${error}`);
+    logger.error(`コメントの投稿に失敗しました - ${error}`);
     return NextResponse.json({ error: 'Failed to post comment' }, { status: 500 });
   }
 }
