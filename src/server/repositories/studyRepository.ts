@@ -4,11 +4,10 @@ import { study } from '@/server/db/schema';
 import { and, eq } from 'drizzle-orm';
 import { User } from '@/types/users';
 import { getUserByChannelId, insertUser } from './userRepository';
+import { VIDEO_ID } from '../lib/youtubeHelper';
 
 export type StudyRow = typeof study.$inferSelect;
 export type InsertStudyRow = typeof study.$inferInsert;
-
-const VIDEO_ID = process.env.VIDEO_ID;
 
 export const saveLog = async (user: User) => {
   logger.info(`savelog: ${user.displayName}`);
