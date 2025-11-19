@@ -5,7 +5,8 @@ import { logger } from '@/server/lib/logger';
 import { postYouTubeComment } from '@/server/lib/youtubeHelper';
 import { START_MESSAGE, removeMentionPrefix } from '@/lib/liveChatMessage';
 import { getStudyDaysByChannelId, saveLog } from '../repositories/studyRepository';
-import { getStartMessageByUser, END_MESSAGE, getEndMessageByUser } from '../lib/messages';
+import { getStartMessageByUser, getEndMessageByUser } from '../lib/messages';
+import { setUser } from '@/server/lib/userStore';
 
 /**
  * 学習開始のビジネスロジック
@@ -49,6 +50,9 @@ export const startStudy = async (
     // コメント投稿失敗してもユーザー作成は継続
   }
 
+  // メモリストアに保存
+  setUser(startUser);
+
   return startUser;
 };
 
@@ -82,6 +86,9 @@ export const restartStudy = async (
     // コメント投稿失敗してもユーザー更新は継続
   }
 
+  // メモリストアに保存
+  setUser(restartUser);
+
   return restartUser;
 };
 
@@ -100,6 +107,10 @@ export const updateStudyTime = (user: User, currentTime: Date): User => {
   };
 
   logger.info(`updateStudyTime - ${updatedUser.displayName} ${calcTime(user.timeSec)} => ${calcTime(updatedUser.timeSec)}`);
+
+  // メモリストアに保存
+  setUser(updatedUser);
+
   return updatedUser;
 };
 
@@ -117,6 +128,10 @@ export const updateCategory = (user: User, category: string): User => {
   };
 
   logger.info(`updateCategory - ${updatedUser.displayName} category: ${updatedUser.category}`);
+
+  // メモリストアに保存
+  setUser(updatedUser);
+
   return updatedUser;
 };
 
@@ -158,6 +173,9 @@ export const endStudy = async (
     logger.error(`${stopUser.displayName}の終了コメント投稿に失敗しました - ${error}`);
     // コメント投稿失敗してもユーザー更新は継続
   }
+
+  // メモリストアに保存（isStudying: false状態で保持）
+  setUser(stopUser);
 
   return stopUser;
 };

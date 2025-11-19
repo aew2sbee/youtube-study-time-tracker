@@ -4,7 +4,7 @@ import { study } from '@/server/db/schema';
 import { and, eq } from 'drizzle-orm';
 import { User } from '@/types/users';
 import { getUserByChannelId, insertUser } from './userRepository';
-import { VIDEO_ID } from '../lib/youtubeHelper';
+import { videoId } from '../lib/youtubeHelper';
 
 export type StudyRow = typeof study.$inferSelect;
 export type InsertStudyRow = typeof study.$inferInsert;
@@ -37,7 +37,7 @@ export const insertStudy = async (userId: number, user: User) => {
     .values({
       userId,
       timeSec: user.timeSec,
-      videoId: VIDEO_ID,
+      videoId: videoId,
       timestamp: typeof user.updateTime === 'string' ? new Date(user.updateTime) : user.updateTime,
     })
     .returning();
@@ -57,7 +57,7 @@ export const updateStudy = async (studyId: number, user: User) => {
 }
 
 export const hasSameVideoData = async (userId: number, user: User) => {
-  if (!VIDEO_ID) {
+  if (!videoId) {
     logger.info(`videoIdが指定されていません。: ${user.displayName}`);
     return null;
   }
@@ -68,15 +68,15 @@ export const hasSameVideoData = async (userId: number, user: User) => {
     .where(
       and(
         eq(study.userId, userId),
-        eq(study.videoId, VIDEO_ID)
+        eq(study.videoId, videoId)
       ),
     );
   logger.info(`checkStudy count=${res.length}`);
   if (res.length > 0) {
-    logger.info(`同じvideo_idのデータを見つけました。: ${user.displayName} videoId=${VIDEO_ID}`);
+    logger.info(`同じvideo_idのデータを見つけました。: ${user.displayName} videoId=${videoId}`);
     return res[0].id;
   } else {
-    logger.info(`同じvideo_idのデータはありませんでした。: ${user.displayName} videoId=${VIDEO_ID}`);
+    logger.info(`同じvideo_idのデータはありませんでした。: ${user.displayName} videoId=${videoId}`);
     return null;
   }
 };

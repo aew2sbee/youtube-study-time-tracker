@@ -21,12 +21,3 @@ export const resetRefresh = (user: User): User => {
   logger.info(`resetRefresh - ${refreshUser.displayName} ${calcTime(user.refreshInterval)} => ${calcTime(refreshUser.refreshInterval)}`);
   return refreshUser;
 };
-
-export const updateCategory = (user: User, messageText: string): User => {
-  const updatedUser = {
-    ...user,
-    category: messageText,
-  };
-  logger.info(`updateCategory - ${updatedUser.displayName} category: ${updatedUser.category}`);
-  return updatedUser;
-};

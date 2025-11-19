@@ -14,12 +14,12 @@ const OAUTH_CALLBACK_URL = 'http://localhost:3000/api/oauth/callback';
  * - YouTube APIクライアント（OAuth認証）
  * - nextPageToken
 */
-export const videoId: string | null = process.env.VIDEO_ID!.trim() || null;
-export let liveChatId: string | null = null;
+export const videoId: string = process.env.VIDEO_ID!.trim();
+export let liveChatId: string = '';
+export let nextPageToken: string = '';
 export let youtube: ReturnType<typeof google.youtube> | null = null;
 export let oauth2Client: InstanceType<typeof google.auth.OAuth2> | null = null;
 export let youtubeWithOAuth: ReturnType<typeof google.youtube> | null = null;
-export let nextPageToken: string | null = null;
 
 /**
  * YouTube API初期化関数
@@ -149,7 +149,7 @@ export const getLiveChatMessages = async (): Promise<youtube_v3.Schema$LiveChatM
       liveChatMessages.data.items?.filter((item) => isAllowMessage(item.snippet?.displayMessage || '')) || [];
 
     // nextPageTokenを更新
-    nextPageToken = liveChatMessages.data.nextPageToken || null;
+    nextPageToken = liveChatMessages.data.nextPageToken || '';
 
     logger.info(`getLiveChatMessages: ${messages.length}件のメッセージを取得しました`);
     return messages;

@@ -69,5 +69,10 @@ export const isAllowMessage = (messageText: string): boolean => {
  * @returns {string} 統計情報を含む終了メッセージ
  */
 export const getEndMessageByUser = (user: User): string => {
-  return `@${user.displayName}さん お疲れ様でした🌟 今日は${calcTime(user.timeSec)}集中しました!! これまでに合計${user.totalDays}日間集中してなんと${calcTime(user.totalSec)}も頑張りました!! ▶ 📅 過去7日間実績は、${user.last7Days}日で${calcTime(user.last7DaysSec)} 📆 過去28日間は、${user.last28Days}日で${calcTime(user.last28DaysSec)} この配信がお役に立ったなら高評価👍をお願いします。また集中したい時はぜひ配信にお越しください`;
+  return `@${user.displayName}さん お疲れ様でした🌟` +
+  `今日は${calcTime(user.timeSec)}集中しました!!` +
+  `これまでに合計${user.totalDays}日間集中してなんと${calcTime(user.totalSec)}も頑張りました!!` +
+  `📅 過去7日間実績は、${user.last7Days}日で${calcTime(user.last7DaysSec)}` +
+  `📆 過去28日間は、${user.last28Days}日で${calcTime(user.last28DaysSec)}` +
+  `この配信がお役に立ったなら高評価👍をお願いします。また集中したい時はぜひ配信にお越しください`;
 };
