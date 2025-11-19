@@ -2,10 +2,10 @@ import { User } from '@/types/users';
 import { youtube_v3 } from 'googleapis';
 import { calcStudyTime, calcTime } from '@/lib/calcTime';
 import { logger } from '@/server/lib/logger';
-import { postYouTubeComment, LIVE_CHAT_ID } from '@/server/lib/youtubeHelper';
+import { postYouTubeComment } from '@/server/lib/youtubeHelper';
 import { START_MESSAGE, removeMentionPrefix } from '@/lib/liveChatMessage';
 import { getStudyDaysByChannelId, saveLog } from '../repositories/studyRepository';
-import { getStartMessageByDays, END_MESSAGE } from '../lib/messages';
+import { getStartMessageByUser, END_MESSAGE, getEndMessageByUser } from '../lib/messages';
 
 /**
  * 学習開始のビジネスロジック
@@ -27,6 +27,12 @@ export const startStudy = async (
     isStudying: true,
     refreshInterval: 0,
     category: '',
+    totalDays: 0,
+    totalSec: 0,
+    last7Days: 0,
+    last7DaysSec: 0,
+    last28Days: 0,
+    last28DaysSec: 0,
   };
 
   logger.info(`startStudy - ${startUser.displayName} ${calcTime(startUser.timeSec)}`);
@@ -35,7 +41,7 @@ export const startStudy = async (
   try {
     // ユーザーの参加日数を取得
     const studyDays = await getStudyDaysByChannelId(startUser.channelId);
-    const startMessage = getStartMessageByDays(studyDays);
+    const startMessage = getStartMessageByUser(studyDays);
     const commentMessage = `@${startUser.displayName}さん ${startMessage}`;
     await postYouTubeComment(commentMessage, startUser.displayName);
   } catch (error) {
@@ -70,7 +76,7 @@ export const restartStudy = async (
   // YouTubeにコメントを投稿
   try {
     const commentMessage = `@${restartUser.displayName}: ${START_MESSAGE}`;
-    await postYouTubeComment(LIVE_CHAT_ID, commentMessage, restartUser.displayName);
+    await postYouTubeComment(commentMessage, restartUser.displayName);
   } catch (error) {
     logger.error(`${restartUser.displayName}の再開コメント投稿に失敗しました - ${error}`);
     // コメント投稿失敗してもユーザー更新は継続
@@ -129,7 +135,7 @@ export const endStudy = async (
 
   // YouTubeにコメントを投稿
   try {
-    const commentMessage = `@${stopUser.displayName}さん ${END_MESSAGE}`;
+    const commentMessage = getEndMessageByUser(stopUser)
     await postYouTubeComment(commentMessage, stopUser.displayName);
   } catch (error) {
     logger.error(`${stopUser.displayName}の終了コメント投稿に失敗しました - ${error}`);
