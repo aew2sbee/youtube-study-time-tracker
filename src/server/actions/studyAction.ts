@@ -2,7 +2,7 @@
 
 import { User } from '@/types/users';
 import { youtube_v3 } from 'googleapis';
-import { startStudy, restartStudy, endStudy } from '@/server/usecases/studyUsecase';
+import { startStudy, restartStudy, endStudy, updateCategory } from '@/server/usecases/studyUsecase';
 import { logger } from '@/server/lib/logger';
 
 /**
@@ -71,6 +71,30 @@ export const endStudyAction = async (
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : '不明なエラー';
     logger.error(`学習終了アクションが失敗しました - ${errorMessage}`);
+    return { success: false, error: errorMessage };
+  }
+};
+
+/**
+ * カテゴリー更新のServer Action
+ * クライアントから呼び出され、既存ユーザーのカテゴリーを更新する
+ * @param user - 既存のユーザー情報
+ * @param category - 新しいカテゴリー
+ * @returns 更新されたユーザー情報、またはエラー情報
+ */
+export const updateCategoryAction = async (
+  user: User,
+  category: string
+): Promise<{ success: true; user: User } | { success: false; error: string }> => {
+  try {
+    logger.info(`${user.displayName}のカテゴリー更新アクションが呼び出されました - ${category}`);
+
+    const updatedUser = updateCategory(user, category);
+
+    return { success: true, user: updatedUser };
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : '不明なエラー';
+    logger.error(`カテゴリー更新アクションが失敗しました - ${errorMessage}`);
     return { success: false, error: errorMessage };
   }
 };

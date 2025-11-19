@@ -104,6 +104,23 @@ export const updateStudyTime = (user: User, currentTime: Date): User => {
 };
 
 /**
+ * カテゴリー更新のビジネスロジック
+ * 既存ユーザーのカテゴリーを更新する
+ * @param user - 既存のユーザー情報
+ * @param category - 新しいカテゴリー
+ * @returns 更新されたユーザー情報
+ */
+export const updateCategory = (user: User, category: string): User => {
+  const updatedUser: User = {
+    ...user,
+    category,
+  };
+
+  logger.info(`updateCategory - ${updatedUser.displayName} category: ${updatedUser.category}`);
+  return updatedUser;
+};
+
+/**
  * 学習終了のビジネスロジック
  * 既存ユーザーの学習終了を処理し、DB保存とYouTubeコメント投稿を行う
  * @param user - 既存のユーザー情報
