@@ -17,7 +17,7 @@ import { parameter } from '@/config/system';
 export default function FocusTimeTracker({ user }: { user: User[] }) {
   if (!user || user.length === 0) {
     return (
-      <div className="text-neutral-200 text-center text-3xl flex-1 flex items-start justify-center pt-16">
+      <div className="text-black text-center text-3xl flex-1 flex items-start justify-center pt-16">
         <div className="space-y-2">
           <div>集中時間の計測に参加しているユーザーがいません</div>
           <div>まずは「start」で計測を開始しましょう</div>
@@ -33,33 +33,33 @@ export default function FocusTimeTracker({ user }: { user: User[] }) {
             <div className="relative">
               <ImageProfile src={user.profileImageUrl} alt={user.name} />
             </div>
-            <span className="text-neutral-200 font-medium truncate max-w-[300px] ">{user.name}</span>
+            <span className="text-black font-medium truncate max-w-[300px] ">{user.name}</span>
           </div>
 
           <div className="flex items-center text-3xl">
             {user.category === parameter.ALLOW_WORDS[0] ? (
-              <Briefcase className="text-neutral-200 w-9 h-9 mr-2" />
+              <Briefcase className="text-black w-9 h-9 mr-2" />
             ) : user.category === parameter.ALLOW_WORDS[1] ? (
-              <ClipboardList className="text-neutral-200 w-9 h-9 mr-2" />
+              <ClipboardList className="text-black w-9 h-9 mr-2" />
             ) : user.category === parameter.ALLOW_WORDS[2] ? (
-              <BookOpen className="text-neutral-200 w-9 h-9 mr-2" />
+              <BookOpen className="text-black w-9 h-9 mr-2" />
             ) : user.category === parameter.ALLOW_WORDS[3] ? (
-              <GraduationCap className="text-neutral-200 w-9 h-9 mr-2" />
+              <GraduationCap className="text-black w-9 h-9 mr-2" />
             ) : user.category === parameter.ALLOW_WORDS[4] ? (
-              <Award className="text-neutral-200 w-9 h-9 mr-2" />
+              <Award className="text-black w-9 h-9 mr-2" />
             ) : user.category === parameter.ALLOW_WORDS[5] ? (
-              <CalendarDays className="text-neutral-200 w-9 h-9 mr-2" />
+              <CalendarDays className="text-black w-9 h-9 mr-2" />
             ) : user.category === parameter.ALLOW_WORDS[6] ? (
-              <Pen className="text-neutral-200 w-9 h-9 mr-2" />
+              <Pen className="text-black w-9 h-9 mr-2" />
             ) : user.category === parameter.ALLOW_WORDS[7] ? (
-              <FileText className="text-neutral-200 w-9 h-9 mr-2" />
+              <FileText className="text-black w-9 h-9 mr-2" />
             ) : user.category === parameter.ALLOW_WORDS[8] ? (
-              <School className="text-neutral-200 w-9 h-9 mr-2" />
+              <School className="text-black w-9 h-9 mr-2" />
             ) : (
               <div className="w-9 h-9 mr-2" />
             )}
             {user.isStudying ? (
-              <span className="text-neutral-200">{calcTime(user.timeSec)}</span>
+              <span className="text-black">{calcTime(user.timeSec)}</span>
             ) : (
               <span className="text-gray-400">{calcTime(user.timeSec)}</span>
             )}
