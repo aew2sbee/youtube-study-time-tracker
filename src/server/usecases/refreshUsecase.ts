@@ -1,6 +1,6 @@
 import { parameter } from '@/config/system';
-import { getAllActiveUsers } from '@/server/lib/storeUser';
-import { resetRefresh } from '@/server/usecases/studyUsecase';
+import { getAllActiveUsers } from '@/server/store/user';
+import { resetRefresh } from '@/server/usecases/userUsecase';
 
 /**
  * 全アクティブユーザーの時間を更新

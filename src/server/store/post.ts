@@ -1,5 +1,5 @@
-import { postYouTubeComment } from './youtubeHelper';
-import { logger } from './logger';
+import { postYouTubeComment } from '../lib/youtubeHelper';
+import { logger } from '../lib/logger';
 
 /**
  * コメント投稿用のキューアイテム

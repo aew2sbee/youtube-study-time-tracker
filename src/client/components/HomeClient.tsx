@@ -2,19 +2,19 @@
 
 import { motion, AnimatePresence } from 'framer-motion';
 import { parameter } from '@/config/system';
-import { useUserStream } from '@/client/hooks/useUserStream';
-import { usePagination } from '@/client/hooks/usePagination';
+import { usePolling } from '@/client/lib/usePolling';
+import { usePagination } from '@/client/lib/usePagination';
 import LoadingSpinner from '@/client/components/LoadingSpinner';
 import ErrorMessage from '@/client/components/ErrorMessage';
 
 /**
  * ホーム画面のクライアントコンポーネント
- * - サーバー側で処理されたユーザー状態を表示
- * - SSEでリアルタイム更新を受信
+ * - クライアント駆動でサーバーポーリング処理を実行
+ * - SWRで1分間隔でポーリング
  */
 export default function HomeClient() {
-  // SSEでサーバーからユーザー状態をリアルタイム取得
-  const { users, isLoading, error } = useUserStream();
+  // SWRでポーリング処理を実行（1分間隔）
+  const { users, isLoading, isError, error } = usePolling();
 
   // ページネーション
   const { currentPage, pages } = usePagination({
@@ -25,7 +25,7 @@ export default function HomeClient() {
 
   // ローディング・エラー処理
   if (isLoading) return <LoadingSpinner />;
-  if (error) return <ErrorMessage error={error} />;
+  if (isError) return <ErrorMessage error={error} />;
 
   const currentPageData = pages[currentPage];
 

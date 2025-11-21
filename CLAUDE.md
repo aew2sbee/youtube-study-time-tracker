@@ -25,72 +25,44 @@
 - "サーバー側"でデータ取得・加工・変換処理を行う
 - "クライアント側"でデータ表示だけを行う
 - 画像は、`next/image`コンポーネントで最適化(自動的な画像リサイズ、遅延読み込み)を行う
-- リアルタイムデータは、SSR(Server-Side Rendering)で表示する
+- リアルタイムデータは、SWRポーリング（1分間隔）で表示する
 - YouTube Data APIのquota（割り当て）の使用を最小限にする
 - 関数はアロー関数で行うこと
 - JSDocを必ず記載すること
-- `LIVE_CHAT_ID`は、build時に初期化されるグローバル定数で`src/server/lib/constants.ts`で管理する
+- OBS配信用オーバーレイアプリケーションのため、アプリを直接閲覧するのは1人だけです。
 
 ## ディレクトリ構造
 ```bash
-./
-├── instrumentation.ts  # Next.js Instrumentation Hook（サーバー起動時の初期化処理）
 src/
-├── app/          # App Router（URL構造）
-├── client/       # クライアント側コード
-│   ├── components/
-│   ├── hooks/        # カスタムフック
+├── app/              # App Router（URL構造）
+│   └── api/          # APIエンドポイント
+│       └── polling/  # ポーリングエンドポイント
+├── client/           # クライアント側コード
+│   ├── components/   # コンポーネント
+│   ├── hooks/        # カスタムフック（usePolling等）
 │   └── lib/          # クライアント専用ヘルパー
-├── server/       # サーバー側コード
+├── server/           # サーバー側コード
+│   ├── db/           # DBスキーマ・接続
 │   ├── usecases/     # ビジネスロジック
 │   ├── repositories/ # DB操作
-│   ├── db/           # DBスキーマ・接続
+│   ├── store/        # メモリー管理（userStore等）
 │   └── lib/          # サーバー専用ヘルパー
-│       ├── userStore.ts       # ユーザー状態管理（メモリストア + SSE通知）
-│       ├── processorMessage.ts # メッセージ処理
-│       ├── processorTime.ts   # 時間更新処理
-│       └── youtubeHelper.ts   # YouTube API ヘルパー
-└── types/        # 型定義
+└── types/            # 型定義
 ```
 
 ## データフロー
 
-### バックグラウンド処理（サーバー側）
-```bash
-instrumentation.ts (Next.js起動時に自動実行)
-    ├─ メッセージポーリング（API_POLLING_INTERVAL毎）
-    │   ├─ YouTube Live Chat API (getLiveChatMessages)
-    │   ├─ setUserByMessage (メッセージ判定・処理)
-    │   ├─ Usecase (startStudy/restartStudy/endStudy/updateCategory)
-    │   └─ UserStore (メモリ管理: Map<channelId, User>)
-    │       └─ SSE通知 (EventEmitter)
-    │
-    └─ 時間更新処理（API_POLLING_INTERVAL毎）
-        ├─ updateAllUsersTime
-        ├─ UserStore (時間・リフレッシュ間隔を更新)
-        │   └─ SSE通知 (EventEmitter)
-        └─ リフレッシュ通知（1時間ごと）→ YouTube API
-```
+### クライアント駆動型ポーリング
+1. ユーザー: YouTubeライブ配信のチャット欄にコメントする
+2. クライアント: SWRで1分間隔でポーリング（/api/pollingを呼び出し）
+3. サーバー: YouTube Live Chat APIから新規メッセージを取得
+4. サーバー: ビジネスロジック処理（学習開始/終了/時間計算）
+5. サーバー: YouTube APIにコメント投稿・DB保存
+6. サーバー: userStore（メモリ）に状態を保存
+7. サーバー: 最新のユーザー情報をクライアントに返却
+8. クライアント: 受信したデータを画面に表示（Framer Motionでアニメーション）
 
-### クライアント表示（SSE）
-```bash
-Client Component (useUserStream)
-    ↓ SSE接続
-GET /api/users/stream
-    ↓ リアルタイムプッシュ
-UserStore (EventEmitter経由)
-    ↓
-表示（時間計測・ページネーション）
-```
-
-### DB保存（学習終了時のみ）
-```bash
-endStudy (Usecase)
-    ↓
-Repository (saveLog)
-    ↓
-Database (Supabase)
-```
+**注意:** この実装はローカル環境またはVPS等の永続サーバーでのみ動作します。Vercelなどのサーバーレス環境では、userStore（メモリ管理）が維持できないため動作しません。
 
 ## Claude Code への指示
 

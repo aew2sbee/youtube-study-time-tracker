@@ -4,9 +4,9 @@ import { logger } from '@/server/lib/logger';
 import { REFRESH_MESSAGE, RESTART_MESSAGE } from '@/server/lib/messages';
 import { getStudyDaysByChannelId, saveLog } from '../repositories/studyRepository';
 import { getStartMessageByUser, getEndMessageByUser } from '../lib/messages';
-import { setUser } from '@/server/lib/storeUser';
+import { setUser } from '@/server/store/user';
 import { LiveChatMessage } from '@/types/youtube';
-import { pushQueue } from '../lib/storePost';
+import { pushQueue } from '../store/post';
 
 /**
  * 学習開始のビジネスロジック
@@ -78,7 +78,6 @@ export const updateTime = async (user: User, currentTime: Date): Promise<void> =
   setUser(updatedUser);
 };
 
-
 /**
  * 学習終了のビジネスロジック
  * 既存ユーザーの学習終了を処理し、DB保存とYouTubeコメント投稿を行う
@@ -142,4 +141,3 @@ export const updateCategory = async (user: User, category: string): Promise<void
   // メモリストアに保存
   setUser(updatedUser);
 };
-

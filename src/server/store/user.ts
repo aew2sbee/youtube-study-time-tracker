@@ -1,31 +1,14 @@
 import { User } from '@/types/users';
 import { logger } from '@/server/lib/logger';
-import { EventEmitter } from 'events';
 
 /**
  * サーバー側のユーザー状態管理（メモリ管理・揮発性）
  * - Map<channelId, User>でアクティブユーザーを管理
  * - サーバー再起動で状態はリセットされる
- * - EventEmitterでSSEにリアルタイム通知
  */
 
 // ユーザー状態を保持するMap（メモリ管理）
 const userStore = new Map<string, User>();
-
-// イベントエミッター（SSE通知用）
-const userStoreEmitter = new EventEmitter();
-
-// メモリリーク防止のためリスナー数上限を設定
-userStoreEmitter.setMaxListeners(100);
-
-
-/**
- * ユーザー更新イベントを発行（SSE通知用）
- */
-export const emitUsersUpdate = async (): Promise<void> => {
-  const users = getAllUsers();
-  userStoreEmitter.emit('usersUpdate', users);
-};
 
 /**
  * ユーザーを取得
@@ -70,18 +53,4 @@ export const getAllUsers = (): User[] => {
  */
 export const getUserStoreSize = (): number => {
   return userStore.size;
-};
-
-/**
- * ユーザー更新イベントのリスナーを登録
- * @param listener - イベントハンドラー
- * @returns リスナー解除関数
- */
-export const onUsersUpdate = (listener: (users: User[]) => void): (() => void) => {
-  userStoreEmitter.on('usersUpdate', listener);
-
-  // リスナー解除関数を返す
-  return () => {
-    userStoreEmitter.off('usersUpdate', listener);
-  };
 };

@@ -1,5 +1,5 @@
-import { getAllActiveUsers } from '@/server/lib/storeUser';
-import { updateTime } from '../usecases/studyUsecase';
+import { getAllActiveUsers } from '@/server/store/user';
+import { updateTime } from '../usecases/userUsecase';
 
 /**
  * 全アクティブユーザーのtimesecを更新
@@ -9,6 +9,6 @@ export const updateAllUsersTime = async (now: Date): Promise<void> => {
   const activeUsers = getAllActiveUsers();
 
   for (const user of activeUsers) {
-    await updateTime(user, now)
+    await updateTime(user, now);
   }
 };

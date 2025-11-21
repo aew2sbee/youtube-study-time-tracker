@@ -1,7 +1,7 @@
 import { logger } from '@/server/lib/logger';
 import { isCategoryMessage, isEndMessage, isStartMessage } from '@/server/lib/messages';
-import { startStudy, restartStudy, endStudy, updateCategory } from '@/server/usecases/studyUsecase';
-import { getUser } from '@/server/lib/storeUser';
+import { startStudy, restartStudy, endStudy, updateCategory } from '@/server/usecases/userUsecase';
+import { getUser } from '@/server/store/user';
 import { getLiveChatMessages } from '@/server/lib/youtubeHelper';
 
 /**
@@ -18,7 +18,6 @@ export const setUserByMessage = async (now: Date): Promise<void> => {
 
     // 各メッセージを処理
     for (const message of messages) {
-
       const existingUser = getUser(message.channelId);
       if (existingUser) {
         // 既存ユーザーの処理
