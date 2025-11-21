@@ -6,6 +6,8 @@ import { usePolling } from '@/client/lib/usePolling';
 import { usePagination } from '@/client/lib/usePagination';
 import LoadingSpinner from '@/client/components/LoadingSpinner';
 import ErrorMessage from '@/client/components/ErrorMessage';
+import Experience from '@/client/components/GameMode';
+import FocusTimeTracker from '@/client/components/FocusTimeTracker';
 
 /**
  * ホーム画面のクライアントコンポーネント
@@ -21,6 +23,16 @@ export default function Home() {
     users,
     itemsPerPage: parameter.USERS_PER_PAGE,
     autoSwitchInterval: parameter.PAGE_DISPLAY_INTERVAL,
+    renderComponents: [
+      {
+        title: '集中時間',
+        renderComponent: (users) => <FocusTimeTracker user={users} />,
+      },
+      {
+        title: 'レベル上げ',
+        renderComponent: (users) => <Experience user={users.filter(user => user.isGameMode)} />,
+      },
+    ],
   });
 
   // ローディング・エラー処理

@@ -8,4 +8,11 @@ export interface User {
   isStudying: boolean;
   refreshInterval: number;
   category: string;
+  isGameMode: boolean;
+  level: number;
+  isMaxLevel: boolean;
+  exp: number;
+  progress: number;
+  timeToNextLevel: number;
+  nextLevelRequiredTime: number;
 }
