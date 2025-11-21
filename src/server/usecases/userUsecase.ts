@@ -1,5 +1,5 @@
 import { User } from '@/types/users';
-import { calcStudyTime } from '@/lib/calcTime';
+import { calcStudyTime } from '@/server/lib/calcTime';
 import { logger } from '@/server/lib/logger';
 import { REFRESH_MESSAGE, RESTART_MESSAGE } from '@/server/lib/messages';
 import { getStudyDaysByChannelId, saveLog } from '../repositories/studyRepository';
@@ -89,13 +89,17 @@ export const endStudy = async (user: User, endTime: Date): Promise<void> => {
   // 学習時間の最終計算
   const stopUser: User = {
     ...user,
-    timeSec: user.timeSec + calcStudyTime(user.updateTime, endTime),
+    timeSec: user.timeSec + calcStudyTime(  user.updateTime, endTime),
     isStudying: false,
     updateTime: endTime,
   };
 
   // DB保存
   try {
+    if (!process.env.IS_DATABASE_ENABLED){
+      logger.info('データベース保存は無効化されています');
+      return;
+    }
     await saveLog(stopUser);
     logger.info(`${stopUser.displayName}の学習記録をDBに保存しました`);
   } catch (error) {

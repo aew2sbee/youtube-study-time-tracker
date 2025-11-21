@@ -1,19 +1,17 @@
-import { parameter } from "@/config/system";
-import { User } from "@/types/users";
-import { calcTime } from "@/lib/calcTime";
+import { parameter } from '@/config/system';
+import { User } from '@/types/users';
+import { calcTime } from '@/server/lib/calcTime';
 
 export const REFRESH_MESSAGE =
   'そろそろ2時間が経過しますので、20分ほど休憩しませんか？' +
   'ポモドーロ・テクニックでは、2時間ごとに"15〜30分程度の長めの休憩"を取ることが推奨されています';
 
-export const START_MESSAGE =
-  '本日もよろしくお願いします。計測を終了される場合は「end」とコメントしてくださいね';
+export const START_MESSAGE = '本日もよろしくお願いします。計測を終了される場合は「end」とコメントしてくださいね';
 
 export const RESTART_MESSAGE =
   'おかえりなさい! 引き続きよろしくお願いいたします。計測を終了される場合は「end」とコメントしてくださいね';
 
-export const END_MESSAGE =
-  'お疲れ様でした！本日の学習時間を記録しました。またのご参加をお待ちしています😊';
+export const END_MESSAGE = 'お疲れ様でした！本日の学習時間を記録しました。またのご参加をお待ちしています😊';
 /**
  * 参加日数に応じた開始メッセージを取得する
  * @param days - 参加日数
@@ -30,7 +28,7 @@ export const getStartMessageByUser = (displayName: string, days: number): string
   } else {
     message = `なんと${days}日目！継続の達人ですね🏆` + START_MESSAGE;
   }
-  return `@${displayName}さん ${message}`
+  return `@${displayName}さん ${message}`;
 };
 
 /**
@@ -74,8 +72,7 @@ export const isAllowMessage = (messageText: string): boolean => {
  * @returns {string} 統計情報を含む終了メッセージ
  */
 export const getEndMessageByUser = (user: User): string => {
-  return `@${user.displayName}さん お疲れ様でした🌟` +
-  `今日は${calcTime(user.timeSec)}集中しました!!`
+  return `@${user.displayName}さん お疲れ様でした🌟` + `今日は${calcTime(user.timeSec)}集中しました!!`;
   // `これまでに合計${user.totalDays}日間集中してなんと${calcTime(user.totalSec)}も頑張りました!!` +
   // `📅 過去7日間実績は、${user.last7Days}日で${calcTime(user.last7DaysSec)}` +
   // `📆 過去28日間は、${user.last28Days}日で${calcTime(user.last28DaysSec)}` +

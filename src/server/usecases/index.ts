@@ -32,16 +32,3 @@ export const processPolling = async (): Promise<void> => {
     throw error;
   }
 };
-
-// 各ユースケースのエクスポート
-export { setUserByMessage } from './messageUsecase';
-export { updateAllUsersTime } from './timeUsecase';
-export { updateRefresh } from './refreshUsecase';
-export {
-  startStudy,
-  restartStudy,
-  endStudy,
-  updateTime,
-  resetRefresh,
-  updateCategory,
-} from './userUsecase';

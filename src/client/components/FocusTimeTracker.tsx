@@ -1,6 +1,6 @@
 import ImageProfile from './ImageProfile';
 import { User } from '@/types/users';
-import { calcTime } from '@/lib/calcTime';
+import { calcTime } from '@/server/lib/calcTime';
 import {
   Briefcase,
   ClipboardList,

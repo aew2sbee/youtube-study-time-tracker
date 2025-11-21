@@ -46,11 +46,3 @@ export const getAllUsers = (): User[] => {
   logger.info(`UserStore: ${allUsers.length}人のユーザーを取得しました`);
   return allUsers;
 };
-
-/**
- * 現在のストアのサイズを取得
- * @returns ストア内のユーザー数
- */
-export const getUserStoreSize = (): number => {
-  return userStore.size;
-};

@@ -30,48 +30,44 @@ export default function Home() {
   const currentPageData = pages[currentPage];
 
   return (
-    <div className="fixed inset-0 w-[1920px] h-[1080px] overflow-hidden pointer-events-none from-slate-900 via-slate-800 to-slate-900">
-      <div className="absolute bottom-0 left-0 w-[640px] h-[1080px] p-4 pointer-events-auto">
-        <div className="bg-gray-300 backdrop-blur-md rounded-xl p-6 h-full border border-gray-900 shadow-2xl">
-          {/* Header */}
+    <>
+      {/* Header */}
+      <motion.div
+        className="flex justify-between items-center mb-6"
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <h1 className="text-5xl font-bold text-black">{currentPageData.title}</h1>
+      </motion.div>
+
+      {/* Page Content */}
+      <div className="h-[calc(100%-80px)]">
+        <AnimatePresence mode="wait">
           <motion.div
-            className="flex justify-between items-center mb-6"
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
+            key={currentPageData.key}
+            initial={{ opacity: 0, x: 50 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -50 }}
+            transition={{ duration: 0.8, ease: 'easeInOut' }}
+            className="h-full"
           >
-            <h1 className="text-5xl font-bold text-black">{currentPageData.title}</h1>
+            {currentPageData.component}
           </motion.div>
-
-          {/* Page Content */}
-          <div className="h-[calc(100%-80px)]">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={currentPageData.key}
-                initial={{ opacity: 0, x: 50 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -50 }}
-                transition={{ duration: 0.8, ease: 'easeInOut' }}
-                className="h-full"
-              >
-                {currentPageData.component}
-              </motion.div>
-            </AnimatePresence>
-          </div>
-
-          {/* Page Indicator */}
-          <div className="absolute bottom-4 right-6 flex space-x-2">
-            {pages.map((_, index) => (
-              <div
-                key={index}
-                className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                  index === currentPage ? 'bg-gray-200' : 'bg-gray-400'
-                }`}
-              />
-            ))}
-          </div>
-        </div>
+        </AnimatePresence>
       </div>
-    </div>
+
+      {/* Page Indicator */}
+      <div className="absolute bottom-4 right-6 flex space-x-2">
+        {pages.map((_, index) => (
+          <div
+            key={index}
+            className={`w-2 h-2 rounded-full transition-all duration-300 ${
+              index === currentPage ? 'bg-gray-200' : 'bg-gray-400'
+            }`}
+          />
+        ))}
+      </div>
+    </>
   );
 }
