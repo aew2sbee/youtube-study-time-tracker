@@ -18,11 +18,10 @@ import { logger } from '@/server/lib/logger';
  */
 export const processPolling = async (): Promise<void> => {
   try {
-    const now = new Date();
     // チャットメッセージ処理
-    await setUserByMessage(now);
+    await setUserByMessage();
     // 時間更新処理
-    await updateAllUsersTime(now);
+    await updateAllUsersTime();
     // リフレッシュ処理
     await updateRefresh();
     // コメントを投稿する

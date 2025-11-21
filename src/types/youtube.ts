@@ -4,5 +4,6 @@ export interface LiveChatMessage {
   profileImageUrl: string;
   displayMessage: string;
   isChatSponsor:  boolean;
+  publishedAt: Date;
 }
 

@@ -153,7 +153,8 @@ export const getLiveChatMessages = async (): Promise<LiveChatMessage[]> => {
       displayName: removeMentionPrefix(item.authorDetails?.displayName || ''),
       profileImageUrl: item.authorDetails?.profileImageUrl || '',
       displayMessage: item.snippet?.displayMessage || '',
-      isChatSponsor: item.authorDetails?.isChatSponsor || false
+      isChatSponsor: item.authorDetails?.isChatSponsor || false,
+      publishedAt: item.snippet?.publishedAt ? new Date(item.snippet.publishedAt) : new Date(),
     }));
 
     logger.info(`${messages.length}件のメッセージを取得しました`);

@@ -14,7 +14,7 @@ import { pushQueue } from '../store/post';
  * @param message - YouTubeライブチャットメッセージ
  * @returns 開始されたユーザー情報
  */
-export const startStudy = async (message: LiveChatMessage, now: Date): Promise<void> => {
+export const startStudy = async (message: LiveChatMessage): Promise<void> => {
   // ユーザーオブジェクトの作成
   const startUser: User = {
     channelId: message.channelId,
@@ -22,7 +22,7 @@ export const startStudy = async (message: LiveChatMessage, now: Date): Promise<v
     profileImageUrl: message.profileImageUrl,
     isChatSponsor: message.isChatSponsor || false,
     timeSec: 0,
-    updateTime: now,
+    updateTime: message.publishedAt,
     isStudying: true,
     refreshInterval: 0,
     category: '',
@@ -89,19 +89,19 @@ export const endStudy = async (user: User, endTime: Date): Promise<void> => {
   // 学習時間の最終計算
   const stopUser: User = {
     ...user,
-    timeSec: user.timeSec + calcStudyTime(  user.updateTime, endTime),
+    timeSec: user.timeSec + calcStudyTime(user.updateTime, endTime),
     isStudying: false,
     updateTime: endTime,
   };
 
   // DB保存
   try {
-    if (!process.env.IS_DATABASE_ENABLED){
+    if (process.env.IS_DATABASE_ENABLED){
+      await saveLog(stopUser);
+      logger.info(`${stopUser.displayName}の学習記録をDBに保存しました`);
+    } else {
       logger.info('データベース保存は無効化されています');
-      return;
     }
-    await saveLog(stopUser);
-    logger.info(`${stopUser.displayName}の学習記録をDBに保存しました`);
   } catch (error) {
     logger.error(`${stopUser.displayName}のDB保存に失敗しました - ${error}`);
     // DB保存失敗してもコメント投稿は継続

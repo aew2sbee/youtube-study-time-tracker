@@ -11,7 +11,7 @@ import { getLiveChatMessages } from '@/server/lib/youtubeHelper';
  * - メモリストアに状態を保存
  * @param now - 現在時刻（学習再開・終了時の時刻として使用）
  */
-export const setUserByMessage = async (now: Date): Promise<void> => {
+export const setUserByMessage = async (): Promise<void> => {
   const messages = await getLiveChatMessages();
   if (messages.length > 0) {
     logger.info(`${messages.length}件のメッセージを取得しました`);
@@ -23,11 +23,11 @@ export const setUserByMessage = async (now: Date): Promise<void> => {
         // 既存ユーザーの処理
         if (isStartMessage(message.displayMessage) && !existingUser.isStudying) {
           // 学習再開
-          await restartStudy(existingUser, now);
+          await restartStudy(existingUser, message.publishedAt);
           logger.info(`${existingUser.displayName}の学習を再開しました`);
         } else if (isEndMessage(message.displayMessage) && existingUser.isStudying) {
           // 学習終了
-          await endStudy(existingUser, now);
+          await endStudy(existingUser, message.publishedAt);
           logger.info(`${existingUser.displayName}の学習を終了しました`);
         } else if (isCategoryMessage(message.displayMessage) && existingUser.isStudying) {
           // カテゴリー更新
@@ -38,7 +38,7 @@ export const setUserByMessage = async (now: Date): Promise<void> => {
         // 新規ユーザーの処理
         if (isStartMessage(message.displayMessage)) {
           // 学習開始
-          await startStudy(message, now);
+          await startStudy(message);
           logger.info(`${message.displayName}の学習を開始しました`);
         }
       }
