@@ -1,4 +1,4 @@
-import { useSWR, fetcher } from '@/client/lib/useSWR';
+import useSWR from 'swr';
 import { User } from '@/types/users';
 
 /**
@@ -18,6 +18,16 @@ export interface UsePollingReturn {
   error: Error | undefined;
   mutate: () => void;
 }
+
+
+/**
+ * デフォルトのfetcher関数
+ * fetch APIを使ってJSONデータを取得する
+ * @param url - 取得するURL
+ * @returns JSONレスポンス
+ */
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
+
 
 /**
  * SWRを使用してポーリング処理を実行するカスタムフック

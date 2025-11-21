@@ -43,7 +43,7 @@ export const usePagination = ({
 
     return {
       key: `users-${pageIndex}`,
-      title: totalUserPages > 1 ? `時間計測 (${pageIndex + 1}/${totalUserPages})` : '時間計測',
+      title: totalUserPages > 1 ? `参加者 (${pageIndex + 1}/${totalUserPages})` : '参加者',
       component: <FocusTimeTracker user={pageUsers} />,
     };
   });

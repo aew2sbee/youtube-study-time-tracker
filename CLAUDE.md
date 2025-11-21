@@ -39,7 +39,6 @@ src/
 │       └── polling/  # ポーリングエンドポイント
 ├── client/           # クライアント側コード
 │   ├── components/   # コンポーネント
-│   ├── hooks/        # カスタムフック（usePolling等）
 │   └── lib/          # クライアント専用ヘルパー
 ├── server/           # サーバー側コード
 │   ├── db/           # DBスキーマ・接続

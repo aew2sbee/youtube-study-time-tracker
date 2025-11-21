@@ -13,7 +13,7 @@ import {
 
 export default function HowToJoin() {
   return (
-    <div className="text-neutral-200 text-3xl space-y-3 items-start justify-start">
+    <div className="text-black text-3xl space-y-3 items-start justify-start">
       <p className="text-4xl pt-2 font-bold">1. 計測開始</p>
       <p className="pl-4">
         チャット欄に<strong>「start」</strong>のみを入力
