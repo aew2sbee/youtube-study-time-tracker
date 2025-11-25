@@ -7,11 +7,12 @@ export interface User {
   updateTime: Date;
   isStudying: boolean;
   refreshInterval: number;
-  category: string;
   isGameMode: boolean;
+  isLeveledUp: boolean;
+  exp: number;
   level: number;
   isMaxLevel: boolean;
-  exp: number;
+  hp: number;
   progress: number;
   timeToNextLevel: number;
   nextLevelRequiredTime: number;

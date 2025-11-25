@@ -1,18 +1,7 @@
 import ImageProfile from './ImageProfile';
 import { User } from '@/types/users';
 import { calcTime } from '@/server/lib/calcTime';
-import {
-  Briefcase,
-  ClipboardList,
-  BookOpen,
-  Pen,
-  GraduationCap,
-  Award,
-  School,
-  CalendarDays,
-  FileText,
-} from 'lucide-react';
-import { parameter } from '@/config/system';
+import { Timer, TimerOff } from 'lucide-react';
 
 export default function FocusTimeTracker({ user }: { user: User[] }) {
   if (!user || user.length === 0) {
@@ -37,32 +26,12 @@ export default function FocusTimeTracker({ user }: { user: User[] }) {
           </div>
 
           <div className="flex items-center text-3xl">
-            {user.category === parameter.ALLOW_WORDS[0] ? (
-              <Briefcase className="text-black w-9 h-9 mr-2" />
-            ) : user.category === parameter.ALLOW_WORDS[1] ? (
-              <ClipboardList className="text-black w-9 h-9 mr-2" />
-            ) : user.category === parameter.ALLOW_WORDS[2] ? (
-              <BookOpen className="text-black w-9 h-9 mr-2" />
-            ) : user.category === parameter.ALLOW_WORDS[3] ? (
-              <GraduationCap className="text-black w-9 h-9 mr-2" />
-            ) : user.category === parameter.ALLOW_WORDS[4] ? (
-              <Award className="text-black w-9 h-9 mr-2" />
-            ) : user.category === parameter.ALLOW_WORDS[5] ? (
-              <CalendarDays className="text-black w-9 h-9 mr-2" />
-            ) : user.category === parameter.ALLOW_WORDS[6] ? (
-              <Pen className="text-black w-9 h-9 mr-2" />
-            ) : user.category === parameter.ALLOW_WORDS[7] ? (
-              <FileText className="text-black w-9 h-9 mr-2" />
-            ) : user.category === parameter.ALLOW_WORDS[8] ? (
-              <School className="text-black w-9 h-9 mr-2" />
-            ) : (
-              <div className="w-9 h-9 mr-2" />
-            )}
             {user.isStudying ? (
-              <span className="text-black">{calcTime(user.timeSec)}</span>
+              <Timer className="text-gray-600 w-10 h-10 mr-3 animate-pulse" />
             ) : (
-              <span className="text-gray-400">{calcTime(user.timeSec)}</span>
+              <TimerOff className="text-gray-400 w-10 h-10 mr-3" />
             )}
+            <span>{calcTime(user.timeSec)}</span>
           </div>
         </div>
       ))}

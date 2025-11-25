@@ -27,24 +27,34 @@ export default function Experience({ user }: { user: User[] }) {
               <span className="text-2xl">Lv.</span>
               <span className="text-3xl">{user.level}</span>
             </span>
+            {/* HPバー */}
+            <div className="flex flex-col space-y-0.5 pl-6">
+              <div className="text-xl font-semibold pl-1">HP</div>
+              <div className="relative w-40 h-4 bg-gray-300 rounded-full overflow-hidden shadow-inner">
+                <motion.div
+                  className={`absolute h-full bg-gradient-to-r ${user.hp <= 20 ? 'from-red-400 to-red-600' : user.hp <= 60 ? 'from-yellow-400 to-yellow-600' : 'from-green-400 to-green-600'}`}
+                  initial={{ width: 0 }}
+                  animate={{ width: `${user.hp}%` }}
+                  transition={{ duration: 0.8, ease: 'easeOut' }}
+                />
+              </div>
+            </div>
           </div>
           <div className="flex flex-col space-y-0.5">
             {/* 時間情報表示 */}
             {!user.isMaxLevel && (
-              <div className="font-medium text-center">
-                <span className="text-sm">次のレベルまで: </span>
-                <span className="text-xl">
-                  {calcMin(user.timeToNextLevel)} / {calcMin(user.nextLevelRequiredTime)}
+              <div className="font-medium flex justify-between">
+                <span className="text-xl font-semibold">EXP</span>
+                <span>
+                  <span className="text-xl">{calcMin(user.timeToNextLevel)}</span>
+                  <span className="text-lg">/ {calcMin(user.nextLevelRequiredTime)}分</span>
                 </span>
               </div>
             )}
             {user.isMaxLevel && (
-              <div className="text-xl font-medium text-center">MAX LEVEL</div>
+              <div className="text-xl font-medium">MAX LEVEL</div>
             )}
-            {/* EXPとプログレスバー */}
-            <div className="flex items-center space-x-3">
-              {/* EXP表示 */}
-              <div className="text-xl font-semibold">EXP</div>
+
               {/* プログレスバー */}
               <div className="relative w-40 h-4 bg-gray-300 rounded-full overflow-hidden shadow-inner">
                 <motion.div
@@ -54,7 +64,6 @@ export default function Experience({ user }: { user: User[] }) {
                   transition={{ duration: 0.8, ease: 'easeOut' }}
                 />
               </div>
-            </div>
           </div>
         </div>
       ))}

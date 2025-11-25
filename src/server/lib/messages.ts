@@ -48,22 +48,12 @@ export const isEndMessage = (messageText: string): boolean =>
   messageText.toLowerCase().trim() === parameter.END_STUDY_KEYWORDS;
 
 /**
- * 指定されたメッセージがカテゴリーメッセージ（作業、勉強、読書）かどうかを判定します。
- * @param {string} messageText - 判定するメッセージテキスト
- * @returns {boolean} カテゴリーメッセージの場合はtrue
- */
-export const isCategoryMessage = (messageText: string): boolean => {
-  const trimmedMessage = messageText.trim();
-  return (parameter.ALLOW_WORDS as readonly string[]).includes(trimmedMessage);
-};
-
-/**
  * 指定されたメッセージが許可されたメッセージ（start/end/category）かどうかを判定します。
  * @param {string} messageText - 判定するメッセージテキスト
  * @returns {boolean} 許可されたメッセージの場合はtrue
  */
 export const isAllowMessage = (messageText: string): boolean => {
-  return isStartMessage(messageText) || isEndMessage(messageText) || isCategoryMessage(messageText);
+  return isStartMessage(messageText) || isEndMessage(messageText) || isLevelUpMessage(messageText);
 };
 
 /**
@@ -77,4 +67,25 @@ export const getEndMessageByUser = (user: User): string => {
   // `📅 過去7日間実績は、${user.last7Days}日で${calcTime(user.last7DaysSec)}` +
   // `📆 過去28日間は、${user.last28Days}日で${calcTime(user.last28DaysSec)}` +
   // `この配信がお役に立ったなら高評価👍をお願いします。また集中したい時はぜひ配信にお越しください`;
+};
+
+/**
+ * 指定されたメッセージが「levelup XXm」形式かどうかを判定する
+ * @param messageText - 判定するメッセージテキスト
+ * @returns 「levelup XXm」形式の場合はtrue
+ */
+export const isLevelUpMessage = (messageText: string): boolean =>
+  /^levelup\s+\d+m$/.test(messageText.toLowerCase().trim());
+
+/**
+ * 「levelup XXm」形式のメッセージから分数を取得する
+ * @param messageText - メッセージテキスト（例: "levelup 100m"）
+ * @returns 分数（数値）。パターンに一致しない場合はnull
+ */
+export const getHP = (messageText: string): number | null => {
+  if (!isLevelUpMessage(messageText)) {
+    return null;
+  }
+  const match = messageText.toLowerCase().trim().match(/(\d+)m$/);
+  return match ? parseInt(match[1], 10) : null;
 };

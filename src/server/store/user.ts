@@ -37,6 +37,13 @@ export const getAllActiveUsers = (): User[] => {
   return activeUsers;
 };
 
+export const getAllGameUsers = (): User[] => {
+  const allUsers = Array.from(userStore.values());
+  const activeUsers = allUsers.filter((user) => user.isGameMode);
+  logger.info(`UserStore: ${activeUsers.length}人のアクティブユーザーを取得しました`);
+  return activeUsers;
+};
+
 /**
  * すべてのユーザーを取得（isStudyingに関係なく）
  * @returns 全ユーザー一覧

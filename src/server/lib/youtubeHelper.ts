@@ -1,6 +1,5 @@
 import { google, youtube_v3 } from 'googleapis';
 import { logger } from '@/server/lib/logger';
-import { parameter } from '@/config/system';
 import { isAllowMessage } from './messages';
 import { LiveChatMessage } from '@/types/youtube';
 
@@ -81,11 +80,6 @@ const initYouTubeAPI = async (): Promise<void> => {
  * @param userName - ユーザー名（ログ用）
  */
 export const postYouTubeComment = async (message: string, userName: string): Promise<void> => {
-  if (!parameter.IS_COMMENT_ENABLED) {
-    logger.info('コメント投稿は無効化されています');
-    return;
-  }
-
   if (!liveChatId) {
     logger.error('Live Chat IDが設定されていません');
     return;

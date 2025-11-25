@@ -13,3 +13,10 @@ export const study = pgTable('study', {
   videoId: text('video_id'),
   timestamp: timestamp("timestamp", { withTimezone: true }).defaultNow().notNull(),
 });
+
+export const stats = pgTable('stats', {
+  id: serial('id').primaryKey(),
+  userId: integer('user_id').notNull().references(() => users.id),
+  expSec: integer('exp_sec').notNull().default(0),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+});

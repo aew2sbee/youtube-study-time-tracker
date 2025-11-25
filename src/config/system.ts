@@ -12,4 +12,6 @@ export const parameter = {
   REFRESH_FLAG: 'refresh',
   END_FLAG: 'end',
   START_FLAG: 'start',
+  GAME_START_FLAG: 'levelup',
+  INITIAL_HP: 120
 } as const;

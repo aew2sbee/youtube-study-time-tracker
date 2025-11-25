@@ -6,7 +6,7 @@ export const calcStudyTime = (start: Date, end: Date): number => {
 
 export const calcMin = (seconds: number): string => {
   const minutes = Math.floor(seconds / 60);
-  return `${minutes}分`;
+  return `${minutes}`;
 };
 
 export const calcTime = (seconds: number): string => {
@@ -21,4 +21,3 @@ export const convertHHMMSS = (publishedAt: string) =>
     hour12: false,
     timeZone: 'Asia/Tokyo',
   });
-  

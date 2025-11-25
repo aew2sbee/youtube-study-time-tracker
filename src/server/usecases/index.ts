@@ -1,8 +1,9 @@
-import { setUserByMessage } from './messageUsecase';
-import { updateAllUsersTime } from './timeUsecase';
-import { updateRefresh } from './refreshUsecase';
+import { setUserByMessage, updateAllUsersTime, updateRefresh } from './timeUsecase';
 import { processQueue } from '@/server/store/post';
 import { logger } from '@/server/lib/logger';
+import { parameter } from '@/config/system';
+import { gameMode } from './gameUsecase';
+import { getLiveChatMessages } from '../lib/youtubeHelper';
 
 /**
  * メインポーリング処理
@@ -18,14 +19,21 @@ import { logger } from '@/server/lib/logger';
  */
 export const processPolling = async (): Promise<void> => {
   try {
+    const messages = await getLiveChatMessages();
     // チャットメッセージ処理
-    await setUserByMessage();
+    await setUserByMessage(messages);
+    // ゲームモード
+    await gameMode(messages);
     // 時間更新処理
     await updateAllUsersTime();
     // リフレッシュ処理
     await updateRefresh();
     // コメントを投稿する
-    await processQueue();
+    if (parameter.IS_COMMENT_ENABLED) {
+      await processQueue();
+    } else {
+      logger.info('コメント投稿は無効化されています');
+    }
   } catch (error) {
     logger.error(`ポーリング処理中にエラーが発生しました - ${error}`);
     throw error;
