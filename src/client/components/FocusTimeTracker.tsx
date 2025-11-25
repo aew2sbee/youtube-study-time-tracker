@@ -22,12 +22,12 @@ export default function FocusTimeTracker({ user }: { user: User[] }) {
             <div className="relative">
               <ImageProfile src={user.profileImageUrl} alt={user.displayName} />
             </div>
-            <span className="text-black font-medium truncate max-w-[300px] ">{user.displayName}</span>
+            <span className="text-black font-medium truncate max-w-[280px] ">{user.displayName}</span>
           </div>
 
           <div className="flex items-center text-3xl">
             {user.isStudying ? (
-              <Timer className="text-gray-600 w-10 h-10 mr-3 animate-pulse" />
+              <Timer className="text-green-600 w-10 h-10 mr-3 animate-pulse" />
             ) : (
               <TimerOff className="text-gray-400 w-10 h-10 mr-3" />
             )}

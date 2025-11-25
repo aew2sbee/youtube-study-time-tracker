@@ -155,6 +155,7 @@ export const updateTime = async (user: User, currentTime: Date): Promise<void> =
   const updatedUser: User = {
     ...user,
     timeSec: user.timeSec + calcStudyTime(user.updateTime, currentTime),
+    exp: user.exp + calcStudyTime(user.updateTime, currentTime),
     updateTime: currentTime,
     refreshInterval: user.refreshInterval + calcStudyTime(user.updateTime, currentTime),
   };
