@@ -178,3 +178,17 @@ export const getLevelInfo = (timeInSeconds: number) => {
     nextLevelRequiredTime,
   };
 };
+
+/**
+ * 4〜6のランダムな整数を生成する
+ *
+ * @returns 4, 5, 6 のいずれかの整数
+ *
+ * @example
+ * ```typescript
+ * const wisdom = getRandomWisdom(); // => 4, 5, または 6
+ * ```
+ */
+export const getRandomWisdom = (): number => {
+  return Math.floor(Math.random() * 3) + 4;
+};

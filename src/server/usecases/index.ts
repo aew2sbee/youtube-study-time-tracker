@@ -1,8 +1,8 @@
-import { setUserByMessage, updateAllUsersTime, updateRefresh } from './timeUsecase';
+import { setTimeByMessage, updateAllUsersTime, updateRefresh } from './timeUsecase';
+import { setGameByMessage, checkLevelup, updateStatus } from './gameUsecase';
 import { processQueue } from '@/server/store/post';
 import { logger } from '@/server/lib/logger';
 import { parameter } from '@/config/system';
-import { gameMode } from './gameUsecase';
 import { getLiveChatMessages } from '../lib/youtubeHelper';
 
 /**
@@ -14,18 +14,22 @@ import { getLiveChatMessages } from '../lib/youtubeHelper';
  * 2. 時間更新処理（全アクティブユーザーの学習時間を更新）
  * 3. リフレッシュ処理（一定時間経過したユーザーにリフレッシュ通知）
  * 4. コメントを投稿する（キューに溜まったコメントを順次投稿）
- *
- * @param now - 現在時刻
  */
 export const processPolling = async (): Promise<void> => {
   try {
+    const now = new Date();
     const messages = await getLiveChatMessages();
+
     // チャットメッセージ処理
-    await setUserByMessage(messages);
+    await setTimeByMessage(messages);
     // ゲームモード
-    await gameMode(messages);
+    await setGameByMessage(messages);
     // 時間更新処理
-    await updateAllUsersTime();
+    await updateAllUsersTime(now);
+    // レベルアップ確認処理
+    await checkLevelup(now);
+    // ステータス更新処理
+    await updateStatus(now);
     // リフレッシュ処理
     await updateRefresh();
     // コメントを投稿する

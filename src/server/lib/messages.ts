@@ -1,6 +1,7 @@
 import { parameter } from '@/config/system';
 import { User } from '@/types/users';
 import { calcTime } from '@/server/lib/calcTime';
+import { getRandomWisdom } from './levelSystem';
 
 export const REFRESH_MESSAGE =
   'そろそろ2時間が経過しますので、20分ほど休憩しませんか？' +
@@ -88,4 +89,8 @@ export const getHP = (messageText: string): number | null => {
   }
   const match = messageText.toLowerCase().trim().match(/(\d+)m$/);
   return match ? parseInt(match[1], 10) : null;
+};
+
+export const getLevelUpMessage = (user: User): string => {
+  return `@${user.displayName}のレベル${user.level}に上がった!!「かしこさ」+${getRandomWisdom()}`;
 };

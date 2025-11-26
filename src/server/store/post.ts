@@ -25,7 +25,7 @@ let isProcessing = false;
  * @param message - 投稿するメッセージ
  */
 export const pushQueue = (userName: string, message: string): void => {
-  postQueue.push({ message, userName });
+  postQueue.push({ userName, message });
   logger.info(`コメントをキューに追加しました: ${userName}`);
 };
 

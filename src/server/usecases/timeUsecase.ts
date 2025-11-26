@@ -23,7 +23,7 @@ import { saveStatsByChannelId } from '../repositories/gameRepository';
  * - メモリストアに状態を保存
  * @param now - 現在時刻（学習再開・終了時の時刻として使用）
  */
-export const setUserByMessage = async (messages: LiveChatMessage[]): Promise<void> => {
+export const setTimeByMessage = async (messages: LiveChatMessage[]): Promise<void> => {
   if (messages.length > 0) {
     logger.info(`${messages.length}件のメッセージを取得しました`);
 
@@ -59,8 +59,7 @@ export const setUserByMessage = async (messages: LiveChatMessage[]): Promise<voi
  * 全アクティブユーザーのtimesecを更新
  * - isStudying: trueのユーザーの経過時間を更新
  */
-export const updateAllUsersTime = async (): Promise<void> => {
-  const now = new Date();
+export const updateAllUsersTime = async (now: Date): Promise<void> => {
   const activeUsers = getAllActiveUsers();
 
   for (const user of activeUsers) {
@@ -103,7 +102,6 @@ export const startStudy = async (message: LiveChatMessage): Promise<void> => {
     isStudying: true,
     refreshInterval: 0,
     isGameMode: false,
-    isLeveledUp: false,
     level: 0,
     exp: 0,
     hp: 0,
@@ -155,7 +153,6 @@ export const updateTime = async (user: User, currentTime: Date): Promise<void> =
   const updatedUser: User = {
     ...user,
     timeSec: user.timeSec + calcStudyTime(user.updateTime, currentTime),
-    exp: user.exp + calcStudyTime(user.updateTime, currentTime),
     updateTime: currentTime,
     refreshInterval: user.refreshInterval + calcStudyTime(user.updateTime, currentTime),
   };

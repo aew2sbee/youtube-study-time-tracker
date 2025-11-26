@@ -1,39 +1,68 @@
 import { User } from '@/types/users';
 import { getStudyDaysByChannelId } from '../repositories/studyRepository';
-import { getHP, getStartMessageByUser, isLevelUpMessage } from '../lib/messages';
+import { getHP, getLevelUpMessage, getStartMessageByUser, isLevelUpMessage } from '../lib/messages';
 import { getAllGameUsers, getUser, setUser } from '@/server/store/user';
 import { LiveChatMessage } from '@/types/youtube';
 import { pushQueue } from '../store/post';
 import { getLevelInfo } from '../lib/levelSystem';
 import { getStatsByChannelId } from '../repositories/gameRepository';
 import { parameter } from '@/config/system';
+import { calcStudyTime } from '../lib/calcTime';
 
-export const gameMode = async (messages: LiveChatMessage[]): Promise<void> => {
+export const setGameByMessage = async (messages: LiveChatMessage[]): Promise<void> => {
   if (messages.length > 0) {
     for (const message of messages) {
       const existingUser = getUser(message.channelId);
       if (existingUser) {
         // 既存ユーザーの処理
         if (isLevelUpMessage(message.displayMessage) && !existingUser.isStudying) {
-          // 学習再開
           await changeGame(existingUser, message);
         }
       } else {
         // 新規ユーザーの処理
         if (isLevelUpMessage(message.displayMessage)) {
-          // 学習開始
           await startGame(message);
         }
       }
     }
   }
+};
 
+export const updateStatus = async (now: Date): Promise<void> => {
   const gameUsers = getAllGameUsers();
 
   for (const user of gameUsers) {
-    await damageHP(user);
+    const clacedEXP = user.exp + calcStudyTime(user.updateTime, now);
+    const nextLevelInfo = getLevelInfo(clacedEXP);
+    const updatedUser: User = {
+      ...user,
+      exp: clacedEXP,
+      level: nextLevelInfo.level,
+      hp: user.hp - 1,
+      isMaxLevel: nextLevelInfo.isMaxLevel,
+      progress: nextLevelInfo.progress,
+      timeToNextLevel: nextLevelInfo.timeToNextLevel,
+      nextLevelRequiredTime: nextLevelInfo.nextLevelRequiredTime,
+    };
+    // メモリストアに保存
+    setUser(updatedUser);
   }
-};
+}
+
+export const checkLevelup = async (now: Date): Promise<void> => {
+  const gameUsers = getAllGameUsers();
+
+  for (const user of gameUsers) {
+    const nextEXP = user.exp + calcStudyTime(user.updateTime, now);
+
+    // 今回のポーリング処理でレベルアップしたか判定
+    if (getLevelInfo(nextEXP).level > user.level) {
+      const levelUpMessage = getLevelUpMessage(user);
+      // キューに追加
+      pushQueue(user.displayName, levelUpMessage);
+    }
+  }
+}
 
 /**
  * 学習開始のビジネスロジック
@@ -57,7 +86,6 @@ export const startGame = async (message: LiveChatMessage): Promise<void> => {
     isStudying: true,
     refreshInterval: 0,
     isGameMode: true,
-    isLeveledUp: false,
     level: levelInfo ? levelInfo.level : 0,
     exp: stats ? stats.expSec : 0,
     hp: hp ? hp : parameter.INITIAL_HP,
@@ -114,7 +142,6 @@ export const changeGame = async (user: User, message: LiveChatMessage): Promise<
     isStudying: true,
     refreshInterval: user.refreshInterval,
     isGameMode: true,
-    isLeveledUp: false,
     level: levelInfo ? levelInfo.level : 0,
     exp: stats ? stats.expSec : 0,
     hp: hp ? hp : parameter.INITIAL_HP,
