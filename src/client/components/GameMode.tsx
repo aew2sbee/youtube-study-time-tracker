@@ -34,7 +34,7 @@ export default function Experience({ user }: { user: User[] }) {
                 <motion.div
                   className={`absolute h-full bg-gradient-to-r ${user.hp <= 20 ? 'from-red-400 to-red-600' : user.hp <= 60 ? 'from-yellow-400 to-yellow-600' : 'from-green-400 to-green-600'}`}
                   initial={{ width: 0 }}
-                  animate={{ width: `${user.hp}%` }}
+                  animate={{ width: `${user.hp / user.maxHp * 100}%` }}
                   transition={{ duration: 0.8, ease: 'easeOut' }}
                 />
               </div>

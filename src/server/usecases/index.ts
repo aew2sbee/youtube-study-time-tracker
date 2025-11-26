@@ -22,16 +22,16 @@ export const processPolling = async (): Promise<void> => {
 
     // チャットメッセージ処理
     await setTimeByMessage(messages);
-    // ゲームモード
-    await setGameByMessage(messages);
     // 時間更新処理
     await updateAllUsersTime(now);
+    // リフレッシュ処理
+    await updateRefresh();
+    // ゲームモード
+    await setGameByMessage(messages);
     // レベルアップ確認処理
     await checkLevelup(now);
     // ステータス更新処理
     await updateStatus(now);
-    // リフレッシュ処理
-    await updateRefresh();
     // コメントを投稿する
     if (parameter.IS_COMMENT_ENABLED) {
       await processQueue();

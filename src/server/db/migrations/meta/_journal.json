@@ -15,6 +15,13 @@
       "when": 1761267356124,
       "tag": "0001_breezy_gorilla_man",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1764132889686,
+      "tag": "0002_loving_captain_midlands",
+      "breakpoints": true
     }
   ]
 }

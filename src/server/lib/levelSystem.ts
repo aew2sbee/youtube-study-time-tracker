@@ -15,7 +15,7 @@ const LEVEL_CONFIG = {
   /** 最大レベル到達時間（秒） */
   MAX_TIME_SECONDS: 1000 * 60 * 60, // 1000時間
   /** 経験値曲線の指数（高いほど後半が厳しい） */
-  EXPONENT: 2.5,
+  EXPONENT: 2.04,
 } as const;
 
 /**
