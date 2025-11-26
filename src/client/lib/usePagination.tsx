@@ -62,9 +62,8 @@ export const usePagination = ({
     });
   });
 
-  // 「参加方法」ページを先頭に追加
   const pages: PageData[] = [
-    { key: 'How to join', title: '参加方法', component: <HowToJoin /> },
+    { key: 'How to join', title: '機能一覧', component: <HowToJoin /> },
     ...allUserPages,
   ];
 

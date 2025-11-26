@@ -18,31 +18,32 @@ export default function Experience({ user }: { user: User[] }) {
     <div className="space-y-4 flex-1 overflow-hidden p-2">
       {user.map((user) => (
         <div key={user.displayName} className="bg-black/5 rounded-lg flex items-center justify-between p-2 h-[74px]">
-          <div className="flex items-center space-x-2 text-3xl">
+          <div className="flex items-center space-x-3 text-3xl">
             <div className="relative">
               <ImageProfile src={user.profileImageUrl} alt={user.displayName} />
             </div>
             {/* レベル表示 */}
-            <span className="font-medium truncate max-w-[300px]">
+            <span className="font-medium truncate w-[100px]">
               <span className="text-2xl">Lv.</span>
               <span className="text-3xl">{user.level}</span>
             </span>
             {/* HPバー */}
-            <div className="flex flex-col space-y-0.5 pl-6">
+            <div className="flex flex-col space-y-0.5">
               <div className="text-xl font-semibold pl-1">HP</div>
               <div className="relative w-40 h-4 bg-gray-300 rounded-full overflow-hidden shadow-inner">
                 <motion.div
-                  className={`absolute h-full bg-gradient-to-r ${user.hp / user.maxHp * 100 <= 20 ? 'from-red-400 to-red-600' : user.hp / user.maxHp * 100 <= 60 ? 'from-yellow-400 to-yellow-600' : 'from-green-400 to-green-600'}`}
+                  className={`absolute h-full bg-gradient-to-r ${(user.hp / user.maxHp * 100) <= 20 ? 'from-red-400 to-red-600' : (user.hp / user.maxHp * 100) <= 40 ? 'from-yellow-400 to-yellow-600' : 'from-green-400 to-green-600'}`}
                   initial={{ width: 0 }}
-                  animate={{ width: `${user.hp / user.maxHp * 100}%` }}
+                  animate={{ width: `${(user.hp / user.maxHp * 100)}%` }}
                   transition={{ duration: 0.8, ease: 'easeOut' }}
                 />
               </div>
             </div>
           </div>
-          <div className="flex flex-col space-y-0.5">
+          {/* EXPバー */}
+          <div className="flex flex-col space-y-0.5 pr-2">
             {/* 時間情報表示 */}
-            {!user.isMaxLevel && (
+            {!user.isMaxLevel ? (
               <div className="font-medium flex justify-between">
                 <span className="text-xl font-semibold">EXP</span>
                 <span>
@@ -50,20 +51,18 @@ export default function Experience({ user }: { user: User[] }) {
                   <span className="text-lg">/ {calcMin(user.nextLevelRequiredTime)}分</span>
                 </span>
               </div>
-            )}
-            {user.isMaxLevel && (
+            ) : (
               <div className="text-xl font-medium">MAX LEVEL</div>
             )}
-
-              {/* プログレスバー */}
-              <div className="relative w-40 h-4 bg-gray-300 rounded-full overflow-hidden shadow-inner">
-                <motion.div
-                  className="absolute h-full bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400"
-                  initial={{ width: 0 }}
-                  animate={{ width: `${user.progress * 100}%` }}
-                  transition={{ duration: 0.8, ease: 'easeOut' }}
-                />
-              </div>
+            {/* プログレスバー */}
+            <div className="relative w-40 h-4 bg-gray-300 rounded-full overflow-hidden shadow-inner">
+              <motion.div
+                className="absolute h-full bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400"
+                initial={{ width: 0 }}
+                animate={{ width: `${user.progress * 100}%` }}
+                transition={{ duration: 0.8, ease: 'easeOut' }}
+              />
+            </div>
           </div>
         </div>
       ))}

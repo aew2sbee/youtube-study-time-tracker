@@ -2,8 +2,8 @@ export const parameter = {
   ALLOW_WORDS: ['仕事', '作業', '読書', '受験', '資格', '試験', '勉強', '宿題', 'テスト'] as readonly string[],
   START_STUDY_KEYWORDS: 'start',
   END_STUDY_KEYWORDS: 'end',
-  IS_COMMENT_ENABLED: false, // YouTube コメント投稿の有効/無効
-  IS_DATABASE_ENABLED: false, // データベース保存の有効/無効
+  IS_COMMENT_ENABLED: true, // YouTube コメント投稿の有効/無効
+  IS_DATABASE_ENABLED: true, // データベース保存の有効/無効
   API_POLLING_INTERVAL: 1 * 60 * 1000, // 1分間隔
   USERS_PER_PAGE: 10, // 1ページあたりのユーザー数
   TRANSITION_DURATION: 1 * 1000, // フェードトランジション時間（ミリ秒）
