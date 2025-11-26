@@ -14,7 +14,6 @@ import { pushQueue } from '@/server/store/post';
 import { getAllActiveUsers, getUser, setUser } from '@/server/store/user';
 import { User } from '@/types/users';
 import { LiveChatMessage } from '@/types/youtube';
-import { saveStatsByChannelId } from '../repositories/gameRepository';
 
 /**
  * 個別メッセージの処理
@@ -182,7 +181,6 @@ export const endStudy = async (user: User, endTime: Date): Promise<void> => {
   try {
     if (process.env.IS_DATABASE_ENABLED){
       await saveLog(stopUser);
-      await saveStatsByChannelId(stopUser);
       logger.info(`${stopUser.displayName}の学習記録をDBに保存しました`);
     } else {
       logger.info('データベース保存は無効化されています');

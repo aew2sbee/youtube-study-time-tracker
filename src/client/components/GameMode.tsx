@@ -32,7 +32,7 @@ export default function Experience({ user }: { user: User[] }) {
               <div className="text-xl font-semibold pl-1">HP</div>
               <div className="relative w-40 h-4 bg-gray-300 rounded-full overflow-hidden shadow-inner">
                 <motion.div
-                  className={`absolute h-full bg-gradient-to-r ${user.hp <= 20 ? 'from-red-400 to-red-600' : user.hp <= 60 ? 'from-yellow-400 to-yellow-600' : 'from-green-400 to-green-600'}`}
+                  className={`absolute h-full bg-gradient-to-r ${user.hp / user.maxHp * 100 <= 20 ? 'from-red-400 to-red-600' : user.hp / user.maxHp * 100 <= 60 ? 'from-yellow-400 to-yellow-600' : 'from-green-400 to-green-600'}`}
                   initial={{ width: 0 }}
                   animate={{ width: `${user.hp / user.maxHp * 100}%` }}
                   transition={{ duration: 0.8, ease: 'easeOut' }}
