@@ -15,7 +15,7 @@ export const saveStatsByChannelId = async (user: User): Promise<void> => {
   if (existing) {
     const statsId = await getStatsIdByuserId(existing.id);
     if (statsId) {
-      await updateStats(statsId, user);
+      await updateStats(existing.id, user);
     } else {
       await insertStats(existing.id, user);
     }
@@ -70,7 +70,7 @@ export const updateStats = async (userId: number, user: User) => {
 export const insertStats = async (userId: number, user: User) => {
   const res = await db
     .insert(stats)
-    .values({ userId: userId, expSec: user.exp })
+    .values({ userId: userId, expSec: user.exp, updatedAt: user.updateTime })
     .returning();
   return res[0];
 };

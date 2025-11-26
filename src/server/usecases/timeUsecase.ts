@@ -179,7 +179,7 @@ export const endStudy = async (user: User, endTime: Date): Promise<void> => {
 
   // DB保存
   try {
-    if (process.env.IS_DATABASE_ENABLED){
+    if (parameter.IS_DATABASE_ENABLED) {
       await saveLog(stopUser);
       logger.info(`${stopUser.displayName}の学習記録をDBに保存しました`);
     } else {

@@ -165,7 +165,7 @@ export const endGame = async (user: User, endTime: Date): Promise<void> => {
 
   // DB保存
   try {
-    if (process.env.IS_DATABASE_ENABLED){
+    if (parameter.IS_DATABASE_ENABLED) {
       await saveStatsByChannelId(stopUser);
       logger.info(`${stopUser.displayName}のステータスをDBに保存しました`);
     } else {

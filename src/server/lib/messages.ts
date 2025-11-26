@@ -76,6 +76,7 @@ export const getEndMessageByUser = (user: User): string => {
  * @returns 「levelup XXm」形式の場合はtrue
  */
 export const isLevelUpMessage = (messageText: string): boolean =>
+  messageText.toLowerCase().trim() === parameter.GAME_START_FLAG ||
   /^levelup\s+\d+m$/.test(messageText.toLowerCase().trim());
 
 /**
@@ -83,12 +84,12 @@ export const isLevelUpMessage = (messageText: string): boolean =>
  * @param messageText - メッセージテキスト（例: "levelup 100m"）
  * @returns 分数（数値）。パターンに一致しない場合はnull
  */
-export const getHP = (messageText: string): number | null => {
+export const getHP = (messageText: string): number => {
   if (!isLevelUpMessage(messageText)) {
-    return null;
+    return parameter.INITIAL_HP;
   }
   const match = messageText.toLowerCase().trim().match(/(\d+)m$/);
-  return match ? parseInt(match[1], 10) : null;
+  return match ? parseInt(match[1], 10) : parameter.INITIAL_HP;
 };
 
 export const getLevelUpMessage = (user: User): string => {
