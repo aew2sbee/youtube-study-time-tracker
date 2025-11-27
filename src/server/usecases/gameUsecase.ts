@@ -141,6 +141,7 @@ export const changeGame = async (user: User, message: LiveChatMessage): Promise<
   // ユーザーオブジェクトの作成
   const startUser: User = {
     ...user,
+    updateTime: message.publishedAt,
     isGameMode: true,
     level: levelInfo ? levelInfo.level : 1,
     exp: stats ? stats.expSec : 0,
