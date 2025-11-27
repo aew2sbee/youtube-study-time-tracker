@@ -1,0 +1,1 @@
+ALTER TABLE "stats" ADD COLUMN "wisdom" integer DEFAULT 0 NOT NULL;

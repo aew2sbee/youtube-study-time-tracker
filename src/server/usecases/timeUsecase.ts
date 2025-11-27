@@ -105,6 +105,7 @@ export const startStudy = async (message: LiveChatMessage): Promise<void> => {
     exp: 0,
     maxHp: 0,
     hp: 0,
+    wisdom: 0,
     progress: 0,
     isMaxLevel: false,
     timeToNextLevel: 0,
@@ -190,7 +191,7 @@ export const endStudy = async (user: User, endTime: Date): Promise<void> => {
     // DB保存失敗してもコメント投稿は継続
   }
 
-  const commentMessage = getEndMessageByUser(stopUser);
+  const commentMessage = await getEndMessageByUser(stopUser);
   // キューに追加
   pushQueue(stopUser.displayName, commentMessage);
   // メモリストアに保存（isStudying: false状態で保持）

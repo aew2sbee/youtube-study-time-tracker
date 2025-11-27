@@ -59,18 +59,18 @@ export const getStatsIdByuserId = async (userId: number) => {
 };
 
 export const updateStats = async (userId: number, user: User) => {
-    const res = await db
-      .update(stats)
-      .set({ expSec: user.exp, updatedAt: new Date() })
-      .where(eq(stats.userId, userId))
-      .returning();
-    return res[0];
+  const res = await db
+    .update(stats)
+    .set({ expSec: user.exp, wisdom: user.wisdom, updatedAt: new Date() })
+    .where(eq(stats.userId, userId))
+    .returning();
+  return res[0];
 }
 
 export const insertStats = async (userId: number, user: User) => {
   const res = await db
     .insert(stats)
-    .values({ userId: userId, expSec: user.exp, updatedAt: user.updateTime })
+    .values({ userId: userId, expSec: user.exp, wisdom: user.wisdom, updatedAt: user.updateTime })
     .returning();
   return res[0];
 };

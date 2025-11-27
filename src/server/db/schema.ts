@@ -18,5 +18,6 @@ export const stats = pgTable('stats', {
   id: serial('id').primaryKey(),
   userId: integer('user_id').notNull().references(() => users.id),
   expSec: integer('exp_sec').notNull().default(0),
+  wisdom: integer('wisdom').notNull().default(0),
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
 });

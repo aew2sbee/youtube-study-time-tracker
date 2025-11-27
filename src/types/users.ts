@@ -13,6 +13,7 @@ export interface User {
   exp: number;
   maxHp: number;
   hp: number;
+  wisdom: number;
   progress: number;
   timeToNextLevel: number;
   nextLevelRequiredTime: number;

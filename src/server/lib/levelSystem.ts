@@ -18,6 +18,14 @@ const LEVEL_CONFIG = {
   EXPONENT: 2.04,
 } as const;
 
+/** かしこさシステムの定数 */
+const WISDOM_CONFIG = {
+  /** 初期値 */
+  INITIAL: 10,
+  /** 最大値（レベル200で到達） */
+  MAX: 999,
+} as const;
+
 /**
  * 各レベルに到達するために必要な累積時間を計算する基礎係数
  * MAX_LEVEL^EXPONENT で MAX_TIME_SECONDS になるように調整
@@ -180,15 +188,67 @@ export const getLevelInfo = (timeInSeconds: number) => {
 };
 
 /**
- * 4〜6のランダムな整数を生成する
+ * かしこさの初期値を取得
  *
- * @returns 4, 5, 6 のいずれかの整数
+ * @returns かしこさの初期値（10）
  *
  * @example
  * ```typescript
- * const wisdom = getRandomWisdom(); // => 4, 5, または 6
+ * const initialWisdom = getInitialWisdom(); // => 10
  * ```
  */
-export const getRandomWisdom = (): number => {
-  return Math.floor(Math.random() * 3) + 4;
+export const getInitialWisdom = (): number => {
+  return WISDOM_CONFIG.INITIAL;
+};
+
+/**
+ * レベルアップ時のかしこさ上昇値を計算（ランダム、レベル200で999に収束）
+ *
+ * 仕様:
+ * - 初期値: 10
+ * - レベル200: 999
+ * - 残りレベルから必要な平均上昇値を計算し、±50%のランダム変動を加える
+ * - 最後の1レベルでは必ず999に到達するよう調整
+ *
+ * @param currentLevel - 現在のレベル（1〜199）
+ * @param currentWisdom - 現在のかしこさ
+ * @returns 上昇値
+ *
+ * @example
+ * ```typescript
+ * calcWisdomGain(1, 10)    // => ランダムな上昇値（例: 2〜8）
+ * calcWisdomGain(100, 500) // => ランダムな上昇値（残り平均に基づく）
+ * calcWisdomGain(199, 990) // => 9（999に到達するため）
+ * ```
+ */
+export const calcWisdomGain = (currentLevel: number, currentWisdom: number): number => {
+  const { MAX } = WISDOM_CONFIG;
+  const { MAX_LEVEL } = LEVEL_CONFIG;
+
+  // レベル1未満は上昇なし
+  if (currentLevel < 1) {
+    return 0;
+  }
+
+  // 最大レベル以上は上昇なし
+  if (currentLevel >= MAX_LEVEL) {
+    return 0;
+  }
+
+  const remainingLevels = MAX_LEVEL - currentLevel;
+  const remainingWisdom = MAX - currentWisdom;
+
+  // 残り1レベルの場合、999に到達するよう調整
+  if (remainingLevels === 1) {
+    return Math.max(0, remainingWisdom);
+  }
+
+  // 残りレベルで必要な平均上昇値
+  const avgNeeded = remainingWisdom / remainingLevels;
+
+  // ランダム変動（平均値の50%〜150%の範囲、最小1）
+  const min = Math.max(1, Math.floor(avgNeeded * 0.5));
+  const max = Math.ceil(avgNeeded * 1.5);
+
+  return Math.floor(Math.random() * (max - min + 1)) + min;
 };

@@ -1,9 +1,9 @@
 export default function HowToJoin() {
   return (
     <div className="text-black text-3xl space-y-3 items-start justify-start">
-      <p className="text-4xl pt-2 font-bold">1. みんなで&quot;時間計測&quot;</p>
+      <p className="text-4xl pt-2 font-bold">1. 時間計測</p>
       <p className="pl-4">チャット欄に<strong>「start/end」</strong>で計測</p>
-      <p className="text-4xl pt-4 font-bold">2. みんなで&quot;レベル上げ&quot;</p>
+      <p className="text-4xl pt-4 font-bold">2. レベル上げ</p>
       <p className="pl-4">チャット欄に<strong>「levelup」</strong>で参加</p>
       <p className="pl-4"><strong>HP</strong>はタイマーとして活用可能</p>
       <p className="pl-4">※1: 終了したい場合<strong>「end」</strong>で終了</p>

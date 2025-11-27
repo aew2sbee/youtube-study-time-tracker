@@ -1,7 +1,7 @@
 import { parameter } from '@/config/system';
 import { User } from '@/types/users';
 import { calcTime } from '@/server/lib/calcTime';
-import { getRandomWisdom } from './levelSystem';
+import { getStudyTimeStatsByChannelId } from '../repositories/studyRepository';
 
 export const REFRESH_MESSAGE =
   'そろそろ2時間が経過しますので、20分ほど休憩しませんか？' +
@@ -62,12 +62,13 @@ export const isAllowMessage = (messageText: string): boolean => {
  * @param {User} user - ユーザー情報（統計情報を含む）
  * @returns {string} 統計情報を含む終了メッセージ
  */
-export const getEndMessageByUser = (user: User): string => {
-  return `@${user.displayName}さん お疲れ様でした🌟` + `今日は${calcTime(user.timeSec)}集中しました!!`;
-  // `これまでに合計${user.totalDays}日間集中してなんと${calcTime(user.totalSec)}も頑張りました!!` +
-  // `📅 過去7日間実績は、${user.last7Days}日で${calcTime(user.last7DaysSec)}` +
-  // `📆 過去28日間は、${user.last28Days}日で${calcTime(user.last28DaysSec)}` +
-  // `この配信がお役に立ったなら高評価👍をお願いします。また集中したい時はぜひ配信にお越しください`;
+export const getEndMessageByUser = async (user: User): Promise<string> => {
+  const studyLog = await getStudyTimeStatsByChannelId(user.channelId)
+  return `@${user.displayName}さん お疲れ様でした🌟` + `今日は${calcTime(user.timeSec)}集中しました!!` +
+  `これまでに合計${studyLog.totalDays}日間集中してなんと${calcTime(studyLog.totalTime)}も頑張りました!!` +
+  `📅 過去7日間実績は、${studyLog.last7Days}日で${calcTime(studyLog.last7DaysTime)}` +
+  `📆 過去28日間は、${studyLog.last28Days}日で${calcTime(studyLog.last28DaysTime)}` +
+  `この配信がお役に立ったなら高評価👍をお願いします。また集中したい時はぜひ配信にお越しください`;
 };
 
 /**
@@ -92,13 +93,19 @@ export const getHP = (messageText: string): number => {
   return match ? parseInt(match[1], 10) : parameter.INITIAL_HP;
 };
 
-export const getLevelUpMessage = (user: User): string => {
-  return `@${user.displayName}のレベル${user.level + 1}に上がった!!「かしこさ」+${getRandomWisdom()}`;
+/**
+ * レベルアップメッセージを生成
+ * @param user - ユーザー情報
+ * @param wisdomGain - かしこさ上昇値
+ * @returns レベルアップメッセージ
+ */
+export const getLevelUpMessage = (user: User, beforeWisdom: number, AfterWisdom: number): string => {
+  return `@${user.displayName}のレベル${user.level + 1}に上がった!! かしこさ: ${beforeWisdom} ▶ ${AfterWisdom}`;
 };
 
 /**
  * 名前を付与したリフレッシュメッセージを取得する
- * @param displayName - ユーザーの表示名
+ * @param displayName - ユーザーの表示名▶
  * @returns 名前を付与したリフレッシュメッセージ
  */
 export const getRefreshMessageByUser = (displayName: string): string => {

@@ -4,7 +4,7 @@ import { getHP, getLevelUpMessage, getStartMessageByUser, isEndMessage, isLevelU
 import { getAllGameUsers, getUser, setUser } from '@/server/store/user';
 import { LiveChatMessage } from '@/types/youtube';
 import { pushQueue } from '../store/post';
-import { getLevelInfo } from '../lib/levelSystem';
+import { calcWisdomGain, getLevelInfo } from '../lib/levelSystem';
 import { getStatsByChannelId, saveStatsByChannelId } from '../repositories/gameRepository';
 import { parameter } from '@/config/system';
 import { calcStudyTime } from '../lib/calcTime';
@@ -63,8 +63,17 @@ export const checkLevelup = async (now: Date): Promise<void> => {
 
     // 今回のポーリング処理でレベルアップしたか判定
     if (getLevelInfo(nextEXP).level > user.level) {
-      const levelUpMessage = getLevelUpMessage(user);
-      // キューに追加
+      // かしこさ上昇値を計算
+      const wisdomGain = calcWisdomGain(user.level, user.wisdom);
+      // ユーザーのかしこさを更新
+      const updatedUser: User = {
+        ...user,
+        wisdom: user.wisdom + wisdomGain,
+      };
+      setUser(updatedUser);
+      // メッセージをキューに追加
+      const levelUpMessage = getLevelUpMessage(user, user.wisdom, wisdomGain);
+      console.log(levelUpMessage);
       pushQueue(user.displayName, levelUpMessage);
     }
   }
@@ -94,6 +103,7 @@ export const startGame = async (message: LiveChatMessage): Promise<void> => {
     isGameMode: true,
     level: levelInfo ? levelInfo.level : 1,
     exp: stats ? stats.expSec : 0,
+    wisdom: stats ? stats.wisdom : 0,
     maxHp: hp ? hp : parameter.INITIAL_HP,
     hp: hp ? hp : parameter.INITIAL_HP,
     progress: levelInfo ? levelInfo.progress : 0,
@@ -145,6 +155,7 @@ export const changeGame = async (user: User, message: LiveChatMessage): Promise<
     isGameMode: true,
     level: levelInfo ? levelInfo.level : 1,
     exp: stats ? stats.expSec : 0,
+    wisdom: stats ? stats.wisdom : 0,
     maxHp: hp ? hp : parameter.INITIAL_HP,
     hp: hp ? hp : parameter.INITIAL_HP,
     progress: levelInfo ? levelInfo.progress : 0,

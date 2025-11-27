@@ -36,7 +36,7 @@ export default function GameMode({ user }: { user: User }) {
             <div className="font-medium flex justify-between">
               <span className="text-xl font-semibold">EXP</span>
               <span>
-                <span className="text-xl">{calcMin((user.nextLevelRequiredTime - user.timeToNextLevel))}</span>
+                <span className="text-xl">{calcMin((user.nextLevelRequiredTime * user.progress))}</span>
                 <span className="text-lg">/ {calcMin(user.nextLevelRequiredTime)}分</span>
               </span>
             </div>
