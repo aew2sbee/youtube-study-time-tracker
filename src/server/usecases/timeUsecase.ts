@@ -153,7 +153,7 @@ export const updateTime = async (user: User, currentTime: Date): Promise<void> =
   const updatedUser: User = {
     ...user,
     timeSec: user.timeSec + calcStudyTime(user.updateTime, currentTime),
-    updateTime: currentTime,
+    updateTime: user.isGameMode ? user.updateTime : currentTime,
     refreshInterval: user.refreshInterval + calcStudyTime(user.updateTime, currentTime),
   };
 

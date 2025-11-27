@@ -41,6 +41,7 @@ export const updateStatus = async (now: Date): Promise<void> => {
     const nextLevelInfo = getLevelInfo(clacedEXP);
     const updatedUser: User = {
       ...user,
+      updateTime: now,
       exp: clacedEXP,
       level: nextLevelInfo.level,
       hp: user.hp - 1,

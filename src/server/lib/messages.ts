@@ -23,11 +23,11 @@ export const getStartMessageByUser = (displayName: string, days: number): string
   if (days === 0) {
     message = '初参加ですね！🔰よろしくお願いします🙇' + START_MESSAGE;
   } else if (days < 7) {
-    message = `${days}日目の参加ですね！継続は力なり💪` + START_MESSAGE;
+    message = `${days + 1}日目の参加ですね！継続は力なり💪` + START_MESSAGE;
   } else if (days < 30) {
-    message = `${days}日目！素晴らしい継続力ですね🦾` + START_MESSAGE;
+    message = `${days + 1}日目！素晴らしい継続力ですね🦾` + START_MESSAGE;
   } else {
-    message = `なんと${days}日目！継続の達人ですね🏆` + START_MESSAGE;
+    message = `なんと${days + 1}日目！継続の達人ですね🏆` + START_MESSAGE;
   }
   return `@${displayName}さん ${message}`;
 };
