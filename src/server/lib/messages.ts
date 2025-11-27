@@ -95,3 +95,12 @@ export const getHP = (messageText: string): number => {
 export const getLevelUpMessage = (user: User): string => {
   return `@${user.displayName}のレベル${user.level + 1}に上がった!!「かしこさ」+${getRandomWisdom()}`;
 };
+
+/**
+ * 名前を付与したリフレッシュメッセージを取得する
+ * @param displayName - ユーザーの表示名
+ * @returns 名前を付与したリフレッシュメッセージ
+ */
+export const getRefreshMessageByUser = (displayName: string): string => {
+  return `@${displayName}さん ${REFRESH_MESSAGE}`;
+};

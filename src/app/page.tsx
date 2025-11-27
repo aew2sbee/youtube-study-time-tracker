@@ -29,14 +29,14 @@ export default function Home() {
 
     if (users.length > 0) {
       components.push({
-        title: 'みんなで"時間計測"',
+        title: '時間計測',
         renderComponent: (users: User[]) => <FocusTimeTracker user={users} />,
       });
     }
 
     if (gameModeUsers.length > 0) {
       components.push({
-        title: 'みんなで"レベル上げ"',
+        title: 'レベル上げ',
         renderComponent: (users: User[]) => <Experience user={users.filter((user) => user.isGameMode)} />,
       });
     }

@@ -4,10 +4,10 @@ import { logger } from '@/server/lib/logger';
 import {
   isEndMessage,
   isStartMessage,
-  REFRESH_MESSAGE,
   RESTART_MESSAGE,
   getStartMessageByUser,
   getEndMessageByUser,
+  getRefreshMessageByUser,
 } from '@/server/lib/messages';
 import { getStudyDaysByChannelId, saveLog } from '@/server/repositories/studyRepository';
 import { pushQueue } from '@/server/store/post';
@@ -207,7 +207,8 @@ export const resetRefresh = async (user: User): Promise<void> => {
     refreshInterval: 0,
   };
   // キューに追加
-  pushQueue(refreshUser.displayName, REFRESH_MESSAGE);
+  const refreshMessage = getRefreshMessageByUser(refreshUser.displayName);
+  pushQueue(refreshUser.displayName, refreshMessage);
   // メモリストアに保存
   setUser(refreshUser);
 };
