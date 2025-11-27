@@ -7,8 +7,9 @@ export default function HowToJoin() {
       <p className="pl-4">チャット欄に<strong>「levelup」</strong>で参加</p>
       <p className="pl-4"><strong>HP</strong>はタイマーとして活用可能</p>
       <p className="pl-4">※1: 終了したい場合<strong>「end」</strong>で終了</p>
-      <p className="pl-4">※2: HPのでデフォルトは<strong>120分</strong>です。</p>
+      <p className="pl-4">※2: HPのデフォルトは<strong>120分</strong>です。</p>
       <p className="pl-4">※3: <strong>&quot;levelup 60m&quot;</strong>でHPを60分に設定</p>
+      <p className="pl-4">※4: <strong>「levelup」</strong>の前に<strong>「start」</strong>は不要</p>
       <p className="text-3xl pt-4 font-bold">補足情報</p>
       <ul className="pl-8 text-2xl">
         <li>1. 配信中なら、何回でも参加OK!!</li>

@@ -1,7 +1,7 @@
 import ImageProfile from './ImageProfile';
 import { User } from '@/types/users';
 import { motion } from 'framer-motion';
-// import { calcMin } from '@/server/lib/calcTime';
+import { calcMin } from '@/server/lib/calcTime';
 
 export default function Experience({ user }: { user: User[] }) {
   if (!user || user.length === 0) {
@@ -46,10 +46,10 @@ export default function Experience({ user }: { user: User[] }) {
             {!user.isMaxLevel ? (
               <div className="font-medium flex justify-between">
                 <span className="text-xl font-semibold">EXP</span>
-                {/* <span>
-                  <span className="text-xl">{calcMin(user.timeToNextLevel)}</span>
+                <span>
+                  <span className="text-xl">{calcMin((user.nextLevelRequiredTime - user.timeToNextLevel))}</span>
                   <span className="text-lg">/ {calcMin(user.nextLevelRequiredTime)}分</span>
-                </span> */}
+                </span>
               </div>
             ) : (
               <div className="text-xl font-medium">MAX LEVEL</div>
