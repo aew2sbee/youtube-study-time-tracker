@@ -93,5 +93,5 @@ export const getHP = (messageText: string): number => {
 };
 
 export const getLevelUpMessage = (user: User): string => {
-  return `@${user.displayName}のレベル${user.level}に上がった!!「かしこさ」+${getRandomWisdom()}`;
+  return `@${user.displayName}のレベル${user.level + 1}に上がった!!「かしこさ」+${getRandomWisdom()}`;
 };
