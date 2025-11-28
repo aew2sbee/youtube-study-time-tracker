@@ -72,7 +72,7 @@ export const checkLevelup = async (now: Date): Promise<void> => {
       };
       setUser(updatedUser);
       // メッセージをキューに追加
-      const levelUpMessage = getLevelUpMessage(user, user.wisdom, wisdomGain);
+      const levelUpMessage = getLevelUpMessage(user, user.wisdom, updatedUser.wisdom);
       console.log(levelUpMessage);
       pushQueue(user.displayName, levelUpMessage);
     }
