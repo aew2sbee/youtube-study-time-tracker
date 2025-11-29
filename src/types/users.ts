@@ -13,5 +13,5 @@ export interface User {
   exp: number;
   wisdom: number;
   progress: number;
-  nextLevelRequiredTime: number;
+  timeToNextLevel: number;
 }

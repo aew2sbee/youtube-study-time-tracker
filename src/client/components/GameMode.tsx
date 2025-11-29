@@ -13,7 +13,7 @@ export default function GameMode({ user }: { user: User }) {
             <ImageProfile src={user.profileImageUrl} alt={user.displayName} />
           </div>
           {/* レベル表示 */}
-          <span className="font-medium truncate w-[100px]">
+          <span className="font-medium truncate w-[85px]">
             <span className="text-2xl">Lv.</span>
             <span className="text-3xl">{user.level}</span>
           </span>
@@ -28,21 +28,14 @@ export default function GameMode({ user }: { user: User }) {
         <div className="flex flex-col space-y-0.5 pr-2">
           {/* 時間情報表示 */}
             <div className="font-medium flex justify-between">
-              <span className="text-xl font-semibold">EXP</span>
-              {!user.isMaxLevel ? (
+              <span className="text-base">次のレベルまで</span>
                 <span>
-                  <span className="text-xl">{calcMin((user.exp))}</span>
-                  <span className="text-lg">/ {calcMin(user.nextLevelRequiredTime)}分</span>
+                  <span className="text-xl font-semibold">{calcMin((user.timeToNextLevel))}</span>
+                  <span className="text-base">分</span>
                 </span>
-              ) : (
-                <span>
-                  <span className="text-xl">60000</span>
-                  <span className="text-lg">/ 60000分</span>
-                </span>
-              )}
             </div>
           {/* プログレスバー */}
-          <div className="relative w-40 h-4 bg-gray-300 rounded-full overflow-hidden shadow-inner">
+          <div className="relative w-44 h-4 bg-gray-300 rounded-full overflow-hidden shadow-inner">
             <motion.div
               className="absolute h-full bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400"
               initial={{ width: 0 }}

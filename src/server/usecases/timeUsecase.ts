@@ -106,7 +106,7 @@ export const startStudy = async (message: LiveChatMessage): Promise<void> => {
     wisdom: 0,
     progress: 0,
     isMaxLevel: false,
-    nextLevelRequiredTime: 0,
+    timeToNextLevel: 0,
   };
 
   const studyDays = await getStudyDaysByChannelId(startUser.channelId);

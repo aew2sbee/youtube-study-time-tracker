@@ -46,7 +46,7 @@ export const updateStatus = async (now: Date): Promise<void> => {
       level: nextLevelInfo.level,
       isMaxLevel: nextLevelInfo.isMaxLevel,
       progress: nextLevelInfo.progress,
-      nextLevelRequiredTime: nextLevelInfo.nextLevelRequiredTime,
+      timeToNextLevel: nextLevelInfo.timeToNextLevel,
     };
     // メモリストアに保存
     setUser(updatedUser);
@@ -103,7 +103,7 @@ export const startGame = async (message: LiveChatMessage): Promise<void> => {
     wisdom: stats ? stats.wisdom : 10,
     progress: levelInfo ? levelInfo.progress : 0,
     isMaxLevel: levelInfo ? levelInfo.isMaxLevel : false,
-    nextLevelRequiredTime: levelInfo ? levelInfo.nextLevelRequiredTime : 0,
+    timeToNextLevel: levelInfo ? levelInfo.timeToNextLevel : 0,
   };
 
   const studyDays = await getStudyDaysByChannelId(startUser.channelId);
@@ -135,7 +135,7 @@ export const changeGame = async (user: User, message: LiveChatMessage): Promise<
     wisdom: stats ? stats.wisdom : 10,
     progress: levelInfo ? levelInfo.progress : 0,
     isMaxLevel: levelInfo ? levelInfo.isMaxLevel : false,
-    nextLevelRequiredTime: levelInfo ? levelInfo.nextLevelRequiredTime : 0,
+    timeToNextLevel: levelInfo ? levelInfo.timeToNextLevel : 0,
   };
 
   // メモリストアに保存
