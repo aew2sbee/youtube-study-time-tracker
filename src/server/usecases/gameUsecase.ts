@@ -1,6 +1,6 @@
 import { User } from '@/types/users';
 import { getStudyDaysByChannelId } from '../repositories/studyRepository';
-import { getHP, getLevelUpMessage, getStartMessageByUser, isEndMessage, isLevelUpMessage } from '../lib/messages';
+import { getLevelUpMessage, getStartMessageByUser, isEndMessage, isLevelUpMessage } from '../lib/messages';
 import { getAllGameUsers, getUser, setUser } from '@/server/store/user';
 import { LiveChatMessage } from '@/types/youtube';
 import { pushQueue } from '../store/post';
@@ -44,10 +44,8 @@ export const updateStatus = async (now: Date): Promise<void> => {
       updateTime: now,
       exp: clacedEXP,
       level: nextLevelInfo.level,
-      hp: user.hp - 1,
       isMaxLevel: nextLevelInfo.isMaxLevel,
       progress: nextLevelInfo.progress,
-      timeToNextLevel: nextLevelInfo.timeToNextLevel,
       nextLevelRequiredTime: nextLevelInfo.nextLevelRequiredTime,
     };
     // メモリストアに保存
@@ -88,7 +86,6 @@ export const checkLevelup = async (now: Date): Promise<void> => {
 export const startGame = async (message: LiveChatMessage): Promise<void> => {
   const stats = await getStatsByChannelId(message.channelId);
   const levelInfo = stats ? getLevelInfo(stats.expSec) : null;
-  const hp = getHP(message.displayMessage);
 
   // ユーザーオブジェクトの作成
   const startUser: User = {
@@ -104,11 +101,8 @@ export const startGame = async (message: LiveChatMessage): Promise<void> => {
     level: levelInfo ? levelInfo.level : 1,
     exp: stats ? stats.expSec : 0,
     wisdom: stats ? stats.wisdom : 10,
-    maxHp: hp ? hp : parameter.INITIAL_HP,
-    hp: hp ? hp : parameter.INITIAL_HP,
     progress: levelInfo ? levelInfo.progress : 0,
     isMaxLevel: levelInfo ? levelInfo.isMaxLevel : false,
-    timeToNextLevel: levelInfo ? levelInfo.timeToNextLevel : 0,
     nextLevelRequiredTime: levelInfo ? levelInfo.nextLevelRequiredTime : 0,
   };
 
@@ -122,22 +116,6 @@ export const startGame = async (message: LiveChatMessage): Promise<void> => {
 };
 
 /**
- * 学習時間を更新する
- * @param user - 既存のユーザー情報
- * @param currentTime - 現在時刻
- * @returns 更新されたユーザー情報
- */
-export const damageHP = async (user: User): Promise<void> => {
-  const damagedUser: User = {
-    ...user,
-    hp: user.hp - 1,
-  };
-
-  // メモリストアに保存
-  setUser(damagedUser);
-};
-
-/**
  * 学習開始のビジネスロジック
  * 新規ユーザーの学習開始を処理し、YouTubeにコメントを投稿する
  * @param message - YouTubeライブチャットメッセージ
@@ -146,7 +124,6 @@ export const damageHP = async (user: User): Promise<void> => {
 export const changeGame = async (user: User, message: LiveChatMessage): Promise<void> => {
   const stats = await getStatsByChannelId(user.channelId);
   const levelInfo = stats ? getLevelInfo(stats.expSec) : null;
-  const hp = getHP(message.displayMessage);
 
   // ユーザーオブジェクトの作成
   const startUser: User = {
@@ -156,11 +133,8 @@ export const changeGame = async (user: User, message: LiveChatMessage): Promise<
     level: levelInfo ? levelInfo.level : 1,
     exp: stats ? stats.expSec : 0,
     wisdom: stats ? stats.wisdom : 10,
-    maxHp: hp ? hp : parameter.INITIAL_HP,
-    hp: hp ? hp : parameter.INITIAL_HP,
     progress: levelInfo ? levelInfo.progress : 0,
     isMaxLevel: levelInfo ? levelInfo.isMaxLevel : false,
-    timeToNextLevel: levelInfo ? levelInfo.timeToNextLevel : 0,
     nextLevelRequiredTime: levelInfo ? levelInfo.nextLevelRequiredTime : 0,
   };
 

@@ -12,5 +12,4 @@ export const parameter = {
   END_FLAG: 'end',
   START_FLAG: 'start',
   GAME_START_FLAG: 'lvup',
-  INITIAL_HP: 120
 } as const;

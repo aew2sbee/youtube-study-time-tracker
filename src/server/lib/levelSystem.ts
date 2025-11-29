@@ -94,32 +94,6 @@ export const getRequiredTimeForLevel = (level: number): number => {
 };
 
 /**
- * 次のレベルまでに必要な残り時間（秒）を計算
- *
- * @param timeInSeconds - 現在の累積学習時間（秒）
- * @returns 次のレベルまでの残り時間（秒）、最大レベルの場合は0
- *
- * @example
- * ```typescript
- * getTimeToNextLevel(3600)    // => 次のレベルまでの残り秒数
- * getTimeToNextLevel(3600000) // => 0（最大レベル到達）
- * ```
- */
-export const getTimeToNextLevel = (timeInSeconds: number): number => {
-  const currentLevel = calculateLevel(timeInSeconds);
-
-  // 最大レベルの場合は0を返す
-  if (currentLevel >= LEVEL_CONFIG.MAX_LEVEL) {
-    return 0;
-  }
-
-  const nextLevel = currentLevel + 1;
-  const requiredTimeForNextLevel = getRequiredTimeForLevel(nextLevel);
-
-  return Math.max(0, requiredTimeForNextLevel - timeInSeconds);
-};
-
-/**
  * 現在のレベルの進捗率を計算（0.0〜1.0）
  *
  * @param timeInSeconds - 現在の累積学習時間（秒）
@@ -161,7 +135,6 @@ export const getLevelProgress = (timeInSeconds: number): number => {
  * //   level: 15,
  * //   progress: 0.42,
  * //   isMaxLevel: false,
- * //   timeToNextLevel: 1200,
  * //   nextLevelRequiredTime: 4800
  * // }
  * ```
@@ -170,7 +143,6 @@ export const getLevelInfo = (timeInSeconds: number) => {
   const level = calculateLevel(timeInSeconds);
   const progress = getLevelProgress(timeInSeconds);
   const isMaxLevel = level >= LEVEL_CONFIG.MAX_LEVEL;
-  const timeToNextLevel = getTimeToNextLevel(timeInSeconds);
   const nextLevelRequiredTime = isMaxLevel ? 0 : getRequiredTimeForLevel(level + 1);
 
   return {
@@ -180,8 +152,6 @@ export const getLevelInfo = (timeInSeconds: number) => {
     progress,
     /** 最大レベルかどうか */
     isMaxLevel,
-    /** 次のレベルまでの残り時間（秒） */
-    timeToNextLevel,
     /** 次のレベルに到達するために必要な累積時間（秒） */
     nextLevelRequiredTime,
   };

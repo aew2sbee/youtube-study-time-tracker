@@ -11,10 +11,7 @@ export interface User {
   level: number;
   isMaxLevel: boolean;
   exp: number;
-  maxHp: number;
-  hp: number;
   wisdom: number;
   progress: number;
-  timeToNextLevel: number;
   nextLevelRequiredTime: number;
 }

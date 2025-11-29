@@ -80,19 +80,6 @@ export const isLevelUpMessage = (messageText: string): boolean =>
   messageText.toLowerCase().trim() === parameter.GAME_START_FLAG;
 
 /**
- * 「levelup XXm」形式のメッセージから分数を取得する
- * @param messageText - メッセージテキスト（例: "levelup 100m"）
- * @returns 分数（数値）。パターンに一致しない場合はnull
- */
-export const getHP = (messageText: string): number => {
-  if (!isLevelUpMessage(messageText)) {
-    return parameter.INITIAL_HP;
-  }
-  const match = messageText.toLowerCase().trim().match(/(\d+)m$/);
-  return match ? parseInt(match[1], 10) : parameter.INITIAL_HP;
-};
-
-/**
  * レベルアップメッセージを生成
  * @param user - ユーザー情報
  * @param wisdomGain - かしこさ上昇値

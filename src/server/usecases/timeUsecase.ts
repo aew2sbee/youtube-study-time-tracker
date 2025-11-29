@@ -103,12 +103,9 @@ export const startStudy = async (message: LiveChatMessage): Promise<void> => {
     isGameMode: false,
     level: 0,
     exp: 0,
-    maxHp: 0,
-    hp: 0,
     wisdom: 0,
     progress: 0,
     isMaxLevel: false,
-    timeToNextLevel: 0,
     nextLevelRequiredTime: 0,
   };
 

@@ -2,6 +2,7 @@ import ImageProfile from './ImageProfile';
 import { User } from '@/types/users';
 import { motion } from 'framer-motion';
 import { calcMin, calcTime } from '@/server/lib/calcTime';
+import { Timer, TimerOff } from 'lucide-react';
 
 export default function GameMode({ user }: { user: User }) {
   return (
@@ -16,22 +17,30 @@ export default function GameMode({ user }: { user: User }) {
             <span className="text-2xl">Lv.</span>
             <span className="text-3xl">{user.level}</span>
           </span>
+          {user.isStudying ? (
+            <Timer className="text-green-600 w-10 h-10 mr-3 animate-pulse" />
+          ) : (
+            <TimerOff className="text-gray-400 w-10 h-10 mr-3" />
+          )}
           <span>{calcTime(user.timeSec)}</span>
         </div>
         {/* EXPバー */}
         <div className="flex flex-col space-y-0.5 pr-2">
           {/* 時間情報表示 */}
-          {!user.isMaxLevel ? (
             <div className="font-medium flex justify-between">
               <span className="text-xl font-semibold">EXP</span>
-              <span>
-                <span className="text-xl">{calcMin((user.nextLevelRequiredTime * user.progress))}</span>
-                <span className="text-lg">/ {calcMin(user.nextLevelRequiredTime)}分</span>
-              </span>
+              {!user.isMaxLevel ? (
+                <span>
+                  <span className="text-xl">{calcMin((user.exp))}</span>
+                  <span className="text-lg">/ {calcMin(user.nextLevelRequiredTime)}分</span>
+                </span>
+              ) : (
+                <span>
+                  <span className="text-xl">60000</span>
+                  <span className="text-lg">/ 60000分</span>
+                </span>
+              )}
             </div>
-          ) : (
-            <div className="text-xl font-medium">MAX LEVEL</div>
-          )}
           {/* プログレスバー */}
           <div className="relative w-40 h-4 bg-gray-300 rounded-full overflow-hidden shadow-inner">
             <motion.div
