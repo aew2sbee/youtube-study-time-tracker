@@ -77,8 +77,7 @@ export const getEndMessageByUser = async (user: User): Promise<string> => {
  * @returns 「levelup XXm」形式の場合はtrue
  */
 export const isLevelUpMessage = (messageText: string): boolean =>
-  messageText.toLowerCase().trim() === parameter.GAME_START_FLAG ||
-  /^levelup\s+\d+m$/.test(messageText.toLowerCase().trim());
+  messageText.toLowerCase().trim() === parameter.GAME_START_FLAG;
 
 /**
  * 「levelup XXm」形式のメッセージから分数を取得する
