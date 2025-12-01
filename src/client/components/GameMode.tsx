@@ -7,7 +7,7 @@ import { Timer, TimerOff } from 'lucide-react';
 export default function GameMode({ user }: { user: User }) {
   return (
     <>
-      <div key={user.displayName} className="bg-black/5 rounded-lg flex items-center justify-between p-2 h-[74px]">
+      <div key={user.displayName} className="bg-black/5 rounded-lg flex items-center justify-between p-3">
         <div className="flex items-center space-x-3 text-3xl">
           <div className="relative">
             <ImageProfile src={user.profileImageUrl} alt={user.displayName} />
@@ -17,12 +17,6 @@ export default function GameMode({ user }: { user: User }) {
             <span className="text-2xl">Lv.</span>
             <span className="text-3xl">{user.level}</span>
           </span>
-          {user.isStudying ? (
-            <Timer className="text-green-600 w-10 h-10 mr-3 animate-pulse" />
-          ) : (
-            <TimerOff className="text-gray-400 w-10 h-10 mr-3" />
-          )}
-          <span>{calcTime(user.timeSec)}</span>
         </div>
         {/* EXPバー */}
         <div className="flex flex-col space-y-0.5 pr-2">
@@ -43,6 +37,15 @@ export default function GameMode({ user }: { user: User }) {
               transition={{ duration: 0.8, ease: 'easeOut' }}
             />
           </div>
+        </div>
+        {/* タイマーアイコンと時間 */}
+        <div className="flex items-center text-3xl">
+          {user.isStudying ? (
+            <Timer className="text-green-600 w-10 h-10 mr-3 animate-pulse" />
+          ) : (
+            <TimerOff className="text-gray-400 w-10 h-10 mr-3" />
+          )}
+          <span>{calcTime(user.timeSec)}</span>
         </div>
       </div>
     </>
