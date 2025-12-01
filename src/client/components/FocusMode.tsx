@@ -11,7 +11,7 @@ export default function FocusMode({ user }: { user: User }) {
           <div className="relative">
             <ImageProfile src={user.profileImageUrl} alt={user.displayName} />
           </div>
-          <span className="text-black font-medium truncate max-w-[280px] ">{user.displayName}</span>
+          <span className="text-black font-medium truncate max-w-[280px]">{user.displayName}</span>
         </div>
 
         <div className="flex items-center text-3xl">
