@@ -129,7 +129,9 @@ export const changeGame = async (user: User, message: LiveChatMessage): Promise<
   const startUser: User = {
     ...user,
     updateTime: message.publishedAt,
+    isStudying: true,
     isGameMode: true,
+    refreshInterval: 0,
     level: levelInfo ? levelInfo.level : 1,
     exp: stats ? stats.expSec : 0,
     wisdom: stats ? stats.wisdom : 10,
