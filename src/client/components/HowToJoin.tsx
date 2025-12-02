@@ -1,18 +1,52 @@
+import { Lightbulb, MessageCircleQuestion, Wrench } from 'lucide-react';
+
 export default function HowToJoin() {
   return (
     <div className="text-black text-3xl space-y-3 items-start justify-start">
-      <p className="text-4xl pt-2 font-bold">1. 時間計測</p>
-      <p className="pl-4">チャット欄に<strong>「start/end」</strong>で計測</p>
-      <p className="text-4xl pt-4 font-bold">2. レベル上げ</p>
-      <p className="pl-4">チャット欄に<strong>「lvup」</strong>で参加</p>
-      <p className="pl-4 text-2xl">※1: 終了したい場合<strong>「end」</strong>で終了</p>
-      <p className="pl-4 text-2xl">※2: <strong>levelup</strong>の前に<strong>「start」</strong>は不要</p>
-      <p className="text-3xl pt-4 font-bold">補足情報</p>
-      <ul className="pl-8 text-2xl">
-        <li>1. 配信中なら、何回でも参加OK!!</li>
-        <li>2. 同じ配信なら、時間は累積します。</li>
-        <li>3. 計測終了がないと、記録しません。</li>
-      </ul>
+      {/* 時間計測モード */}
+      <div className="flex items-center pt-3">
+        <Wrench className="w-9 h-9 mr-2 text-gray-600" />
+        <p className="text-3xl font-bold">時間計測モード</p>
+      </div>
+      <p className="pl-4">- 内容: 集中時間を計測</p>
+      <p className="pl-4">- 開始: <span className="font-bold">&quot;start&quot;</span>のみを入力</p>
+      <p className="pl-4">- 終了: <span className="font-bold">&quot;end&quot;</span>のみを入力</p>
+      <div className="flex items-center">
+        <Lightbulb className="w-9 h-9 text-orange-500" />
+        <p className="underline">終了時に<span className="font-bold">記録通知&#40;7日/28日/累計&#41;</span></p>
+      </div>
+
+      {/* レベル上げモード */}
+      <div className="flex items-center pt-3">
+        <Wrench className="w-9 h-9 mr-2 text-gray-600" />
+        <p className="text-3xl font-bold">レベル上げモード</p>
+      </div>
+      <p className="pl-4">- 内容: 集中時間に応じてレベル上昇</p>
+      <p className="pl-4">- 開始: <span className="font-bold">&quot;lvup&quot;</span>のみを入力</p>
+      <p className="pl-4">- 終了: <span className="font-bold">&quot;end&quot;</span>のみを入力</p>
+      <div className="flex items-center">
+        <Lightbulb className="w-9 h-9 text-orange-500" />
+        <p className="underline"><span className="font-bold">勉強のモチベ・習慣化</span>に活用してね</p>
+      </div>
+
+      <p className="text-3xl pt-4 font-bold">よくある質問&#40;Q&amp;A&#41;</p>
+      <div className="flex items-center pt-3">
+        <MessageCircleQuestion className="w-8 h-8 mr-2 text-gray-500" />
+        <p className="text-3xl font-bold">何回も参加OK？</p>
+      </div>
+      <p className="underline pl-4">A. 何回でもどうぞ</p>
+
+      <div className="flex items-center pt-3">
+        <MessageCircleQuestion className="w-8 h-8 mr-2 text-gray-500" />
+        <p className="text-3xl font-bold">少しの時間でも大丈夫？</p>
+      </div>
+      <p className="underline pl-4">A. 短時間でも歓迎です!!</p>
+
+      <div className="flex items-center pt-3">
+        <MessageCircleQuestion className="w-8 h-8 mr-2 text-gray-500" />
+        <p className="text-3xl font-bold">再開時、時間はリセット？</p>
+      </div>
+      <p className="underline pl-4">A. 時間は累積されます</p>
     </div>
   );
 }
