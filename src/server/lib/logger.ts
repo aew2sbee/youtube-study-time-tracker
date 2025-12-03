@@ -22,9 +22,6 @@ class Logger {
     const logMessage = this.formatMessage(level, message);
 
     switch (level) {
-      case 'debug':
-        console.debug(`[${logMessage.timestamp}] DEBUG:`, message);
-        break;
       case 'info':
         console.info(`[${logMessage.timestamp}] INFO:`, message);
         break;
@@ -35,10 +32,6 @@ class Logger {
         console.error(`[${logMessage.timestamp}] ERROR:`, message);
         break;
     }
-  }
-
-  debug(message: string): void {
-    this.log('debug', message);
   }
 
   info(message: string): void {
