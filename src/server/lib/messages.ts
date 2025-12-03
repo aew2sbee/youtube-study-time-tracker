@@ -86,7 +86,7 @@ export const isLevelUpMessage = (messageText: string): boolean =>
  * @returns レベルアップメッセージ
  */
 export const getLevelUpMessage = (user: User, beforeWisdom: number, AfterWisdom: number): string => {
-  return `@${user.displayName}のレベル${user.level + 1}に上がった!! かしこさ: ${beforeWisdom} ▶ ${AfterWisdom}`;
+  return `@${user.displayName}のレベル${user.level + 1}に上がった!!🎉 かしこさ🧠: ${beforeWisdom} ► ${AfterWisdom}`;
 };
 
 /**
