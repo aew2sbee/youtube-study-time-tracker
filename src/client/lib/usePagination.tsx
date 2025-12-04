@@ -43,14 +43,14 @@ export const usePagination = ({
 
     return {
       key: `users-${pageIndex}`,
-      title: totalUserPages > 1 ? `参加者 (${pageIndex + 1}/${totalUserPages})` : '参加者',
+      title: totalUserPages > 1 ? `Participant(${pageIndex + 1}/${totalUserPages})` : 'Participant',
       component: <Display user={pageUsers} />,
     };
   });
 
   // 「参加方法」ページを先頭に追加
   const pages: PageData[] = [
-    { key: 'How to join', title: 'インフォメーション', component: <HowToJoin /> },
+    { key: 'How to join', title: 'Information', component: <HowToJoin /> },
     ...userPages,
   ];
 

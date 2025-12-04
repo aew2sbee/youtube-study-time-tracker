@@ -10,10 +10,10 @@ export const calcMin = (seconds: number): string => {
 };
 
 export const calcTime = (seconds: number): string => {
-  if (seconds === 0) return '0時00分';
+  if (seconds === 0) return '0h 00m';
   const hours = Math.floor(seconds / 3600);
   const minutes = Math.floor((seconds % 3600) / 60);
-  return `${hours.toString()}時${minutes.toString().padStart(2, '0')}分`;
+  return `${hours.toString()}h ${minutes.toString().padStart(2, '0')}m`;
 };
 
 export const convertHHMMSS = (publishedAt: string) =>

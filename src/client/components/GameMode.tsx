@@ -22,10 +22,10 @@ export default function GameMode({ user }: { user: User }) {
         <div className="flex flex-col space-y-0.5 pr-2">
           {/* 時間情報表示 */}
             <div className="font-medium flex justify-between">
-              <span className="text-base">次のレベルまで</span>
+              <span className="text-lg">to the next lv</span>
                 <span>
                   <span className="text-xl font-semibold">{calcMin((user.timeToNextLevel))}</span>
-                  <span className="text-base">分</span>
+                  <span className="text-base">m</span>
                 </span>
             </div>
           {/* プログレスバー */}
